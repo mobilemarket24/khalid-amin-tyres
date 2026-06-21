@@ -1,0 +1,46 @@
+﻿---
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const items = isArabic
+  ? [
+      { value: "+50", label: "علامة تجارية", accent: "cyan" },
+      { value: "2", label: "فرع", accent: "orange" },
+      { value: "دبي", label: "والشارقة", accent: "cyan" },
+      { value: "واتساب", label: "رد سريع", accent: "orange" },
+      { value: "يومي", label: "تركيب وميزان", accent: "cyan" },
+    ]
+  : [
+      { value: "50+", label: "Premium Brands", accent: "cyan" },
+      { value: "2", label: "Branches", accent: "orange" },
+      { value: "Dubai", label: "& Sharjah", accent: "cyan" },
+      { value: "WhatsApp", label: "Fast Support", accent: "orange" },
+      { value: "Same-Day", label: "Fitting Available", accent: "cyan" },
+    ];
+---
+
+<div class="relative border-y border-slate-200 bg-white" dir={isArabic ? "rtl" : "ltr"}>
+  <div class="mx-auto max-w-7xl">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+      {
+        items.map((item, i) => (
+          <div
+            class="flex flex-col items-center justify-center border-r border-slate-200 px-4 py-7 text-center last:border-r-0"
+            data-animate
+            data-animate-delay={String(i + 1)}
+          >
+            <span
+              class={`text-xl font-black sm:text-2xl ${
+                item.accent === "cyan" ? "text-amber-500" : "text-red-500"
+              }`}
+            >
+              {item.value}
+            </span>
+            <span class="mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+              {item.label}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>

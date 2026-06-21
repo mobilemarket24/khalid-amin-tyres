@@ -1,0 +1,76 @@
+---
+interface Props {
+  textKey: string;
+  fallback: string;
+  as?: keyof HTMLElementTagNameMap;
+  class?: string;
+}
+
+const {
+  textKey,
+  fallback,
+  as = "span",
+  class: className = "",
+} = Astro.props;
+
+const Tag = as;
+---
+
+<Tag data-site-text-key={textKey} class={className}>
+  {fallback}
+</Tag>
+
+<script>
+  import { createClient } from "@supabase/supabase-js";
+
+  const siteTextSupabase = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    }
+  );
+
+  async function loadDynamicSiteTexts() {
+    const textElements = Array.from(
+      document.querySelectorAll("[data-site-text-key]")
+    );
+
+    const textKeys = [
+      ...new Set(
+        textElements
+          .map((element) => element.getAttribute("data-site-text-key"))
+          .filter(Boolean)
+      ),
+    ];
+
+    if (textKeys.length === 0) return;
+
+    const { data, error } = await siteTextSupabase
+      .from("site_texts")
+      .select("text_key, text_value")
+      .in("text_key", textKeys)
+      .eq("is_active", true);
+
+    if (error || !data) return;
+
+    const textMap = new Map(
+      data.map((textItem) => [textItem.text_key, textItem.text_value])
+    );
+
+    textElements.forEach((element) => {
+      const textKey = element.getAttribute("data-site-text-key");
+      const textValue = textMap.get(textKey);
+
+      if (!textValue) return;
+
+      element.textContent = textValue;
+    });
+  }
+
+  loadDynamicSiteTexts();
+</script>

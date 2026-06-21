@@ -1,0 +1,209 @@
+﻿---
+const isAr = Astro.url.pathname.startsWith("/ar");
+
+const text = isAr
+  ? {
+      eyebrow: "طلب سعر سريع",
+      title: "احصل على سعر اليوم",
+      subtitle: "اختر الفرع وأرسل طلبك على واتساب.",
+      branch: "الفرع",
+      sharjah: "فرع الشارقة",
+      dubai: "فرع دبي",
+      carModel: "موديل السيارة مثال: Toyota Land Cruiser",
+      tyreSize: "مقاس الإطار مثال: 275/60R20",
+      brand: "الماركة اختياري",
+      productType: "نوع المنتج",
+      tyres: "إطارات",
+      rims: "جنوط",
+      both: "الاثنين",
+      button: "إرسال الطلب عبر واتساب",
+      note: "سيتم إرسال الطلب إلى الفرع المختار.",
+    }
+  : {
+      eyebrow: "Quick Price Request",
+      title: "Get Today’s Price",
+      subtitle: "Choose your branch and send your request on WhatsApp.",
+      branch: "Branch",
+      sharjah: "Sharjah Branch",
+      dubai: "Dubai Branch",
+      carModel: "Car Model e.g. Toyota Land Cruiser",
+      tyreSize: "Tyre Size e.g. 275/60R20",
+      brand: "Brand Optional",
+      productType: "Product Type",
+      tyres: "Tyres",
+      rims: "Rims",
+      both: "Both",
+      button: "Send Request on WhatsApp",
+      note: "The message goes to the selected branch.",
+    };
+---
+
+<div class="mb-8 rounded-[2rem] border border-white/20 bg-white/10 p-3 shadow-2xl shadow-amber-500/10 backdrop-blur-xl sm:p-4 lg:mb-0">
+  <div class="rounded-[1.5rem] bg-[#0e0e14]/95 p-5 sm:p-6">
+    <div class="mb-6 flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-black uppercase tracking-[0.25em] text-amber-300">
+          {text.eyebrow}
+        </p>
+
+        <h2 class="mt-2 text-2xl font-black text-white">
+          {text.title}
+        </h2>
+
+        <p class="mt-2 text-sm font-semibold text-slate-400">
+          {text.subtitle}
+        </p>
+      </div>
+
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-lg font-black text-slate-950">
+        KA
+      </div>
+    </div>
+
+    <form
+      id="quickTyreForm"
+      data-lang={isAr ? "ar" : "en"}
+      dir={isAr ? "rtl" : "ltr"}
+      class="space-y-4"
+    >
+      <div>
+        <label for="branch" class="mb-2 block text-sm font-black text-white">
+          {text.branch}
+        </label>
+
+        <select
+          id="branch"
+          name="branch"
+          class="w-full rounded-2xl border border-white/10 bg-white px-4 py-4 text-sm font-bold text-slate-950 outline-none focus:border-amber-300"
+        >
+          <option value="sharjah">{text.sharjah}</option>
+          <option value="dubai">{text.dubai}</option>
+        </select>
+      </div>
+
+      <input
+        id="carModel"
+        name="carModel"
+        class="w-full rounded-2xl border border-white/10 bg-white px-4 py-4 text-sm font-bold text-slate-950 outline-none placeholder:text-slate-500 focus:border-amber-300"
+        placeholder={text.carModel}
+      />
+
+      <input
+        id="tyreSize"
+        name="tyreSize"
+        class="w-full rounded-2xl border border-white/10 bg-white px-4 py-4 text-sm font-bold text-slate-950 outline-none placeholder:text-slate-500 focus:border-amber-300"
+        placeholder={text.tyreSize}
+      />
+
+      <input
+        id="brand"
+        name="brand"
+        class="w-full rounded-2xl border border-white/10 bg-white px-4 py-4 text-sm font-bold text-slate-950 outline-none placeholder:text-slate-500 focus:border-amber-300"
+        placeholder={text.brand}
+      />
+
+      <div>
+        <p class="mb-3 text-sm font-black text-white">
+          {text.productType}
+        </p>
+
+        <div class="grid grid-cols-3 gap-2">
+          <label class="cursor-pointer">
+            <input class="peer hidden" type="radio" name="productType" value="Tyres" checked />
+            <span class="block rounded-xl border border-white/10 bg-white/10 px-3 py-3 text-center text-xs font-black text-white peer-checked:bg-amber-400 peer-checked:text-slate-950">
+              {text.tyres}
+            </span>
+          </label>
+
+          <label class="cursor-pointer">
+            <input class="peer hidden" type="radio" name="productType" value="Rims" />
+            <span class="block rounded-xl border border-white/10 bg-white/10 px-3 py-3 text-center text-xs font-black text-white peer-checked:bg-amber-400 peer-checked:text-slate-950">
+              {text.rims}
+            </span>
+          </label>
+
+          <label class="cursor-pointer">
+            <input class="peer hidden" type="radio" name="productType" value="Tyres & Rims" />
+            <span class="block rounded-xl border border-white/10 bg-white/10 px-3 py-3 text-center text-xs font-black text-white peer-checked:bg-amber-400 peer-checked:text-slate-950">
+              {text.both}
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-2xl bg-amber-400 px-5 py-4 font-black text-slate-950 shadow-xl shadow-amber-400/20 transition hover:bg-amber-300"
+      >
+        {text.button}
+      </button>
+    </form>
+
+    <p class="mt-4 text-center text-xs font-bold text-slate-400">
+      {text.note}
+    </p>
+  </div>
+</div>
+
+<script>
+  const form = document.querySelector("#quickTyreForm");
+
+  const branchNumbers = {
+    sharjah: "971503512023",
+    dubai: "971561615010",
+  };
+
+  const productTypeArabic = {
+    Tyres: "إطارات",
+    Rims: "جنوط",
+    "Tyres & Rims": "إطارات وجنوط",
+  };
+
+  if (form instanceof HTMLFormElement) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const lang = form.dataset.lang || "en";
+      const isArabic = lang === "ar";
+
+      const branch = String(formData.get("branch") || "sharjah");
+      const carModel = String(formData.get("carModel") || "").trim();
+      const tyreSize = String(formData.get("tyreSize") || "").trim();
+      const brand = String(formData.get("brand") || "").trim();
+      const productType = String(formData.get("productType") || "Tyres").trim();
+
+      const whatsappNumber =
+        branch === "dubai" ? branchNumbers.dubai : branchNumbers.sharjah;
+
+      const branchNameEn = branch === "dubai" ? "Dubai" : "Sharjah";
+      const branchNameAr = branch === "dubai" ? "دبي" : "الشارقة";
+
+      const productTypeAr =
+        productTypeArabic[productType] || productType;
+
+      const messageLines = isArabic
+        ? [
+            "مرحبا، أريد معرفة السعر والتوفر.",
+            "نوع المنتج: " + productTypeAr,
+            "الفرع: " + branchNameAr,
+            carModel ? "موديل السيارة: " + carModel : "",
+            tyreSize ? "مقاس الإطار: " + tyreSize : "",
+            brand ? "الماركة المفضلة: " + brand : "",
+          ].filter(Boolean)
+        : [
+            "Hi, I need price and availability.",
+            "Product type: " + productType,
+            "Branch: " + branchNameEn,
+            carModel ? "Car model: " + carModel : "",
+            tyreSize ? "Tyre size: " + tyreSize : "",
+            brand ? "Preferred brand: " + brand : "",
+          ].filter(Boolean);
+
+      const message = encodeURIComponent(messageLines.join("\n"));
+      const whatsappUrl = "https://wa.me/" + whatsappNumber + "?text=" + message;
+
+      window.open(whatsappUrl, "_blank");
+    });
+  }
+</script>

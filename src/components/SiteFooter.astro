@@ -1,0 +1,456 @@
+﻿---
+import BrandLogo from "./BrandLogo.astro";
+import DynamicSiteText from "./DynamicSiteText.astro";
+import { business } from "../data/business";
+import { getWhatsAppUrl } from "../utils/whatsapp";
+
+const isAr = Astro.url.pathname.startsWith("/ar");
+
+const homeUrl = isAr ? "/ar/" : "/";
+const langUrl = isAr ? "/" : "/ar/";
+
+const quickLinks = isAr
+  ? [
+      { labelKey: "footer_ar_link_home", fallbackLabel: "الرئيسية", href: "/ar/" },
+      { labelKey: "footer_ar_link_tyres", fallbackLabel: "الإطارات", href: "/ar/#tyres" },
+      { labelKey: "footer_ar_link_rims", fallbackLabel: "الجنوط", href: "/ar/#rims" },
+      { labelKey: "footer_ar_link_services", fallbackLabel: "الخدمات", href: "/ar/#services" },
+      { labelKey: "footer_ar_link_branches", fallbackLabel: "الفروع", href: "/ar/#branches" },
+      { labelKey: "footer_ar_link_faq", fallbackLabel: "الأسئلة", href: "/ar/#faq" },
+      { labelKey: "footer_ar_link_contact", fallbackLabel: "تواصل معنا", href: "/ar/#contact" },
+    ]
+  : [
+      { labelKey: "footer_link_home", fallbackLabel: "Home", href: "/" },
+      { labelKey: "footer_link_tyres", fallbackLabel: "Tyres", href: "/#tyres" },
+      { labelKey: "footer_link_rims", fallbackLabel: "Rims", href: "/#rims" },
+      { labelKey: "footer_link_services", fallbackLabel: "Services", href: "/#services" },
+      { labelKey: "footer_link_branches", fallbackLabel: "Branches", href: "/#branches" },
+      { labelKey: "footer_link_faq", fallbackLabel: "FAQ", href: "/#faq" },
+      { labelKey: "footer_link_contact", fallbackLabel: "Contact", href: "/#contact" },
+    ];
+
+const services = isAr
+  ? [
+      { textKey: "footer_ar_service_tyres", fallback: "إطارات" },
+      { textKey: "footer_ar_service_rims", fallback: "جنوط" },
+      { textKey: "footer_ar_service_tyre_fitting", fallback: "تركيب الإطارات" },
+      { textKey: "footer_ar_service_wheel_balancing", fallback: "ميزان العجلات" },
+      { textKey: "footer_ar_service_wheel_alignment", fallback: "ضبط الزوايا" },
+      { textKey: "footer_ar_service_whatsapp_support", fallback: "خدمة واتساب" },
+    ]
+  : [
+      { textKey: "footer_service_tyres", fallback: "Tyres" },
+      { textKey: "footer_service_rims", fallback: "Rims" },
+      { textKey: "footer_service_tyre_fitting", fallback: "Tyre Fitting" },
+      { textKey: "footer_service_wheel_balancing", fallback: "Wheel Balancing" },
+      { textKey: "footer_service_wheel_alignment", fallback: "Wheel Alignment" },
+      { textKey: "footer_service_whatsapp_support", fallback: "WhatsApp Support" },
+    ];
+
+const popularSearches = isAr
+  ? [
+      { labelKey: "footer_ar_popular_tyres_dubai", fallbackLabel: "إطارات دبي", href: "/tyres-dubai/" },
+      { labelKey: "footer_ar_popular_tyres_sharjah", fallbackLabel: "إطارات الشارقة", href: "/tyres-sharjah/" },
+      { labelKey: "footer_ar_popular_rims_dubai", fallbackLabel: "جنوط دبي", href: "/rims-dubai/" },
+      { labelKey: "footer_ar_popular_rims_sharjah", fallbackLabel: "جنوط الشارقة", href: "/rims-sharjah/" },
+      { labelKey: "footer_ar_popular_alignment_dubai", fallbackLabel: "ضبط زوايا دبي", href: "/wheel-alignment-dubai/" },
+      { labelKey: "footer_ar_popular_balancing_dubai", fallbackLabel: "ميزان عجلات دبي", href: "/wheel-balancing-dubai/" },
+    ]
+  : [
+      { labelKey: "footer_popular_tyres_dubai", fallbackLabel: "Tyres Dubai", href: "/tyres-dubai/" },
+      { labelKey: "footer_popular_tyres_sharjah", fallbackLabel: "Tyres Sharjah", href: "/tyres-sharjah/" },
+      { labelKey: "footer_popular_rims_dubai", fallbackLabel: "Rims Dubai", href: "/rims-dubai/" },
+      { labelKey: "footer_popular_rims_sharjah", fallbackLabel: "Rims Sharjah", href: "/rims-sharjah/" },
+      { labelKey: "footer_popular_alignment_dubai", fallbackLabel: "Wheel Alignment Dubai", href: "/wheel-alignment-dubai/" },
+      { labelKey: "footer_popular_balancing_dubai", fallbackLabel: "Wheel Balancing Dubai", href: "/wheel-balancing-dubai/" },
+    ];
+
+const text = isAr
+  ? {
+      logoKey: "footer_ar_logo_text",
+      logoFallback: "خالد أمين تايرز",
+      locationKey: "footer_ar_location_text",
+      locationFallback: "دبي والشارقة",
+      descriptionKey: "footer_ar_description",
+      descriptionFallback:
+        "خالد أمين تايرز يوفر الإطارات، الرنقات، الترصيص، الميزان وخدمات السيارات من خلال فرعي دبي والشارقة.",
+      quickLinksTitleKey: "footer_ar_quick_links_title",
+      quickLinksTitleFallback: "روابط سريعة",
+      servicesTitleKey: "footer_ar_services_title",
+      servicesTitleFallback: "الخدمات",
+      popularSearchesTitleKey: "footer_ar_popular_searches_title",
+      popularSearchesTitleFallback: "عمليات البحث الشائعة",
+      branchesTitleKey: "footer_ar_branches_title",
+      branchesTitleFallback: "فروعنا",
+      languageKey: "footer_ar_language_label",
+      languageFallback: "English",
+      sharjahTitleKey: "footer_ar_sharjah_branch_title",
+      sharjahTitleFallback: "فرع الشارقة",
+      dubaiTitleKey: "footer_ar_dubai_branch_title",
+      dubaiTitleFallback: "فرع دبي",
+      sharjahAddressKey: "footer_ar_sharjah_address",
+      sharjahAddressFallback: "الصناعية 4 - المنطقة الصناعية - الشارقة",
+      dubaiAddressKey: "footer_ar_dubai_address",
+      dubaiAddressFallback: "شارع المنارة - القوز الصناعية الأولى - القوز 1 - دبي",
+      sharjahHoursKey: "footer_ar_sharjah_hours",
+      sharjahHoursFallback: "9:00 صباحاً - 11:00 مساءً",
+      dubaiHoursKey: "footer_ar_dubai_hours",
+      dubaiHoursFallback: "9:00 صباحاً - 2:00 بعد منتصف الليل",
+      addressLabelKey: "footer_ar_address_label",
+      addressLabelFallback: "العنوان",
+      hoursLabelKey: "footer_ar_hours_label",
+      hoursLabelFallback: "ساعات العمل",
+      contactSharjahKey: "footer_ar_whatsapp_sharjah",
+      contactSharjahFallback: "واتساب الشارقة",
+      contactDubaiKey: "footer_ar_whatsapp_dubai",
+      contactDubaiFallback: "واتساب دبي",
+      copyrightKey: "footer_ar_copyright",
+      copyrightFallback: "© 2026 خالد أمين تايرز. جميع الحقوق محفوظة.",
+      backToTopKey: "footer_ar_back_to_top",
+      backToTopFallback: "أعلى الصفحة",
+    }
+  : {
+      logoKey: "footer_logo_text",
+      logoFallback: business.name,
+      locationKey: "footer_location_text",
+      locationFallback: "Dubai & Sharjah",
+      descriptionKey: "footer_description",
+      descriptionFallback:
+        "Khalid Amin Tyres provides tyres, rims, wheel balancing, wheel alignment and automotive support through Dubai and Sharjah branches.",
+      quickLinksTitleKey: "footer_quick_links_title",
+      quickLinksTitleFallback: "Quick Links",
+      servicesTitleKey: "footer_services_title",
+      servicesTitleFallback: "Services",
+      popularSearchesTitleKey: "footer_popular_searches_title",
+      popularSearchesTitleFallback: "Popular Searches",
+      branchesTitleKey: "footer_branches_title",
+      branchesTitleFallback: "Branches",
+      languageKey: "footer_language_label",
+      languageFallback: "عربي",
+      sharjahTitleKey: "footer_sharjah_branch_title",
+      sharjahTitleFallback: "Sharjah Branch",
+      dubaiTitleKey: "footer_dubai_branch_title",
+      dubaiTitleFallback: "Dubai Branch",
+      sharjahAddressKey: "footer_sharjah_address",
+      sharjahAddressFallback: "Industrial Area 4 - Industrial Area - Sharjah",
+      dubaiAddressKey: "footer_dubai_address",
+      dubaiAddressFallback: "Al Manara St - Al Qouz Ind.first - Al Quoz 1 - Dubai",
+      sharjahHoursKey: "footer_sharjah_hours",
+      sharjahHoursFallback: "9:00 AM - 11:00 PM",
+      dubaiHoursKey: "footer_dubai_hours",
+      dubaiHoursFallback: "9:00 AM - 2:00 AM",
+      addressLabelKey: "footer_address_label",
+      addressLabelFallback: "Address",
+      hoursLabelKey: "footer_hours_label",
+      hoursLabelFallback: "Working Hours",
+      contactSharjahKey: "footer_whatsapp_sharjah",
+      contactSharjahFallback: "WhatsApp Sharjah",
+      contactDubaiKey: "footer_whatsapp_dubai",
+      contactDubaiFallback: "WhatsApp Dubai",
+      copyrightKey: "footer_copyright",
+      copyrightFallback: "© 2026 Khalid Amin Tyres. All rights reserved.",
+      backToTopKey: "footer_back_to_top",
+      backToTopFallback: "Back to top",
+    };
+
+const sharjahMessage = isAr
+  ? "مرحبا، أريد التواصل مع فرع الشارقة."
+  : "Hi, I want to contact Sharjah branch.";
+
+const dubaiMessage = isAr
+  ? "مرحبا، أريد التواصل مع فرع دبي."
+  : "Hi, I want to contact Dubai branch.";
+---
+
+<footer class="bg-[#0a0a0e] text-white" dir={isAr ? "rtl" : "ltr"}>
+  <div class="border-t border-white/10">
+    <div class="mx-auto max-w-7xl px-5 py-14">
+      <div class="grid gap-10 lg:grid-cols-[1.15fr_0.75fr_0.8fr_1fr_1.25fr]">
+        <div>
+          <a href={homeUrl} class="inline-flex items-center gap-3">
+            <BrandLogo />
+
+            <div>
+              <DynamicSiteText
+                textKey={text.logoKey}
+                fallback={text.logoFallback}
+                as="p"
+                class="text-base font-black leading-tight text-white"
+              />
+
+              <DynamicSiteText
+                textKey={text.locationKey}
+                fallback={text.locationFallback}
+                as="p"
+                class="mt-1 text-xs font-bold uppercase tracking-[0.22em] text-amber-300"
+              />
+            </div>
+          </a>
+
+          <DynamicSiteText
+            textKey={text.descriptionKey}
+            fallback={text.descriptionFallback}
+            as="p"
+            class="mt-5 max-w-sm text-sm font-semibold leading-7 text-slate-400"
+          />
+
+          <div class="mt-6 flex flex-col gap-3">
+            <a
+              href={getWhatsAppUrl("sharjah", sharjahMessage)}
+              class="rounded-2xl bg-amber-400 px-5 py-4 text-center text-sm font-black text-slate-950 transition hover:bg-amber-300"
+            >
+              <DynamicSiteText
+                textKey={text.contactSharjahKey}
+                fallback={text.contactSharjahFallback}
+                as="span"
+              />
+            </a>
+
+            <a
+              href={getWhatsAppUrl("dubai", dubaiMessage)}
+              class="rounded-2xl bg-red-500 px-5 py-4 text-center text-sm font-black text-white transition hover:bg-red-400"
+            >
+              <DynamicSiteText
+                textKey={text.contactDubaiKey}
+                fallback={text.contactDubaiFallback}
+                as="span"
+              />
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <DynamicSiteText
+            textKey={text.quickLinksTitleKey}
+            fallback={text.quickLinksTitleFallback}
+            as="h3"
+            class="text-sm font-black uppercase tracking-[0.25em] text-amber-300"
+          />
+
+          <nav class="mt-5 grid gap-3">
+            {
+              quickLinks.map((item) => (
+                <a
+                  href={item.href}
+                  class="text-sm font-bold text-slate-300 transition hover:text-amber-300"
+                >
+                  <DynamicSiteText
+                    textKey={item.labelKey}
+                    fallback={item.fallbackLabel}
+                    as="span"
+                  />
+                </a>
+              ))
+            }
+          </nav>
+        </div>
+
+        <div>
+          <DynamicSiteText
+            textKey={text.servicesTitleKey}
+            fallback={text.servicesTitleFallback}
+            as="h3"
+            class="text-sm font-black uppercase tracking-[0.25em] text-red-300"
+          />
+
+          <div class="mt-5 grid gap-3">
+            {
+              services.map((service) => (
+                <DynamicSiteText
+                  textKey={service.textKey}
+                  fallback={service.fallback}
+                  as="p"
+                  class="text-sm font-bold text-slate-300"
+                />
+              ))
+            }
+          </div>
+        </div>
+
+        <div>
+          <DynamicSiteText
+            textKey={text.popularSearchesTitleKey}
+            fallback={text.popularSearchesTitleFallback}
+            as="h3"
+            class="text-sm font-black uppercase tracking-[0.25em] text-amber-300"
+          />
+
+          <nav class="mt-5 grid gap-3">
+            {
+              popularSearches.map((item) => (
+                <a
+                  href={item.href}
+                  class="text-sm font-bold text-slate-300 transition hover:text-amber-300"
+                >
+                  <DynamicSiteText
+                    textKey={item.labelKey}
+                    fallback={item.fallbackLabel}
+                    as="span"
+                  />
+                </a>
+              ))
+            }
+          </nav>
+        </div>
+
+        <div>
+          <DynamicSiteText
+            textKey={text.branchesTitleKey}
+            fallback={text.branchesTitleFallback}
+            as="h3"
+            class="text-sm font-black uppercase tracking-[0.25em] text-amber-300"
+          />
+
+          <div class="mt-5 grid gap-4">
+            <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+              <div class="flex items-center justify-between gap-3">
+                <DynamicSiteText
+                  textKey={text.sharjahTitleKey}
+                  fallback={text.sharjahTitleFallback}
+                  as="p"
+                  class="text-base font-black text-white"
+                />
+
+                <span class="rounded-xl bg-amber-400 px-3 py-2 text-xs font-black text-slate-950">
+                  SHJ
+                </span>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <div>
+                  <DynamicSiteText
+                    textKey={text.addressLabelKey}
+                    fallback={text.addressLabelFallback}
+                    as="p"
+                    class="text-xs font-black uppercase tracking-[0.18em] text-slate-500"
+                  />
+
+                  <DynamicSiteText
+                    textKey={text.sharjahAddressKey}
+                    fallback={text.sharjahAddressFallback}
+                    as="p"
+                    class="mt-1 text-sm font-semibold leading-6 text-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <DynamicSiteText
+                    textKey={text.hoursLabelKey}
+                    fallback={text.hoursLabelFallback}
+                    as="p"
+                    class="text-xs font-black uppercase tracking-[0.18em] text-slate-500"
+                  />
+
+                  <DynamicSiteText
+                    textKey={text.sharjahHoursKey}
+                    fallback={text.sharjahHoursFallback}
+                    as="p"
+                    class="mt-1 text-sm font-semibold text-slate-300"
+                  />
+                </div>
+
+                <a
+                  href={getWhatsAppUrl("sharjah", sharjahMessage)}
+                  class="inline-flex rounded-xl bg-amber-400 px-4 py-3 text-sm font-black text-slate-950"
+                >
+                  {business.branches.sharjah.whatsappLocal}
+                </a>
+              </div>
+            </div>
+
+            <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+              <div class="flex items-center justify-between gap-3">
+                <DynamicSiteText
+                  textKey={text.dubaiTitleKey}
+                  fallback={text.dubaiTitleFallback}
+                  as="p"
+                  class="text-base font-black text-white"
+                />
+
+                <span class="rounded-xl bg-red-500 px-3 py-2 text-xs font-black text-white">
+                  DXB
+                </span>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <div>
+                  <DynamicSiteText
+                    textKey={text.addressLabelKey}
+                    fallback={text.addressLabelFallback}
+                    as="p"
+                    class="text-xs font-black uppercase tracking-[0.18em] text-slate-500"
+                  />
+
+                  <DynamicSiteText
+                    textKey={text.dubaiAddressKey}
+                    fallback={text.dubaiAddressFallback}
+                    as="p"
+                    class="mt-1 text-sm font-semibold leading-6 text-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <DynamicSiteText
+                    textKey={text.hoursLabelKey}
+                    fallback={text.hoursLabelFallback}
+                    as="p"
+                    class="text-xs font-black uppercase tracking-[0.18em] text-slate-500"
+                  />
+
+                  <DynamicSiteText
+                    textKey={text.dubaiHoursKey}
+                    fallback={text.dubaiHoursFallback}
+                    as="p"
+                    class="mt-1 text-sm font-semibold text-slate-300"
+                  />
+                </div>
+
+                <a
+                  href={getWhatsAppUrl("dubai", dubaiMessage)}
+                  class="inline-flex rounded-xl bg-red-500 px-4 py-3 text-sm font-black text-white"
+                >
+                  {business.branches.dubai.whatsappLocal}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 border-t border-white/10 pt-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <DynamicSiteText
+            textKey={text.copyrightKey}
+            fallback={text.copyrightFallback}
+            as="p"
+            class="text-sm font-semibold text-slate-500"
+          />
+
+          <div class="flex flex-wrap items-center gap-3">
+            <a
+              href={langUrl}
+              class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white transition hover:border-amber-300/50 hover:text-amber-300"
+            >
+              <DynamicSiteText
+                textKey={text.languageKey}
+                fallback={text.languageFallback}
+                as="span"
+              />
+            </a>
+
+            <a
+              href={homeUrl}
+              class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white transition hover:border-amber-300/50 hover:text-amber-300"
+            >
+              <DynamicSiteText
+                textKey={text.backToTopKey}
+                fallback={text.backToTopFallback}
+                as="span"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

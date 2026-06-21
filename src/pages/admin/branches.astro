@@ -1,0 +1,467 @@
+﻿---
+import "../../styles/global.css";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<AdminLayout title="Branches | Khalid Amin Tyres Admin">
+  <AdminShell title="Branches" eyebrow="Branch Management" current="branches">
+    <div class="space-y-6">
+      <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+        <form
+          id="branchForm"
+          class="rounded-[2rem] border border-white/10 bg-white/10 p-6"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[0.2em] text-amber-300">
+                Branch Form
+              </p>
+
+              <h3 id="formTitle" class="mt-2 text-2xl font-black">
+                Select a branch to edit
+              </h3>
+            </div>
+
+            <span
+              id="branchCodeBadge"
+              class="rounded-full bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-300"
+            >
+              Branch
+            </span>
+          </div>
+
+          <input id="branchId" type="hidden" />
+
+          <div class="mt-6 grid gap-5">
+            <div>
+              <label class="mb-2 block text-sm font-black text-slate-300">
+                Branch Name
+              </label>
+              <input
+                id="branchName"
+                required
+                class="field"
+                placeholder="Khalid Amin Tyres - Dubai Branch"
+              />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-black text-slate-300">
+                City
+              </label>
+              <input
+                id="branchCity"
+                required
+                class="field"
+                placeholder="Dubai / Sharjah"
+              />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-black text-slate-300">
+                Address
+              </label>
+              <textarea
+                id="branchAddress"
+                class="field min-h-28"
+                placeholder="Full branch address"
+              ></textarea>
+            </div>
+
+            <div class="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label class="mb-2 block text-sm font-black text-slate-300">
+                  Phone
+                </label>
+                <input
+                  id="branchPhone"
+                  class="field"
+                  placeholder="050 351 2023"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-black text-slate-300">
+                  WhatsApp Number
+                </label>
+                <input
+                  id="branchWhatsapp"
+                  class="field"
+                  placeholder="971503512023"
+                />
+                <p class="mt-2 text-xs font-semibold text-slate-500">
+                  بدون + بنویس. مثال: 971503512023
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-black text-slate-300">
+                Working Hours
+              </label>
+              <input
+                id="branchHours"
+                class="field"
+                placeholder="9:00 AM - 11:00 PM"
+              />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-black text-slate-300">
+                Status
+              </label>
+              <select id="branchIsActive" class="field">
+                <option value="true">Active</option>
+                <option value="false">Hidden</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="message" class="mt-5 hidden rounded-2xl p-4 text-sm font-bold"></div>
+
+          <button
+            id="saveButton"
+            type="submit"
+            class="mt-6 w-full rounded-2xl bg-amber-400 px-6 py-4 font-black text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled
+          >
+            Save Branch
+          </button>
+        </form>
+
+        <div class="rounded-[2rem] border border-white/10 bg-white/10 p-6">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-red-300">
+            Branch Summary
+          </p>
+
+          <div class="mt-6 grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
+            <div class="rounded-[1.5rem] bg-slate-950/60 p-5">
+              <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                Total Branches
+              </p>
+              <p id="totalBranches" class="mt-3 text-4xl font-black">0</p>
+            </div>
+
+            <div class="rounded-[1.5rem] bg-green-500/10 p-5">
+              <p class="text-xs font-black uppercase tracking-[0.2em] text-green-300">
+                Active
+              </p>
+              <p id="activeBranches" class="mt-3 text-4xl font-black text-green-200">0</p>
+            </div>
+
+            <div class="rounded-[1.5rem] bg-red-500/10 p-5">
+              <p class="text-xs font-black uppercase tracking-[0.2em] text-red-300">
+                Hidden
+              </p>
+              <p id="hiddenBranches" class="mt-3 text-4xl font-black text-red-200">0</p>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/60 p-5">
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+              Important
+            </p>
+            <p class="mt-3 text-sm font-semibold leading-7 text-slate-300">
+              فعلاً این صفحه اطلاعات شعبه‌ها را داخل دیتابیس مدیریت می‌کند. در مرحله بعد می‌توانیم سایت اصلی را هم به دیتابیس شعبه‌ها وصل کنیم.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="loading" class="rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-black">
+        Loading branches...
+      </div>
+
+      <div id="errorBox" class="hidden rounded-[2rem] bg-red-500/20 p-8 font-bold text-red-200"></div>
+
+      <div id="branchesGrid" class="hidden grid gap-5 lg:grid-cols-2"></div>
+    </div>
+  </AdminShell>
+
+  <style>
+    .field {
+      width: 100%;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #020617;
+      padding: 1rem 1.25rem;
+      color: white;
+      outline: none;
+    }
+
+    .field:focus {
+      box-shadow: 0 0 0 4px rgba(103, 232, 249, 0.25);
+    }
+  </style>
+
+  <script>
+    import { supabase } from "../../lib/supabase";
+
+    const branchForm = document.getElementById("branchForm");
+    const formTitle = document.getElementById("formTitle");
+    const branchCodeBadge = document.getElementById("branchCodeBadge");
+    const saveButton = document.getElementById("saveButton");
+    const message = document.getElementById("message");
+
+    const branchIdInput = document.getElementById("branchId");
+    const branchNameInput = document.getElementById("branchName");
+    const branchCityInput = document.getElementById("branchCity");
+    const branchAddressInput = document.getElementById("branchAddress");
+    const branchPhoneInput = document.getElementById("branchPhone");
+    const branchWhatsappInput = document.getElementById("branchWhatsapp");
+    const branchHoursInput = document.getElementById("branchHours");
+    const branchIsActiveInput = document.getElementById("branchIsActive");
+
+    const loading = document.getElementById("loading");
+    const errorBox = document.getElementById("errorBox");
+    const branchesGrid = document.getElementById("branchesGrid");
+
+    const totalBranches = document.getElementById("totalBranches");
+    const activeBranches = document.getElementById("activeBranches");
+    const hiddenBranches = document.getElementById("hiddenBranches");
+
+    let allBranches = [];
+
+    async function checkAdminSession() {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        window.location.href = "/admin/login/";
+        return false;
+      }
+
+      return true;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.classList.remove(
+        "hidden",
+        "bg-red-500/20",
+        "text-red-200",
+        "bg-green-500/20",
+        "text-green-200"
+      );
+
+      if (type === "success") {
+        message.classList.add("bg-green-500/20", "text-green-200");
+      } else {
+        message.classList.add("bg-red-500/20", "text-red-200");
+      }
+    }
+
+    function statusBadge(isActive) {
+      const base = "inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide";
+
+      if (isActive) {
+        return `<span class="${base} bg-green-500/20 text-green-200">Active</span>`;
+      }
+
+      return `<span class="${base} bg-red-500/20 text-red-200">Hidden</span>`;
+    }
+
+    function updateSummary() {
+      totalBranches.textContent = String(allBranches.length);
+      activeBranches.textContent = String(allBranches.filter((branch) => branch.is_active).length);
+      hiddenBranches.textContent = String(allBranches.filter((branch) => !branch.is_active).length);
+    }
+
+    function setFormForEdit(branch) {
+      branchIdInput.value = branch.id;
+      branchNameInput.value = branch.name || "";
+      branchCityInput.value = branch.city || "";
+      branchAddressInput.value = branch.address || "";
+      branchPhoneInput.value = branch.phone || "";
+      branchWhatsappInput.value = branch.whatsapp || "";
+      branchHoursInput.value = branch.hours || "";
+      branchIsActiveInput.value = branch.is_active ? "true" : "false";
+
+      const code = branch.id === "dubai" ? "DXB" : "SHJ";
+
+      formTitle.textContent = `Edit ${branch.city} Branch`;
+      branchCodeBadge.textContent = code;
+      saveButton.disabled = false;
+      message.classList.add("hidden");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderBranches() {
+      updateSummary();
+
+      branchesGrid.innerHTML = allBranches
+        .map((branch) => {
+          const code = branch.id === "dubai" ? "DXB" : "SHJ";
+          const colorClass =
+            branch.id === "dubai"
+              ? "bg-red-500 text-white"
+              : "bg-amber-400 text-slate-950";
+
+          return `
+            <article class="rounded-[2rem] border border-white/10 bg-white/10 p-6">
+              <div class="flex items-start justify-between gap-5">
+                <div>
+                  <span class="inline-flex rounded-xl px-3 py-2 text-xs font-black ${colorClass}">
+                    ${code}
+                  </span>
+
+                  <h3 class="mt-4 text-2xl font-black text-white">
+                    ${escapeHtml(branch.name)}
+                  </h3>
+
+                  <p class="mt-2 text-sm font-bold text-slate-400">
+                    ${escapeHtml(branch.city)}
+                  </p>
+                </div>
+
+                ${statusBadge(branch.is_active)}
+              </div>
+
+              <div class="mt-6 space-y-4">
+                <div class="rounded-2xl bg-slate-950/60 p-4">
+                  <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Address</p>
+                  <p class="mt-2 text-sm font-semibold leading-6 text-slate-300">
+                    ${escapeHtml(branch.address || "-")}
+                  </p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="rounded-2xl bg-slate-950/60 p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Phone</p>
+                    <p class="mt-2 text-sm font-black text-slate-300">
+                      ${escapeHtml(branch.phone || "-")}
+                    </p>
+                  </div>
+
+                  <div class="rounded-2xl bg-slate-950/60 p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">WhatsApp</p>
+                    <p class="mt-2 text-sm font-black text-slate-300">
+                      ${escapeHtml(branch.whatsapp || "-")}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-slate-950/60 p-4">
+                  <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Hours</p>
+                  <p class="mt-2 text-sm font-semibold text-slate-300">
+                    ${escapeHtml(branch.hours || "-")}
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-6 flex justify-end">
+                <button
+                  data-action="edit"
+                  data-id="${branch.id}"
+                  class="rounded-2xl bg-amber-400 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-amber-300"
+                >
+                  Edit Branch
+                </button>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      branchesGrid.classList.remove("hidden");
+    }
+
+    async function loadBranches() {
+      const allowed = await checkAdminSession();
+
+      if (!allowed) return;
+
+      const { data, error } = await supabase
+        .from("branches")
+        .select("*")
+        .order("city", { ascending: true });
+
+      loading.classList.add("hidden");
+
+      if (error) {
+        errorBox.textContent = error.message;
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      allBranches = data || [];
+      renderBranches();
+    }
+
+    async function saveBranch(event) {
+      event.preventDefault();
+
+      const branchId = branchIdInput.value;
+
+      if (!branchId) {
+        showMessage("Please select a branch first.");
+        return;
+      }
+
+      saveButton.textContent = "Saving...";
+      saveButton.disabled = true;
+
+      try {
+        const payload = {
+          name: branchNameInput.value.trim(),
+          city: branchCityInput.value.trim(),
+          address: branchAddressInput.value.trim() || null,
+          phone: branchPhoneInput.value.trim() || null,
+          whatsapp: branchWhatsappInput.value.trim() || null,
+          hours: branchHoursInput.value.trim() || null,
+          is_active: branchIsActiveInput.value === "true",
+        };
+
+        if (!payload.name || !payload.city) {
+          throw new Error("Branch name and city are required.");
+        }
+
+        const { error } = await supabase
+          .from("branches")
+          .update(payload)
+          .eq("id", branchId);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        showMessage("Branch updated successfully ✅", "success");
+
+        await loadBranches();
+
+        saveButton.textContent = "Save Branch";
+        saveButton.disabled = false;
+      } catch (error) {
+        showMessage(error.message || "Something went wrong.");
+        saveButton.textContent = "Save Branch";
+        saveButton.disabled = false;
+      }
+    }
+
+    branchesGrid.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-action='edit']");
+      if (!button) return;
+
+      const id = button.dataset.id;
+      const branch = allBranches.find((item) => item.id === id);
+
+      if (branch) {
+        setFormForEdit(branch);
+      }
+    });
+
+    branchForm.addEventListener("submit", saveBranch);
+
+    loadBranches();
+  </script>
+</AdminLayout>

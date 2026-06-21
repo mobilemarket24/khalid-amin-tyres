@@ -1,17 +1,31 @@
 ---
-
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroSection from "../components/HeroSection.astro";
+import TrustBar from "../components/TrustBar.astro";
+import HowItWorks from "../components/HowItWorks.astro";
+import ServicesSection from "../components/ServicesSection.astro";
+import BrandsStrip from "../components/BrandsStrip.astro";
+import FeaturedProductsSection from "../components/FeaturedProductsSection.astro";
+import LeadCaptureSection from "../components/LeadCaptureSection.astro";
+import BranchesSection from "../components/BranchesSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import FinalCtaSection from "../components/FinalCtaSection.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="KHALID AMIN TYRES | Tyres & Rims in Dubai & Sharjah UAE"
+  description="Buy tyres and rims in Dubai and Sharjah. Khalid Amin Tyres offers tyre fitting, wheel balancing, wheel alignment and fast WhatsApp pricing."
+>
+  <main>
+    <HeroSection />
+    <TrustBar />
+    <HowItWorks />
+    <ServicesSection />
+    <BrandsStrip />
+    <FeaturedProductsSection />
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

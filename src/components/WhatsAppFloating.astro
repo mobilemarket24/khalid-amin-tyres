@@ -1,0 +1,76 @@
+﻿---
+import { business } from "../data/business";
+import { getWhatsAppUrl } from "../utils/whatsapp";
+
+const isAr = Astro.url.pathname.startsWith("/ar");
+
+const sharjahLabel = isAr ? "واتساب الشارقة" : "WhatsApp Sharjah";
+const dubaiLabel = isAr ? "واتساب دبي" : "WhatsApp Dubai";
+
+const sharjahShort = isAr ? "الشارقة" : "Sharjah";
+const dubaiShort = isAr ? "دبي" : "Dubai";
+
+const message = isAr
+  ? "مرحبا، أريد معرفة سعر الإطارات أو الجنوط اليوم."
+  : "Hi, I need today’s price for tyres or rims.";
+---
+
+<div class="fixed bottom-5 right-5 z-50 hidden flex-col gap-3 lg:flex">
+  <a
+    href={getWhatsAppUrl("sharjah", message)}
+    class="group flex items-center gap-3 rounded-2xl bg-amber-400 px-5 py-4 font-black text-slate-950 shadow-2xl shadow-amber-500/25 transition hover:-translate-y-1 hover:bg-amber-300"
+  >
+    <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-4.964-1.344l-.356-.211-3.688.977.983-3.596-.232-.368A9.818 9.818 0 0 1 2.182 12C2.182 6.574 6.574 2.182 12 2.182S21.818 6.574 21.818 12 17.426 21.818 12 21.818z"/>
+    </svg>
+
+    <span>
+      {sharjahLabel}
+      <span class="block text-xs font-black opacity-80">
+        {business.branches.sharjah.whatsappLocal}
+      </span>
+    </span>
+  </a>
+
+  <a
+    href={getWhatsAppUrl("dubai", message)}
+    class="group flex items-center gap-3 rounded-2xl bg-red-500 px-5 py-4 font-black text-white shadow-2xl shadow-red-500/25 transition hover:-translate-y-1 hover:bg-red-400"
+  >
+    <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-4.964-1.344l-.356-.211-3.688.977.983-3.596-.232-.368A9.818 9.818 0 0 1 2.182 12C2.182 6.574 6.574 2.182 12 2.182S21.818 6.574 21.818 12 17.426 21.818 12 21.818z"/>
+    </svg>
+
+    <span>
+      {dubaiLabel}
+      <span class="block text-xs font-black opacity-90">
+        {business.branches.dubai.whatsappLocal}
+      </span>
+    </span>
+  </a>
+</div>
+
+<div class="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0a0a0e]/95 px-3 py-2 shadow-2xl backdrop-blur lg:hidden">
+  <div class="mx-auto grid max-w-md grid-cols-2 gap-2">
+    <a
+      href={getWhatsAppUrl("sharjah", message)}
+      class="rounded-xl bg-amber-400 px-3 py-3 text-center text-sm font-black leading-tight text-slate-950"
+    >
+      {sharjahShort}
+      <span class="block text-[11px] font-black">
+        {business.branches.sharjah.whatsappLocal}
+      </span>
+    </a>
+
+    <a
+      href={getWhatsAppUrl("dubai", message)}
+      class="rounded-xl bg-red-500 px-3 py-3 text-center text-sm font-black leading-tight text-white"
+    >
+      {dubaiShort}
+      <span class="block text-[11px] font-black">
+        {business.branches.dubai.whatsappLocal}
+      </span>
+    </a>
+  </div>
+</div>

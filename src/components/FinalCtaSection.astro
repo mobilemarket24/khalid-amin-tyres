@@ -1,0 +1,112 @@
+﻿---
+import DynamicSiteText from "./DynamicSiteText.astro";
+import { getWhatsAppUrl } from "../utils/whatsapp";
+
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const sharjahWhatsApp = getWhatsAppUrl(
+  "sharjah",
+  isArabic
+    ? "مرحبا، أحتاج مساعدة بخصوص الإطارات أو الرنقات أو خدمة للسيارة."
+    : "Hi, I need help with tyres, rims or wheel service from Khalid Amin Tyres Sharjah."
+);
+
+const dubaiWhatsApp = getWhatsAppUrl(
+  "dubai",
+  isArabic
+    ? "مرحبا، أحتاج مساعدة بخصوص الإطارات أو الرنقات أو خدمة للسيارة."
+    : "Hi, I need help with tyres, rims or wheel service from Khalid Amin Tyres Dubai."
+);
+
+const content = isArabic
+  ? {
+      badge: "تواصل معنا",
+      titleKey: "final_cta_ar_title",
+      subtitleKey: "final_cta_ar_subtitle",
+      fallbackTitle: "تحتاج إطارات أو رنقات أو خدمة اليوم؟",
+      fallbackSubtitle:
+        "راسل خالد أمين تايرز عبر واتساب وسنساعدك بالسعر، التوفر وخدمة الفرع المناسب.",
+      sharjahButton: "واتساب الشارقة",
+      dubaiButton: "واتساب دبي",
+      branchesText: "فرع دبي وفرع الشارقة",
+      supportText: "رد سريع عبر واتساب",
+    }
+  : {
+      badge: "Ready to order?",
+      titleKey: "final_cta_title",
+      subtitleKey: "final_cta_subtitle",
+      fallbackTitle: "Need tyres, rims or wheel service today?",
+      fallbackSubtitle:
+        "Message Khalid Amin Tyres on WhatsApp and our team will help you with pricing, availability and branch support.",
+      sharjahButton: "WhatsApp Sharjah",
+      dubaiButton: "WhatsApp Dubai",
+      branchesText: "Dubai & Sharjah branches",
+      supportText: "Fast WhatsApp support",
+    };
+---
+
+<section class="relative overflow-hidden bg-[#0a0a0e] px-5 py-16 text-white sm:px-8 lg:px-12">
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.16),transparent_32%)]"></div>
+
+  <div class="relative mx-auto max-w-7xl">
+    <div data-animate class="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl sm:p-8 lg:p-10">
+      <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div dir={isArabic ? "rtl" : "ltr"}>
+          <span class="inline-flex rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-950">
+            {content.badge}
+          </span>
+
+          <DynamicSiteText
+            textKey={content.titleKey}
+            fallback={content.fallbackTitle}
+            as="h2"
+            class="mt-5 max-w-3xl text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+          />
+
+          <DynamicSiteText
+            textKey={content.subtitleKey}
+            fallback={content.fallbackSubtitle}
+            as="p"
+            class="mt-4 max-w-2xl text-base font-semibold leading-8 text-slate-300"
+          />
+
+          <div class="mt-7 grid max-w-xl gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-slate-950/50 px-5 py-4">
+              <p class="text-sm font-black text-white">
+                {content.branchesText}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-slate-950/50 px-5 py-4">
+              <p class="text-sm font-black text-white">
+                {content.supportText}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid gap-4">
+          <a
+            href={sharjahWhatsApp}
+            target="_blank"
+            rel="noreferrer"
+            class="rounded-2xl bg-amber-400 px-7 py-5 text-center font-black text-slate-950 shadow-xl shadow-amber-400/20 transition hover:bg-amber-300"
+          >
+            {content.sharjahButton}
+            <span class="block text-xs font-black opacity-80">050 351 2023</span>
+          </a>
+
+          <a
+            href={dubaiWhatsApp}
+            target="_blank"
+            rel="noreferrer"
+            class="rounded-2xl bg-red-500 px-7 py-5 text-center font-black text-white shadow-xl shadow-red-500/20 transition hover:bg-red-400"
+          >
+            {content.dubaiButton}
+            <span class="block text-xs font-black opacity-90">056 161 5010</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

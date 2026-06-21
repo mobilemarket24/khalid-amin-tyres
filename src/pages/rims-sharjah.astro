@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SeoPageHero from "../components/SeoPageHero.astro";
+import FeaturedProductsSection from "../components/FeaturedProductsSection.astro";
+import LeadCaptureSection from "../components/LeadCaptureSection.astro";
+import BranchesSection from "../components/BranchesSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import FinalCtaSection from "../components/FinalCtaSection.astro";
+---
+
+<BaseLayout
+  title="Rims Sharjah | Buy Alloy Wheels & Car Rims in Sharjah UAE | Khalid Amin Tyres"
+  description="Buy car rims and alloy wheels in Sharjah with fast WhatsApp pricing. Khalid Amin Tyres offers premium rims, fitment support and wheel services in Sharjah and Dubai."
+  metaTitleKey="meta_rims_sharjah_title"
+  metaDescriptionKey="meta_rims_sharjah_description"
+>
+  <main>
+    <SeoPageHero
+      imageKey="rims_sharjah_hero"
+      badge="Rims Sharjah"
+      titleKey="rims_sharjah_hero_title"
+      subtitleKey="rims_sharjah_hero_subtitle"
+      title="Rims & Alloy Wheels in Sharjah"
+      subtitle="Upgrade your car with premium rims and alloy wheels from Khalid Amin Tyres Sharjah."
+      branch="sharjah"
+      bullets={[
+        "Alloy wheels",
+        "Rims for SUV and sedan",
+        "Fitment support",
+        "WhatsApp quotation",
+      ]}
+    />
+
+    <FeaturedProductsSection
+      productType="rim"
+      branch="sharjah"
+      featuredOnly={false}
+      limit={12}
+      badge="Rims Available in Sharjah"
+      title="Shop rims available from our Sharjah branch"
+      subtitle="Browse active rim options available for Sharjah customers, including size, fitment details, origin and direct WhatsApp pricing."
+      emptyText="No active Sharjah rims are available right now. Please contact us on WhatsApp for current stock."
+    />
+
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

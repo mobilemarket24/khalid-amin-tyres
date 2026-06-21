@@ -1,0 +1,605 @@
+﻿---
+import "../styles/global.css";
+
+import { createClient } from "@supabase/supabase-js";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import WhatsAppFloating from "../components/WhatsAppFloating.astro";
+import { business } from "../data/business";
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: "en" | "ar";
+  dir?: "ltr" | "rtl";
+  metaTitleKey?: string;
+  metaDescriptionKey?: string;
+}
+
+const {
+  title = "KHALID AMIN TYRES TR CO LLC | Tyres & Rims in Dubai and Sharjah",
+  description = "KHALID AMIN TYRES TR CO LLC provides tyres, rims, tyre fitting, wheel balancing and wheel alignment services in Dubai and Sharjah.",
+  lang = "en",
+  dir = "ltr",
+  metaTitleKey,
+  metaDescriptionKey,
+} = Astro.props;
+
+const siteUrl = "https://khalidamintyres.com";
+const currentPath = Astro.url.pathname;
+
+function normalizePath(path: string) {
+  if (!path || path === "") return "/";
+  if (path === "/") return "/";
+  return path.endsWith("/") ? path : `${path}/`;
+}
+
+function absoluteUrl(path: string) {
+  return new URL(path, siteUrl).toString();
+}
+
+const normalizedPath = normalizePath(currentPath);
+const canonicalUrl = absoluteUrl(normalizedPath);
+
+const isAr = lang === "ar";
+
+const ogLocale = isAr ? "ar_AE" : "en_AE";
+const alternateLocale = isAr ? "en_AE" : "ar_AE";
+
+const ogImage = `${siteUrl}/images/hero-banner.png`;
+
+const metaKeyMap: Record<string, { titleKey: string; descriptionKey: string }> = {
+  "/": {
+    titleKey: "meta_home_title",
+    descriptionKey: "meta_home_description",
+  },
+  "/ar/": {
+    titleKey: "meta_ar_home_title",
+    descriptionKey: "meta_ar_home_description",
+  },
+  "/tyres-dubai/": {
+    titleKey: "meta_tyres_dubai_title",
+    descriptionKey: "meta_tyres_dubai_description",
+  },
+  "/tyres-sharjah/": {
+    titleKey: "meta_tyres_sharjah_title",
+    descriptionKey: "meta_tyres_sharjah_description",
+  },
+  "/rims-dubai/": {
+    titleKey: "meta_rims_dubai_title",
+    descriptionKey: "meta_rims_dubai_description",
+  },
+  "/rims-sharjah/": {
+    titleKey: "meta_rims_sharjah_title",
+    descriptionKey: "meta_rims_sharjah_description",
+  },
+  "/wheel-alignment-dubai/": {
+    titleKey: "meta_wheel_alignment_dubai_title",
+    descriptionKey: "meta_wheel_alignment_dubai_description",
+  },
+  "/wheel-balancing-dubai/": {
+    titleKey: "meta_wheel_balancing_dubai_title",
+    descriptionKey: "meta_wheel_balancing_dubai_description",
+  },
+};
+
+const hreflangMap: Record<
+  string,
+  {
+    en?: string;
+    ar?: string;
+    xDefault: string;
+  }
+> = {
+  "/": {
+    en: "/",
+    ar: "/ar/",
+    xDefault: "/",
+  },
+  "/ar/": {
+    en: "/",
+    ar: "/ar/",
+    xDefault: "/",
+  },
+  "/tyres-dubai/": {
+    en: "/tyres-dubai/",
+    xDefault: "/tyres-dubai/",
+  },
+  "/tyres-sharjah/": {
+    en: "/tyres-sharjah/",
+    xDefault: "/tyres-sharjah/",
+  },
+  "/rims-dubai/": {
+    en: "/rims-dubai/",
+    xDefault: "/rims-dubai/",
+  },
+  "/rims-sharjah/": {
+    en: "/rims-sharjah/",
+    xDefault: "/rims-sharjah/",
+  },
+  "/wheel-alignment-dubai/": {
+    en: "/wheel-alignment-dubai/",
+    xDefault: "/wheel-alignment-dubai/",
+  },
+  "/wheel-balancing-dubai/": {
+    en: "/wheel-balancing-dubai/",
+    xDefault: "/wheel-balancing-dubai/",
+  },
+};
+
+const servicePageMap: Record<
+  string,
+  {
+    pageName: string;
+    serviceName: string;
+    serviceType: string;
+    city: "Dubai" | "Sharjah";
+    branch: "dubai" | "sharjah";
+    fallbackDescription: string;
+  }
+> = {
+  "/tyres-dubai/": {
+    pageName: "Tyres Dubai",
+    serviceName: "Tyre Sales and Tyre Fitting in Dubai",
+    serviceType: "Tyre Shop",
+    city: "Dubai",
+    branch: "dubai",
+    fallbackDescription:
+      "Buy tyres in Dubai from Khalid Amin Tyres with tyre fitting support and WhatsApp availability.",
+  },
+  "/tyres-sharjah/": {
+    pageName: "Tyres Sharjah",
+    serviceName: "Tyre Sales and Tyre Fitting in Sharjah",
+    serviceType: "Tyre Shop",
+    city: "Sharjah",
+    branch: "sharjah",
+    fallbackDescription:
+      "Buy tyres in Sharjah from Khalid Amin Tyres with tyre fitting support and WhatsApp availability.",
+  },
+  "/rims-dubai/": {
+    pageName: "Rims Dubai",
+    serviceName: "Car Rims and Alloy Wheels in Dubai",
+    serviceType: "Rims and Alloy Wheels",
+    city: "Dubai",
+    branch: "dubai",
+    fallbackDescription:
+      "Shop car rims and alloy wheels in Dubai with fitment support from Khalid Amin Tyres.",
+  },
+  "/rims-sharjah/": {
+    pageName: "Rims Sharjah",
+    serviceName: "Car Rims and Alloy Wheels in Sharjah",
+    serviceType: "Rims and Alloy Wheels",
+    city: "Sharjah",
+    branch: "sharjah",
+    fallbackDescription:
+      "Shop car rims and alloy wheels in Sharjah with fitment support from Khalid Amin Tyres.",
+  },
+  "/wheel-alignment-dubai/": {
+    pageName: "Wheel Alignment Dubai",
+    serviceName: "Wheel Alignment Service in Dubai",
+    serviceType: "Wheel Alignment",
+    city: "Dubai",
+    branch: "dubai",
+    fallbackDescription:
+      "Wheel alignment support in Dubai from Khalid Amin Tyres to improve tyre life, steering feel and vehicle stability.",
+  },
+  "/wheel-balancing-dubai/": {
+    pageName: "Wheel Balancing Dubai",
+    serviceName: "Wheel Balancing Service in Dubai",
+    serviceType: "Wheel Balancing",
+    city: "Dubai",
+    branch: "dubai",
+    fallbackDescription:
+      "Wheel balancing support in Dubai from Khalid Amin Tyres to reduce vibration and improve driving comfort.",
+  },
+};
+
+const mappedMetaKeys = metaKeyMap[normalizedPath];
+
+const resolvedMetaTitleKey = metaTitleKey || mappedMetaKeys?.titleKey;
+const resolvedMetaDescriptionKey =
+  metaDescriptionKey || mappedMetaKeys?.descriptionKey;
+
+let finalTitle = title;
+let finalDescription = description;
+
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+if (supabaseUrl && supabaseAnonKey && resolvedMetaTitleKey && resolvedMetaDescriptionKey) {
+  const metaSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+
+  const { data: metaTexts } = await metaSupabase
+    .from("site_texts")
+    .select("text_key, text_value")
+    .in("text_key", [resolvedMetaTitleKey, resolvedMetaDescriptionKey])
+    .eq("is_active", true);
+
+  if (metaTexts?.length) {
+    const metaTextMap = new Map(
+      metaTexts.map((item) => [item.text_key, item.text_value])
+    );
+
+    const dynamicTitle = metaTextMap.get(resolvedMetaTitleKey);
+    const dynamicDescription = metaTextMap.get(resolvedMetaDescriptionKey);
+
+    if (dynamicTitle) {
+      finalTitle = dynamicTitle;
+    }
+
+    if (dynamicDescription) {
+      finalDescription = dynamicDescription;
+    }
+  }
+}
+
+const hreflangConfig = hreflangMap[normalizedPath] || {
+  en: normalizedPath,
+  xDefault: normalizedPath,
+};
+
+const alternateLinks = [
+  hreflangConfig.en
+    ? {
+        hreflang: "en-AE",
+        href: absoluteUrl(hreflangConfig.en),
+      }
+    : null,
+  hreflangConfig.ar
+    ? {
+        hreflang: "ar-AE",
+        href: absoluteUrl(hreflangConfig.ar),
+      }
+    : null,
+  {
+    hreflang: "x-default",
+    href: absoluteUrl(hreflangConfig.xDefault),
+  },
+].filter(
+  (link): link is { hreflang: string; href: string } => Boolean(link)
+);
+
+const servicePage = servicePageMap[normalizedPath];
+
+const providerBranchId =
+  servicePage?.branch === "dubai"
+    ? `${siteUrl}/#dubai-branch`
+    : servicePage?.branch === "sharjah"
+      ? `${siteUrl}/#sharjah-branch`
+      : `${siteUrl}/#organization`;
+
+const providerPhone =
+  servicePage?.branch === "dubai" ? "+971561615010" : "+971503512023";
+
+const webPageSchema = {
+  "@type": "WebPage",
+  "@id": `${canonicalUrl}#webpage`,
+  url: canonicalUrl,
+  name: finalTitle,
+  description: finalDescription,
+  isPartOf: {
+    "@id": `${siteUrl}/#website`,
+  },
+  about: servicePage
+    ? {
+        "@id": `${canonicalUrl}#service`,
+      }
+    : {
+        "@id": `${siteUrl}/#organization`,
+      },
+  primaryImageOfPage: {
+    "@type": "ImageObject",
+    url: ogImage,
+  },
+  inLanguage: isAr ? "ar-AE" : "en-AE",
+};
+
+const breadcrumbSchema = servicePage
+  ? {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: `${siteUrl}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: servicePage.pageName,
+          item: canonicalUrl,
+        },
+      ],
+    }
+  : null;
+
+const serviceSchema = servicePage
+  ? {
+      "@type": "Service",
+      "@id": `${canonicalUrl}#service`,
+      name: servicePage.serviceName,
+      serviceType: servicePage.serviceType,
+      description: finalDescription || servicePage.fallbackDescription,
+      url: canonicalUrl,
+      provider: {
+        "@id": providerBranchId,
+      },
+      areaServed: {
+        "@type": "City",
+        name: servicePage.city,
+        addressCountry: "AE",
+      },
+      availableChannel: {
+        "@type": "ServiceChannel",
+        serviceUrl: canonicalUrl,
+        servicePhone: {
+          "@type": "ContactPoint",
+          telephone: providerPhone,
+          contactType: "customer service",
+          areaServed: "AE",
+          availableLanguage: ["English", "Arabic"],
+        },
+      },
+      offers: {
+        "@type": "Offer",
+        url: canonicalUrl,
+        priceCurrency: "AED",
+        availability: "https://schema.org/InStock",
+        seller: {
+          "@id": providerBranchId,
+        },
+      },
+    }
+  : null;
+
+const homeServicesSchema =
+  normalizedPath === "/" || normalizedPath === "/ar/"
+    ? {
+        "@type": "ItemList",
+        "@id": `${siteUrl}/#services-list`,
+        name: "Khalid Amin Tyres Services",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Tyres Dubai",
+            url: `${siteUrl}/tyres-dubai/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Tyres Sharjah",
+            url: `${siteUrl}/tyres-sharjah/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: "Rims Dubai",
+            url: `${siteUrl}/rims-dubai/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 4,
+            name: "Rims Sharjah",
+            url: `${siteUrl}/rims-sharjah/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 5,
+            name: "Wheel Alignment Dubai",
+            url: `${siteUrl}/wheel-alignment-dubai/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 6,
+            name: "Wheel Balancing Dubai",
+            url: `${siteUrl}/wheel-balancing-dubai/`,
+          },
+        ],
+      }
+    : null;
+
+const structuredDataGraph = [
+  {
+    "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
+    name: "KHALID AMIN TYRES TR CO LLC",
+    alternateName: "KHALID AMIN TYRES",
+    url: siteUrl,
+    logo: `${siteUrl}/favicon.svg`,
+    image: ogImage,
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        telephone: "+971503512023",
+        contactType: "customer service",
+        areaServed: "AE",
+        availableLanguage: ["English", "Arabic"],
+      },
+      {
+        "@type": "ContactPoint",
+        telephone: "+971561615010",
+        contactType: "customer service",
+        areaServed: "AE",
+        availableLanguage: ["English", "Arabic"],
+      },
+    ],
+  },
+  {
+    "@type": "AutomotiveBusiness",
+    "@id": `${siteUrl}/#sharjah-branch`,
+    name: "KHALID AMIN TYRES - Sharjah Branch",
+    url: siteUrl,
+    image: `${siteUrl}${business.images.exteriorDay}`,
+    telephone: "+971503512023",
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: business.branches.sharjah.address,
+      addressLocality: "Sharjah",
+      addressRegion: "Sharjah",
+      addressCountry: "AE",
+    },
+    areaServed: {
+      "@type": "City",
+      name: "Sharjah",
+      addressCountry: "AE",
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "09:00",
+        closes: "23:00",
+      },
+    ],
+    parentOrganization: {
+      "@id": `${siteUrl}/#organization`,
+    },
+  },
+  {
+    "@type": "AutomotiveBusiness",
+    "@id": `${siteUrl}/#dubai-branch`,
+    name: "KHALID AMIN TYRES - Dubai Branch",
+    url: siteUrl,
+    image: `${siteUrl}${business.images.dubaiNight}`,
+    telephone: "+971561615010",
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: business.branches.dubai.address,
+      addressLocality: "Dubai",
+      addressRegion: "Dubai",
+      addressCountry: "AE",
+    },
+    areaServed: {
+      "@type": "City",
+      name: "Dubai",
+      addressCountry: "AE",
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "09:00",
+        closes: "02:00",
+      },
+    ],
+    parentOrganization: {
+      "@id": `${siteUrl}/#organization`,
+    },
+  },
+  {
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    url: siteUrl,
+    name: "KHALID AMIN TYRES",
+    publisher: {
+      "@id": `${siteUrl}/#organization`,
+    },
+    inLanguage: isAr ? "ar-AE" : "en-AE",
+  },
+  webPageSchema,
+  serviceSchema,
+  breadcrumbSchema,
+  homeServicesSchema,
+].filter(Boolean);
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@graph": structuredDataGraph,
+};
+---
+
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{finalTitle}</title>
+    <meta name="description" content={finalDescription} />
+    <meta
+      name="keywords"
+      content="tyres Dubai, tyres Sharjah, rims Dubai, rims Sharjah, tyre shop Dubai, tyre shop Sharjah, wheel balancing Dubai, wheel alignment Dubai, اطارات دبي, اطارات الشارقة, جنوط دبي, جنوط الشارقة"
+    />
+
+    <link rel="canonical" href={canonicalUrl} />
+
+    {
+      alternateLinks.map((link) => (
+        <link rel="alternate" hreflang={link.hreflang} href={link.href} />
+      ))
+    }
+
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="KHALID AMIN TYRES TR CO LLC" />
+    <meta name="theme-color" content="#0a0a0e" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="KHALID AMIN TYRES" />
+    <meta property="og:title" content={finalTitle} />
+    <meta property="og:description" content={finalDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={alternateLocale} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={finalTitle} />
+    <meta name="twitter:description" content={finalDescription} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  </head>
+
+  <body class="bg-[#0a0a0e] text-slate-950 antialiased">
+    <SiteHeader />
+    <slot />
+    <SiteFooter />
+    <WhatsAppFloating />
+    <script>
+      (() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("in-view");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
+        );
+        document.querySelectorAll("[data-animate]").forEach((el) => observer.observe(el));
+      })();
+    </script>
+  </body>
+</html>

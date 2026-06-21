@@ -1,0 +1,559 @@
+﻿---
+const isAr = Astro.url.pathname.startsWith("/ar");
+
+const t = isAr
+  ? {
+      title: "ابحث حسب المقاس",
+      subtitle: "اختر مقاس الإطار أو الجنط وأرسل الطلب على واتساب.",
+      tyreTab: "إطارات",
+      rimTab: "جنوط",
+      width: "العرض",
+      height: "الارتفاع",
+      tyreRim: "Rim",
+      rimDiameter: "القطر",
+      rimWidth: "العرض",
+      pcd: "PCD",
+      offset: "Offset",
+      carMake: "نوع السيارة",
+      carModel: "موديل السيارة / السنة",
+      branch: "الفرع",
+      sharjah: "الشارقة",
+      dubai: "دبي",
+      preview: "المقاس",
+      tyreButton: "إرسال طلب الإطار",
+      rimButton: "إرسال طلب الجنط",
+      selectCar: "اختر السيارة",
+      modelPlaceholder: "مثال: X5 2022",
+    }
+  : {
+      title: "Search by Size",
+      subtitle: "Choose tyre or rim size and send request on WhatsApp.",
+      tyreTab: "Tyres",
+      rimTab: "Rims",
+      width: "Width",
+      height: "Height",
+      tyreRim: "Rim",
+      rimDiameter: "Diameter",
+      rimWidth: "Width",
+      pcd: "PCD",
+      offset: "Offset",
+      carMake: "Car Make",
+      carModel: "Car Model / Year",
+      branch: "Branch",
+      sharjah: "Sharjah",
+      dubai: "Dubai",
+      preview: "Size",
+      tyreButton: "Send Tyre Request",
+      rimButton: "Send Rim Request",
+      selectCar: "Select Car",
+      modelPlaceholder: "e.g. X5 2022",
+    };
+
+const tyreWidths = [
+  145, 155, 165, 175, 185, 195, 205, 215, 225, 235, 245, 255, 265, 275, 285,
+  295, 305, 315, 325, 335, 345,
+];
+
+const tyreHeights = [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85];
+
+const tyreRimSizes = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+
+const rimDiameters = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+
+const rimWidths = [
+  "5.5",
+  "6.0",
+  "6.5",
+  "7.0",
+  "7.5",
+  "8.0",
+  "8.5",
+  "9.0",
+  "9.5",
+  "10.0",
+  "10.5",
+  "11.0",
+  "12.0",
+];
+
+const pcdOptions = [
+  "4x100",
+  "4x108",
+  "4x114.3",
+  "5x100",
+  "5x105",
+  "5x108",
+  "5x112",
+  "5x114.3",
+  "5x115",
+  "5x120",
+  "5x127",
+  "5x130",
+  "6x114.3",
+  "6x120",
+  "6x127",
+  "6x135",
+  "6x139.7",
+];
+
+const offsetOptions = [
+  "ET0",
+  "ET10",
+  "ET15",
+  "ET20",
+  "ET25",
+  "ET30",
+  "ET35",
+  "ET40",
+  "ET45",
+  "ET50",
+  "ET55",
+];
+
+const carMakes = [
+  "BMW",
+  "Mercedes-Benz",
+  "Audi",
+  "Porsche",
+  "Range Rover",
+  "Lexus",
+  "Toyota",
+  "Nissan",
+  "Infiniti",
+  "Ford",
+  "Jeep",
+  "Chevrolet",
+  "GMC",
+  "Cadillac",
+  "Dodge",
+  "Hyundai",
+  "Kia",
+  "Mazda",
+  "Honda",
+  "Volkswagen",
+  "Tesla",
+];
+---
+
+<div
+  data-hero-size-search
+  data-lang={isAr ? "ar" : "en"}
+  class="mb-8 rounded-[2rem] border border-white/20 bg-white/10 p-3 shadow-2xl shadow-amber-500/10 backdrop-blur-xl sm:p-4 lg:mb-0"
+>
+  <div class="rounded-[1.5rem] bg-[#0e0e14]/95 p-5 sm:p-6">
+    <div class="mb-5 flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-black uppercase tracking-[0.25em] text-amber-300">
+          {t.title}
+        </p>
+
+        <h2 class="mt-2 text-2xl font-black text-white">
+          {isAr ? "اختيار المقاس" : "Find Your Size"}
+        </h2>
+
+        <p class="mt-2 text-sm font-semibold leading-6 text-slate-400">
+          {t.subtitle}
+        </p>
+      </div>
+
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-lg font-black text-slate-950">
+        KA
+      </div>
+    </div>
+
+    <div class="mb-4 grid grid-cols-2 gap-2">
+      <button
+        type="button"
+        data-hero-tab="tyre"
+        class="rounded-xl bg-amber-400 px-3 py-3 text-sm font-black text-slate-950"
+      >
+        {t.tyreTab}
+      </button>
+
+      <button
+        type="button"
+        data-hero-tab="rim"
+        class="rounded-xl bg-white/10 px-3 py-3 text-sm font-black text-white"
+      >
+        {t.rimTab}
+      </button>
+    </div>
+
+    <div data-hero-panel="tyre" class="space-y-4">
+      <div class="grid grid-cols-3 gap-2">
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.width}
+          </label>
+
+          <select
+            data-hero-tyre-width
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              tyreWidths.map((item) => (
+                <option value={item} selected={item === 275}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.height}
+          </label>
+
+          <select
+            data-hero-tyre-height
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              tyreHeights.map((item) => (
+                <option value={item} selected={item === 60}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.tyreRim}
+          </label>
+
+          <select
+            data-hero-tyre-rim
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              tyreRimSizes.map((item) => (
+                <option value={item} selected={item === 20}>
+                  R{item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="grid gap-2 sm:grid-cols-[0.9fr_1.1fr]">
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.branch}
+          </label>
+
+          <select
+            data-hero-tyre-branch
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            <option value="sharjah">{t.sharjah}</option>
+            <option value="dubai">{t.dubai}</option>
+          </select>
+        </div>
+
+        <div class="rounded-xl border border-amber-300/20 bg-amber-400/10 p-3">
+          <p class="text-[10px] font-black uppercase tracking-[0.16em] text-amber-300">
+            {t.preview}
+          </p>
+
+          <p data-hero-tyre-preview class="mt-1 text-xl font-black text-white">
+            275/60R20
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        data-hero-send-tyre
+        class="w-full rounded-2xl bg-amber-400 px-5 py-4 font-black text-slate-950 transition hover:bg-amber-300"
+      >
+        {t.tyreButton}
+      </button>
+    </div>
+
+    <div data-hero-panel="rim" class="hidden space-y-4">
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.carMake}
+          </label>
+
+          <select
+            data-hero-rim-car-make
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            <option value="">{t.selectCar}</option>
+            {
+              carMakes.map((item) => (
+                <option value={item} selected={item === "BMW"}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.carModel}
+          </label>
+
+          <input
+            data-hero-rim-car-model
+            placeholder={t.modelPlaceholder}
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none placeholder:text-slate-500"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.rimDiameter}
+          </label>
+
+          <select
+            data-hero-rim-diameter
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              rimDiameters.map((item) => (
+                <option value={item} selected={item === 20}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.rimWidth}
+          </label>
+
+          <select
+            data-hero-rim-width
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              rimWidths.map((item) => (
+                <option value={item} selected={item === "9.0"}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.pcd}
+          </label>
+
+          <select
+            data-hero-rim-pcd
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              pcdOptions.map((item) => (
+                <option value={item} selected={item === "5x114.3"}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            {t.offset}
+          </label>
+
+          <select
+            data-hero-rim-offset
+            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+          >
+            {
+              offsetOptions.map((item) => (
+                <option value={item} selected={item === "ET35"}>
+                  {item}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+          {t.branch}
+        </label>
+
+        <select
+          data-hero-rim-branch
+          class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+        >
+          <option value="sharjah">{t.sharjah}</option>
+          <option value="dubai">{t.dubai}</option>
+        </select>
+      </div>
+
+      <div class="rounded-xl border border-red-300/20 bg-red-500/10 p-3">
+        <p class="text-[10px] font-black uppercase tracking-[0.16em] text-red-300">
+          {t.preview}
+        </p>
+
+        <p data-hero-rim-preview class="mt-1 text-base font-black leading-7 text-white">
+          BMW | 20x9.0 | PCD 5x114.3 | ET35
+        </p>
+      </div>
+
+      <button
+        type="button"
+        data-hero-send-rim
+        class="w-full rounded-2xl bg-red-500 px-5 py-4 font-black text-white transition hover:bg-red-400"
+      >
+        {t.rimButton}
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const branchNumbers = {
+      sharjah: "971503512023",
+      dubai: "971561615010",
+    };
+
+    document.querySelectorAll("[data-hero-size-search]").forEach((root) => {
+      const lang = root.getAttribute("data-lang") || "en";
+      const isArabic = lang === "ar";
+
+      const tabs = root.querySelectorAll("[data-hero-tab]");
+      const panels = root.querySelectorAll("[data-hero-panel]");
+
+      const tyreWidth = root.querySelector("[data-hero-tyre-width]");
+      const tyreHeight = root.querySelector("[data-hero-tyre-height]");
+      const tyreRim = root.querySelector("[data-hero-tyre-rim]");
+      const tyreBranch = root.querySelector("[data-hero-tyre-branch]");
+      const tyrePreview = root.querySelector("[data-hero-tyre-preview]");
+      const sendTyre = root.querySelector("[data-hero-send-tyre]");
+
+      const rimCarMake = root.querySelector("[data-hero-rim-car-make]");
+      const rimCarModel = root.querySelector("[data-hero-rim-car-model]");
+      const rimDiameter = root.querySelector("[data-hero-rim-diameter]");
+      const rimWidth = root.querySelector("[data-hero-rim-width]");
+      const rimPcd = root.querySelector("[data-hero-rim-pcd]");
+      const rimOffset = root.querySelector("[data-hero-rim-offset]");
+      const rimBranch = root.querySelector("[data-hero-rim-branch]");
+      const rimPreview = root.querySelector("[data-hero-rim-preview]");
+      const sendRim = root.querySelector("[data-hero-send-rim]");
+
+      function valueOf(element) {
+        return element && "value" in element ? String(element.value).trim() : "";
+      }
+
+      function setTab(active) {
+        tabs.forEach((tab) => {
+          const isActive = tab.getAttribute("data-hero-tab") === active;
+
+          tab.className = isActive
+            ? active === "tyre"
+              ? "rounded-xl bg-amber-400 px-3 py-3 text-sm font-black text-slate-950"
+              : "rounded-xl bg-red-500 px-3 py-3 text-sm font-black text-white"
+            : "rounded-xl bg-white/10 px-3 py-3 text-sm font-black text-white";
+        });
+
+        panels.forEach((panel) => {
+          panel.classList.toggle(
+            "hidden",
+            panel.getAttribute("data-hero-panel") !== active
+          );
+        });
+      }
+
+      function tyreSize() {
+        const size =
+          valueOf(tyreWidth) +
+          "/" +
+          valueOf(tyreHeight) +
+          "R" +
+          valueOf(tyreRim).replace("R", "");
+
+        if (tyrePreview) tyrePreview.textContent = size;
+        return size;
+      }
+
+      function rimSize() {
+        const carMake = valueOf(rimCarMake);
+        const carModel = valueOf(rimCarModel);
+
+        const carText = [carMake, carModel].filter(Boolean).join(" ");
+
+        const size =
+          valueOf(rimDiameter) +
+          "x" +
+          valueOf(rimWidth) +
+          " | PCD " +
+          valueOf(rimPcd) +
+          " | " +
+          valueOf(rimOffset);
+
+        const previewText = carText ? carText + " | " + size : size;
+
+        if (rimPreview) rimPreview.textContent = previewText;
+        return { size, carText };
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          setTab(tab.getAttribute("data-hero-tab") || "tyre");
+        });
+      });
+
+      [tyreWidth, tyreHeight, tyreRim].forEach((el) => {
+        el?.addEventListener("change", tyreSize);
+      });
+
+      [rimCarMake, rimCarModel, rimDiameter, rimWidth, rimPcd, rimOffset].forEach((el) => {
+        el?.addEventListener("change", rimSize);
+        el?.addEventListener("input", rimSize);
+      });
+
+      sendTyre?.addEventListener("click", () => {
+        const branch = valueOf(tyreBranch) || "sharjah";
+        const number = branch === "dubai" ? branchNumbers.dubai : branchNumbers.sharjah;
+        const size = tyreSize();
+
+        const message = isArabic
+          ? "مرحبا، أريد معرفة السعر والتوفر للإطار مقاس: " + size
+          : "Hi, I need price and availability for tyre size: " + size;
+
+        window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(message), "_blank");
+      });
+
+      sendRim?.addEventListener("click", () => {
+        const branch = valueOf(rimBranch) || "sharjah";
+        const number = branch === "dubai" ? branchNumbers.dubai : branchNumbers.sharjah;
+        const result = rimSize();
+
+        const message = isArabic
+          ? [
+              "مرحبا، أريد معرفة السعر والتوفر للجنوط.",
+              result.carText ? "السيارة: " + result.carText : "",
+              "مقاس الجنط: " + result.size,
+            ].filter(Boolean).join("\n")
+          : [
+              "Hi, I need price and availability for rims.",
+              result.carText ? "Car: " + result.carText : "",
+              "Rim size: " + result.size,
+            ].filter(Boolean).join("\n");
+
+        window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(message), "_blank");
+      });
+
+      tyreSize();
+      rimSize();
+    });
+  </script>
+</div>

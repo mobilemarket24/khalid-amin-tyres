@@ -1,0 +1,186 @@
+﻿---
+import DynamicSiteText from "./DynamicSiteText.astro";
+
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const content = isArabic
+  ? {
+      badgeKey: "faq_ar_badge",
+      titleKey: "faq_ar_title",
+      subtitleKey: "faq_ar_subtitle",
+      fallbackBadge: "الأسئلة الشائعة",
+      fallbackTitle: "أسئلة شائعة",
+      fallbackSubtitle:
+        "إجابات سريعة حول الإطارات، الرنقات، التركيب، الميزان وفروع دبي والشارقة.",
+    }
+  : {
+      badgeKey: "faq_badge",
+      titleKey: "faq_title",
+      subtitleKey: "faq_subtitle",
+      fallbackBadge: "FAQ",
+      fallbackTitle: "Frequently asked questions",
+      fallbackSubtitle:
+        "Quick answers about tyres, rims, fitting, balancing and our Dubai and Sharjah branches.",
+    };
+
+const faqs = isArabic
+  ? [
+      {
+        questionKey: "faq_ar_1_question",
+        answerKey: "faq_ar_1_answer",
+        fallbackQuestion: "هل تبيعون الإطارات في دبي والشارقة؟",
+        fallbackAnswer:
+          "نعم. خالد أمين تايرز يخدم العملاء من فرعي دبي والشارقة مع بيع الإطارات، التركيب ودعم الأسعار عبر واتساب.",
+      },
+      {
+        questionKey: "faq_ar_2_question",
+        answerKey: "faq_ar_2_answer",
+        fallbackQuestion: "هل أستطيع طلب السعر عبر واتساب؟",
+        fallbackAnswer:
+          "نعم. أرسل مقاس الإطار، مقاس الرنق أو موديل السيارة عبر واتساب وسيرد عليك الفريق بالسعر والتوفر.",
+      },
+      {
+        questionKey: "faq_ar_3_question",
+        answerKey: "faq_ar_3_answer",
+        fallbackQuestion: "هل توفرون خدمة ترصيص وميزان؟",
+        fallbackAnswer:
+          "نعم. نوفر خدمة الترصيص والميزان لتقليل الاهتزاز وتحسين راحة القيادة.",
+      },
+      {
+        questionKey: "faq_ar_4_question",
+        answerKey: "faq_ar_4_answer",
+        fallbackQuestion: "هل توفرون ميزان أرضي؟",
+        fallbackAnswer:
+          "نعم. خدمة الميزان الأرضي تساعد على تحسين عمر الإطارات وثبات السيارة أثناء القيادة.",
+      },
+      {
+        questionKey: "faq_ar_5_question",
+        answerKey: "faq_ar_5_answer",
+        fallbackQuestion: "هل تبيعون الرنقات والألوي ويلز؟",
+        fallbackAnswer:
+          "نعم. نوفر رنقات وألوي ويلز مع دعم اختيار المقاس المناسب لموديل السيارة.",
+      },
+      {
+        questionKey: "faq_ar_6_question",
+        answerKey: "faq_ar_6_answer",
+        fallbackQuestion: "أي فرع أتواصل معه؟",
+        fallbackAnswer:
+          "للتواصل مع فرع الشارقة: 050 351 2023. للتواصل مع فرع دبي: 056 161 5010. يمكنك أيضاً إرسال طلبك من نموذج الموقع.",
+      },
+    ]
+  : [
+      {
+        questionKey: "faq_1_question",
+        answerKey: "faq_1_answer",
+        fallbackQuestion: "Do you sell tyres in Dubai and Sharjah?",
+        fallbackAnswer:
+          "Yes. Khalid Amin Tyres serves customers from Dubai and Sharjah branches with tyre sales, fitting and WhatsApp pricing support.",
+      },
+      {
+        questionKey: "faq_2_question",
+        answerKey: "faq_2_answer",
+        fallbackQuestion: "Can I ask for tyre prices on WhatsApp?",
+        fallbackAnswer:
+          "Yes. Send your tyre size, rim size or car model on WhatsApp and our team will reply with price and availability.",
+      },
+      {
+        questionKey: "faq_3_question",
+        answerKey: "faq_3_answer",
+        fallbackQuestion: "Do you provide wheel balancing?",
+        fallbackAnswer:
+          "Yes. We provide wheel balancing support to reduce vibration and improve driving comfort.",
+      },
+      {
+        questionKey: "faq_4_question",
+        answerKey: "faq_4_answer",
+        fallbackQuestion: "Do you provide wheel alignment?",
+        fallbackAnswer:
+          "Yes. Wheel alignment support is available to help improve tyre life, steering feel and vehicle stability.",
+      },
+      {
+        questionKey: "faq_5_question",
+        answerKey: "faq_5_answer",
+        fallbackQuestion: "Do you sell rims and alloy wheels?",
+        fallbackAnswer:
+          "Yes. We offer rims and alloy wheels with fitment support for different car models.",
+      },
+      {
+        questionKey: "faq_6_question",
+        answerKey: "faq_6_answer",
+        fallbackQuestion: "Which branch should I contact?",
+        fallbackAnswer:
+          "For Sharjah contact 050 351 2023. For Dubai contact 056 161 5010. You can also send your request from the website form.",
+      },
+    ];
+---
+
+<section
+  id="faq"
+  class="relative overflow-hidden bg-white px-5 py-16 sm:px-8 lg:px-12"
+  dir={isArabic ? "rtl" : "ltr"}
+>
+  <div class="relative mx-auto max-w-7xl">
+    <div class="mx-auto max-w-3xl text-center" data-animate>
+      <DynamicSiteText
+        textKey={content.badgeKey}
+        fallback={content.fallbackBadge}
+        as="span"
+        class="inline-flex rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-950"
+      />
+
+      <DynamicSiteText
+        textKey={content.titleKey}
+        fallback={content.fallbackTitle}
+        as="h2"
+        class="mt-5 text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl"
+      />
+
+      <DynamicSiteText
+        textKey={content.subtitleKey}
+        fallback={content.fallbackSubtitle}
+        as="p"
+        class="mt-4 text-base font-semibold leading-8 text-slate-500"
+      />
+    </div>
+
+    <div class="mx-auto mt-10 grid max-w-5xl gap-3">
+      {
+        faqs.map((faq, index) => (
+          <details
+            data-animate
+            data-animate-delay={String(Math.min(index + 1, 5))}
+            class="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 shadow-sm open:bg-white open:shadow-md"
+          >
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-5 px-5 py-5 sm:px-6">
+              <div class="flex items-center gap-4">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-400 text-sm font-black text-slate-950">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+
+                <DynamicSiteText
+                  textKey={faq.questionKey}
+                  fallback={faq.fallbackQuestion}
+                  as="h3"
+                  class="text-base font-black leading-7 text-slate-900 sm:text-lg"
+                />
+              </div>
+
+              <span class="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1 text-xl font-black text-amber-500 transition group-open:rotate-45">
+                +
+              </span>
+            </summary>
+
+            <div class="border-t border-slate-200 px-5 py-5 sm:px-6">
+              <DynamicSiteText
+                textKey={faq.answerKey}
+                fallback={faq.fallbackAnswer}
+                as="p"
+                class="text-sm font-semibold leading-8 text-slate-600"
+              />
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>

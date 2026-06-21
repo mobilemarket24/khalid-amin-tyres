@@ -1,0 +1,255 @@
+﻿---
+import DynamicSiteText from "./DynamicSiteText.astro";
+import DynamicSiteImage from "./DynamicSiteImage.astro";
+
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const content = isArabic
+  ? {
+      badgeKey: "services_ar_badge",
+      titleKey: "services_ar_title",
+      subtitleKey: "services_ar_subtitle",
+      fallbackBadge: "خدماتنا",
+      fallbackTitle: "خدمات الإطارات والرنقات في مكان واحد",
+      fallbackSubtitle:
+        "من تركيب الإطارات إلى الرنقات، الميزان، الترصيص، الميزان الأرضي ودعم البطاريات، خالد أمين تايرز يخدم العملاء في دبي والشارقة.",
+    }
+  : {
+      badgeKey: "services_badge",
+      titleKey: "services_title",
+      subtitleKey: "services_subtitle",
+      fallbackBadge: "Our Services",
+      fallbackTitle: "Tyre, rim and wheel services in one place",
+      fallbackSubtitle:
+        "From tyre fitting to rims, balancing, alignment and battery support, Khalid Amin Tyres helps customers in Dubai and Sharjah.",
+    };
+
+const services = isArabic
+  ? [
+      {
+        imageKey: "services_tyres_image",
+        titleKey: "services_ar_tyres_title",
+        descKey: "services_ar_tyres_desc",
+        fallbackTitle: "إطارات",
+        fallbackDesc:
+          "إطارات فاخرة واقتصادية للسيارات، الدفع الرباعي، السيارات الرياضية والاستخدام اليومي.",
+        label: "TYRES",
+        accent: "cyan",
+      },
+      {
+        imageKey: "services_rims_image",
+        titleKey: "services_ar_rims_title",
+        descKey: "services_ar_rims_desc",
+        fallbackTitle: "رنقات وألوي ويلز",
+        fallbackDesc:
+          "رنقات وألوي ويلز مع دعم اختيار المقاس المناسب لموديل السيارة.",
+        label: "RIMS",
+        accent: "orange",
+      },
+      {
+        imageKey: "services_batteries_image",
+        titleKey: "services_ar_batteries_title",
+        descKey: "services_ar_batteries_desc",
+        fallbackTitle: "بطاريات",
+        fallbackDesc: "دعم فحص وتبديل البطاريات للسيارات بسرعة من الفريق.",
+        label: "BATTERY",
+        accent: "cyan",
+      },
+      {
+        imageKey: "services_alignment_image",
+        titleKey: "services_ar_alignment_title",
+        descKey: "services_ar_alignment_desc",
+        fallbackTitle: "ميزان أرضي",
+        fallbackDesc:
+          "خدمة ميزان تساعد على تحسين عمر الإطارات وثبات السيارة أثناء القيادة.",
+        label: "ALIGNMENT",
+        accent: "orange",
+      },
+      {
+        imageKey: "services_balancing_image",
+        titleKey: "services_ar_balancing_title",
+        descKey: "services_ar_balancing_desc",
+        fallbackTitle: "ترصيص وميزان",
+        fallbackDesc: "ترصيص وميزان لتقليل الاهتزاز وتحسين راحة القيادة.",
+        label: "BALANCING",
+        accent: "cyan",
+      },
+      {
+        imageKey: "services_onsite_image",
+        titleKey: "services_ar_onsite_title",
+        descKey: "services_ar_onsite_desc",
+        fallbackTitle: "دعم عبر واتساب",
+        fallbackDesc:
+          "راسل فريقنا عبر واتساب للحصول على دعم الإطارات، الرنقات والخدمات من أقرب فرع.",
+        label: "SUPPORT",
+        accent: "orange",
+      },
+    ]
+  : [
+      {
+        imageKey: "services_tyres_image",
+        fallbackImage: "/images/ferrari-service-bay.jpg.webp",
+        titleKey: "services_tyres_title",
+        descKey: "services_tyres_desc",
+        fallbackTitle: "Tyres",
+        fallbackDesc:
+          "Premium and budget tyres for SUV, sedan, sports cars and daily driving.",
+        label: "TYRES",
+        accent: "cyan",
+      },
+      {
+        imageKey: "services_rims_image",
+        fallbackImage: "/images/porsche-service-bay.jpg.webp",
+        titleKey: "services_rims_title",
+        descKey: "services_rims_desc",
+        fallbackTitle: "Rims & Alloy Wheels",
+        fallbackDesc:
+          "Alloy wheels and rims with fitment support for different car models.",
+        label: "RIMS",
+        accent: "orange",
+      },
+      {
+        imageKey: "services_batteries_image",
+        fallbackImage: "/images/branch-exterior-day.jpg.webp",
+        titleKey: "services_batteries_title",
+        descKey: "services_batteries_desc",
+        fallbackTitle: "Batteries",
+        fallbackDesc:
+          "Battery support for cars with fast checking and replacement assistance.",
+        label: "BATTERY",
+        accent: "cyan",
+      },
+      {
+        imageKey: "services_alignment_image",
+        fallbackImage: "/images/porsche-service-bay.jpg.webp",
+        titleKey: "services_alignment_title",
+        descKey: "services_alignment_desc",
+        fallbackTitle: "Wheel Alignment",
+        fallbackDesc:
+          "Alignment support to improve tyre life, steering feel and driving stability.",
+        label: "ALIGNMENT",
+        accent: "orange",
+      },
+      {
+        imageKey: "services_balancing_image",
+        fallbackImage: "/images/ferrari-service-bay.jpg.webp",
+        titleKey: "services_balancing_title",
+        descKey: "services_balancing_desc",
+        fallbackTitle: "Wheel Balancing",
+        fallbackDesc:
+          "Balancing support to reduce vibration and improve driving comfort.",
+        label: "BALANCING",
+        accent: "cyan",
+      },
+      {
+        imageKey: "services_onsite_image",
+        fallbackImage: "/images/branch-dubai-night.jpg.webp",
+        titleKey: "services_onsite_title",
+        descKey: "services_onsite_desc",
+        fallbackTitle: "On-site Support",
+        fallbackDesc:
+          "WhatsApp our team for tyre, rim and service support from the nearest branch.",
+        label: "SUPPORT",
+        accent: "orange",
+      },
+    ];
+---
+
+<section
+  id="services"
+  class="relative overflow-hidden bg-slate-50 px-5 py-16 sm:px-8 lg:px-12"
+  dir={isArabic ? "rtl" : "ltr"}
+>
+  <div class="relative mx-auto max-w-7xl">
+    <div class="mx-auto max-w-3xl text-center" data-animate>
+      <DynamicSiteText
+        textKey={content.badgeKey}
+        fallback={content.fallbackBadge}
+        as="span"
+        class="inline-flex rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-950"
+      />
+
+      <DynamicSiteText
+        textKey={content.titleKey}
+        fallback={content.fallbackTitle}
+        as="h2"
+        class="mt-5 text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl"
+      />
+
+      <DynamicSiteText
+        textKey={content.subtitleKey}
+        fallback={content.fallbackSubtitle}
+        as="p"
+        class="mt-4 text-base font-semibold leading-8 text-slate-500"
+      />
+    </div>
+
+    <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {
+        services.map((service, i) => (
+          <article
+            data-animate
+            data-animate-delay={String((i % 3) + 1)}
+            class="group overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+          >
+            <div class="relative h-56 overflow-hidden rounded-t-[2rem] bg-slate-100">
+              <DynamicSiteImage
+                imageKey={service.imageKey}
+                fallbackSrc={service.fallbackImage}
+                alt={service.fallbackTitle}
+                loading="lazy"
+                class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"
+              />
+
+              <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/70"></div>
+
+              <div class="absolute left-5 top-5">
+                <span
+                  class={`inline-flex rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] ${
+                    service.accent === "cyan"
+                      ? "bg-amber-400 text-slate-950"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  {service.label}
+                </span>
+              </div>
+
+              <div class="absolute bottom-5 left-5 right-5">
+                <DynamicSiteText
+                  textKey={service.titleKey}
+                  fallback={service.fallbackTitle}
+                  as="h3"
+                  class="text-2xl font-black leading-tight text-white"
+                />
+              </div>
+            </div>
+
+            <div class="p-6">
+              <DynamicSiteText
+                textKey={service.descKey}
+                fallback={service.fallbackDesc}
+                as="p"
+                class="min-h-[84px] text-sm font-semibold leading-7 text-slate-500"
+              />
+
+              <div class="mt-5 h-px w-full bg-slate-100"></div>
+
+              <div class="mt-4 flex items-center justify-between gap-4">
+                <p class="text-xs font-black uppercase tracking-[0.18em] text-amber-500">
+                  Khalid Amin Tyres
+                </p>
+
+                <span
+                  class={`h-2 w-2 rounded-full ${
+                    service.accent === "cyan" ? "bg-amber-400" : "bg-red-500"
+                  }`}
+                ></span>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

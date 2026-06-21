@@ -1,0 +1,309 @@
+﻿---
+import BrandLogo from "./BrandLogo.astro";
+import DynamicSiteText from "./DynamicSiteText.astro";
+import { business } from "../data/business";
+import { getWhatsAppUrl } from "../utils/whatsapp";
+
+const isAr = Astro.url.pathname.startsWith("/ar");
+
+const homeUrl = isAr ? "/ar/" : "/";
+const langUrl = isAr ? "/" : "/ar/";
+
+const navItems = isAr
+  ? [
+      {
+        labelKey: "header_ar_nav_home",
+        fallbackLabel: "الرئيسية",
+        href: "/ar/",
+      },
+      {
+        labelKey: "header_ar_nav_tyres",
+        fallbackLabel: "الإطارات",
+        href: "/ar/#tyres",
+      },
+      {
+        labelKey: "header_ar_nav_rims",
+        fallbackLabel: "الجنوط",
+        href: "/ar/#rims",
+      },
+      {
+        labelKey: "header_ar_nav_services",
+        fallbackLabel: "الخدمات",
+        href: "/ar/#services",
+      },
+      {
+        labelKey: "header_ar_nav_branches",
+        fallbackLabel: "الفروع",
+        href: "/ar/#branches",
+      },
+      {
+        labelKey: "header_ar_nav_faq",
+        fallbackLabel: "الأسئلة",
+        href: "/ar/#faq",
+      },
+      {
+        labelKey: "header_ar_nav_contact",
+        fallbackLabel: "تواصل معنا",
+        href: "/ar/#contact",
+      },
+    ]
+  : [
+      {
+        labelKey: "header_nav_home",
+        fallbackLabel: "Home",
+        href: "/",
+      },
+      {
+        labelKey: "header_nav_tyres",
+        fallbackLabel: "Tyres",
+        href: "/#tyres",
+      },
+      {
+        labelKey: "header_nav_rims",
+        fallbackLabel: "Rims",
+        href: "/#rims",
+      },
+      {
+        labelKey: "header_nav_services",
+        fallbackLabel: "Services",
+        href: "/#services",
+      },
+      {
+        labelKey: "header_nav_branches",
+        fallbackLabel: "Branches",
+        href: "/#branches",
+      },
+      {
+        labelKey: "header_nav_faq",
+        fallbackLabel: "FAQ",
+        href: "/#faq",
+      },
+      {
+        labelKey: "header_nav_contact",
+        fallbackLabel: "Contact",
+        href: "/#contact",
+      },
+    ];
+
+const text = isAr
+  ? {
+      logoKey: "header_ar_logo_text",
+      logoFallback: "خالد أمين تايرز",
+      locationKey: "header_ar_location_text",
+      locationFallback: "دبي والشارقة",
+      quoteKey: "header_ar_quote_button",
+      quoteFallback: "احصل على السعر",
+      langKey: "header_language_en",
+      langFallback: "English",
+      mobileMenu: "القائمة",
+      whatsappKey: "header_ar_mobile_whatsapp",
+      whatsappFallback: "واتساب",
+      sharjahBranchKey: "header_ar_branch_sharjah_label",
+      sharjahBranchFallback: "فرع الشارقة",
+      dubaiBranchKey: "header_ar_branch_dubai_label",
+      dubaiBranchFallback: "فرع دبي",
+    }
+  : {
+      logoKey: "header_logo_text",
+      logoFallback: business.name,
+      locationKey: "header_location_text",
+      locationFallback: "Dubai & Sharjah",
+      quoteKey: "header_quote_button",
+      quoteFallback: "Get Price",
+      langKey: "header_language_ar",
+      langFallback: "عربي",
+      mobileMenu: "Menu",
+      whatsappKey: "header_mobile_whatsapp",
+      whatsappFallback: "WhatsApp",
+      sharjahBranchKey: "header_branch_sharjah_label",
+      sharjahBranchFallback: "Sharjah Branch",
+      dubaiBranchKey: "header_branch_dubai_label",
+      dubaiBranchFallback: "Dubai Branch",
+    };
+---
+
+<header class="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a0e]/90 text-white shadow-2xl shadow-slate-950/20 backdrop-blur-xl">
+  <div class="mx-auto max-w-7xl px-5">
+    <div class="flex h-20 items-center justify-between gap-5">
+      <a href={homeUrl} class="flex items-center gap-3">
+        <BrandLogo />
+
+        <div class="hidden sm:block">
+          <DynamicSiteText
+            textKey={text.logoKey}
+            fallback={text.logoFallback}
+            as="p"
+            class="text-sm font-black leading-tight tracking-wide text-white"
+          />
+
+          <DynamicSiteText
+            textKey={text.locationKey}
+            fallback={text.locationFallback}
+            as="p"
+            class="mt-1 text-xs font-bold text-slate-400"
+          />
+        </div>
+      </a>
+
+      <nav class="hidden items-center gap-1 lg:flex">
+        {
+          navItems.map((item) => (
+            <a
+              href={item.href}
+              class="rounded-xl px-3 py-3 text-sm font-black text-slate-200 transition hover:bg-white/10 hover:text-amber-300 xl:px-4"
+            >
+              <DynamicSiteText
+                textKey={item.labelKey}
+                fallback={item.fallbackLabel}
+                as="span"
+              />
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="hidden items-center gap-3 lg:flex">
+        <a
+          href={langUrl}
+          class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white transition hover:border-amber-300/50 hover:bg-amber-400/10 hover:text-amber-300"
+        >
+          <DynamicSiteText
+            textKey={text.langKey}
+            fallback={text.langFallback}
+            as="span"
+          />
+        </a>
+
+        <a
+          href={getWhatsAppUrl(
+            "sharjah",
+            isAr
+              ? "مرحبا، أريد معرفة السعر والتوفر."
+              : "Hi, I need price and availability."
+          )}
+          class="rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-slate-950 shadow-lg shadow-amber-400/20 transition hover:bg-amber-300"
+        >
+          <DynamicSiteText
+            textKey={text.quoteKey}
+            fallback={text.quoteFallback}
+            as="span"
+          />
+        </a>
+      </div>
+
+      <button
+        type="button"
+        id="siteMobileMenuButton"
+        class="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-2xl font-black text-white lg:hidden"
+        aria-label={text.mobileMenu}
+      >
+        ☰
+      </button>
+    </div>
+
+    <div id="siteMobileMenu" class="hidden border-t border-white/10 py-4 lg:hidden">
+      <nav class="grid gap-2">
+        {
+          navItems.map((item) => (
+            <a
+              href={item.href}
+              class="rounded-2xl bg-white/5 px-4 py-4 text-sm font-black text-white transition hover:bg-white/10 hover:text-amber-300"
+            >
+              <DynamicSiteText
+                textKey={item.labelKey}
+                fallback={item.fallbackLabel}
+                as="span"
+              />
+            </a>
+          ))
+        }
+
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <a
+            href={langUrl}
+            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-center text-sm font-black text-white"
+          >
+            <DynamicSiteText
+              textKey={text.langKey}
+              fallback={text.langFallback}
+              as="span"
+            />
+          </a>
+
+          <a
+            href={getWhatsAppUrl(
+              "sharjah",
+              isAr
+                ? "مرحبا، أريد معرفة السعر والتوفر."
+                : "Hi, I need price and availability."
+            )}
+            class="rounded-2xl bg-amber-400 px-4 py-4 text-center text-sm font-black text-slate-950"
+          >
+            <DynamicSiteText
+              textKey={text.whatsappKey}
+              fallback={text.whatsappFallback}
+              as="span"
+            />
+          </a>
+        </div>
+
+        <div class="grid gap-2 pt-2 sm:grid-cols-2">
+          <a
+            href={getWhatsAppUrl(
+              "sharjah",
+              isAr
+                ? "مرحبا، أريد التواصل مع فرع الشارقة."
+                : "Hi, I want to contact Sharjah branch."
+            )}
+            class="rounded-2xl border border-amber-300/20 bg-amber-400/10 px-4 py-4 text-center text-sm font-black text-amber-300"
+          >
+            <DynamicSiteText
+              textKey={text.sharjahBranchKey}
+              fallback={text.sharjahBranchFallback}
+              as="span"
+            />
+            <br />
+            <span class="text-xs text-slate-300">
+              {business.branches.sharjah.whatsappLocal}
+            </span>
+          </a>
+
+          <a
+            href={getWhatsAppUrl(
+              "dubai",
+              isAr
+                ? "مرحبا، أريد التواصل مع فرع دبي."
+                : "Hi, I want to contact Dubai branch."
+            )}
+            class="rounded-2xl border border-red-300/20 bg-red-500/10 px-4 py-4 text-center text-sm font-black text-red-300"
+          >
+            <DynamicSiteText
+              textKey={text.dubaiBranchKey}
+              fallback={text.dubaiBranchFallback}
+              as="span"
+            />
+            <br />
+            <span class="text-xs text-slate-300">
+              {business.branches.dubai.whatsappLocal}
+            </span>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    const mobileMenuButton = document.querySelector("#siteMobileMenuButton");
+    const mobileMenu = document.querySelector("#siteMobileMenu");
+
+    mobileMenuButton?.addEventListener("click", () => {
+      mobileMenu?.classList.toggle("hidden");
+    });
+
+    mobileMenu?.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.add("hidden");
+      });
+    });
+  </script>
+</header>

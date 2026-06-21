@@ -1,0 +1,60 @@
+---
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+interface Brand {
+  name: string;
+  color: string;
+  bg: string;
+  short: string;
+}
+
+const brands: Brand[] = [
+  { name: "Michelin",    color: "#0057A8", bg: "#E8F0FA", short: "M"  },
+  { name: "Bridgestone", color: "#CC0000", bg: "#FAEAEA", short: "BS" },
+  { name: "Continental", color: "#F5A200", bg: "#FEF6E6", short: "C"  },
+  { name: "Pirelli",     color: "#1A1A1A", bg: "#F0F0F0", short: "P"  },
+  { name: "Goodyear",    color: "#005BAC", bg: "#E6EFF8", short: "GY" },
+  { name: "Dunlop",      color: "#006633", bg: "#E6F3EC", short: "D"  },
+  { name: "Yokohama",    color: "#D40000", bg: "#FAEAEA", short: "Y"  },
+  { name: "Hankook",     color: "#E30613", bg: "#FAEAEA", short: "H"  },
+  { name: "Toyo",        color: "#CC0000", bg: "#FAEAEA", short: "T"  },
+  { name: "Falken",      color: "#CC0000", bg: "#F0F0F0", short: "FK" },
+  { name: "Nitto",       color: "#1A1A1A", bg: "#F0F0F0", short: "N"  },
+  { name: "Kumho",       color: "#0061A1", bg: "#E6EFF8", short: "K"  },
+  { name: "Nexen",       color: "#0056A2", bg: "#E6EFF8", short: "NX" },
+  { name: "Cooper",      color: "#003087", bg: "#E6EFF8", short: "CO" },
+  { name: "BFGoodrich",  color: "#003087", bg: "#E6EFF8", short: "BF" },
+  { name: "Firestone",   color: "#CC0000", bg: "#FAEAEA", short: "FS" },
+];
+---
+
+<div class="relative overflow-hidden border-y border-slate-200 bg-white py-10" data-animate>
+  <div class="mx-auto max-w-7xl px-5 text-center">
+    <p class="mb-8 text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">
+      {isArabic ? "العلامات التجارية المتوفرة" : "Brands We Carry"}
+    </p>
+  </div>
+
+  <div class="relative overflow-hidden">
+    <div class="flex animate-brand-scroll items-center gap-3 whitespace-nowrap">
+      {
+        [...brands, ...brands].map((brand) => (
+          <div class="inline-flex shrink-0 items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-white hover:shadow-md">
+            <div
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black"
+              style={`background:${brand.bg}; color:${brand.color};`}
+            >
+              {brand.short}
+            </div>
+            <span
+              class="text-sm font-black tracking-tight"
+              style={`color:${brand.color};`}
+            >
+              {brand.name}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>

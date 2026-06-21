@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SeoPageHero from "../components/SeoPageHero.astro";
+import LeadCaptureSection from "../components/LeadCaptureSection.astro";
+import BranchesSection from "../components/BranchesSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import FinalCtaSection from "../components/FinalCtaSection.astro";
+---
+
+<BaseLayout
+  title="Wheel Alignment Dubai | Car Alignment Service UAE | Khalid Amin Tyres"
+  description="Wheel alignment service in Dubai. Khalid Amin Tyres offers tyre fitting, wheel balancing and alignment support in Dubai and Sharjah."
+>
+  <main>
+    <SeoPageHero
+      imageKey="wheel_alignment_dubai_hero"
+      badge="Wheel Alignment Dubai"
+      titleKey="wheel_alignment_dubai_hero_title"
+      subtitleKey="wheel_alignment_dubai_hero_subtitle"
+      title="Wheel Alignment in Dubai"
+      subtitle="Improve tyre life, steering feel and driving stability with wheel alignment support from Khalid Amin Tyres."
+      branch="dubai"
+      bullets={[
+        "Alignment support",
+        "Tyre wear check",
+        "Steering vibration support",
+        "Fast WhatsApp booking",
+      ]}
+    />
+
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

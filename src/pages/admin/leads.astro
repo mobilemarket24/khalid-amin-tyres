@@ -1,0 +1,613 @@
+﻿---
+import "../../styles/global.css";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<AdminLayout title="Leads | Khalid Amin Tyres Admin">
+  <AdminShell title="Leads" eyebrow="Customer Requests" current="leads">
+    <div class="space-y-6">
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Total</p>
+          <p id="totalCount" class="mt-3 text-4xl font-black">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-amber-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-amber-300">New</p>
+          <p id="newCount" class="mt-3 text-4xl font-black text-amber-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-red-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-red-300">Follow Up</p>
+          <p id="followUpCount" class="mt-3 text-4xl font-black text-red-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-green-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-green-300">Won</p>
+          <p id="wonCount" class="mt-3 text-4xl font-black text-green-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-red-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-red-300">Lost</p>
+          <p id="lostCount" class="mt-3 text-4xl font-black text-red-200">0</p>
+        </div>
+      </div>
+
+      <div class="grid gap-4 rounded-[2rem] border border-white/10 bg-white/10 p-5 xl:grid-cols-[1.4fr_0.6fr_0.6fr_0.6fr]">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search phone, customer, tyre size, car, message..."
+          class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+        />
+
+        <select
+          id="statusFilter"
+          class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+        >
+          <option value="all">All Status</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="quoted">Quoted</option>
+          <option value="follow_up">Follow Up</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+
+        <select
+          id="typeFilter"
+          class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+        >
+          <option value="all">All Types</option>
+          <option value="tyre">Tyre</option>
+          <option value="rim">Rim</option>
+          <option value="battery">Battery</option>
+          <option value="service">Service</option>
+          <option value="general">General</option>
+        </select>
+
+        <select
+          id="priorityFilter"
+          class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+        >
+          <option value="all">All Priority</option>
+          <option value="urgent">Urgent</option>
+          <option value="high">High</option>
+          <option value="normal">Normal</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <div id="message" class="hidden rounded-2xl p-5 text-sm font-bold"></div>
+
+      <div id="loading" class="rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-black">
+        Loading leads...
+      </div>
+
+      <div id="errorBox" class="hidden rounded-[2rem] bg-red-500/20 p-8 font-bold text-red-200"></div>
+
+      <div id="emptyBox" class="hidden rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center">
+        <h3 class="text-2xl font-black">No leads found</h3>
+        <p class="mt-3 text-sm font-semibold text-slate-400">
+          هنوز هیچ درخواست مشتری ثبت نشده. وقتی مشتری فرم سایت را پر کند، اینجا نمایش داده می‌شود.
+        </p>
+      </div>
+
+      <div id="leadsWrap" class="hidden overflow-hidden rounded-[2rem] border border-white/10 bg-white/10">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[1500px] text-left">
+            <thead class="bg-slate-950/70 text-xs uppercase tracking-[0.2em] text-slate-400">
+              <tr>
+                <th class="px-5 py-4">Customer</th>
+                <th class="px-5 py-4">Request</th>
+                <th class="px-5 py-4">Car / Size</th>
+                <th class="px-5 py-4">Branch</th>
+                <th class="px-5 py-4">Status</th>
+                <th class="px-5 py-4">Priority</th>
+                <th class="px-5 py-4">Admin Note</th>
+                <th class="px-5 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="leadsTable" class="divide-y divide-white/10"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </AdminShell>
+
+  <script>
+    import { supabase } from "../../lib/supabase";
+
+    const loading = document.getElementById("loading");
+    const errorBox = document.getElementById("errorBox");
+    const emptyBox = document.getElementById("emptyBox");
+    const leadsWrap = document.getElementById("leadsWrap");
+    const leadsTable = document.getElementById("leadsTable");
+    const message = document.getElementById("message");
+
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const typeFilter = document.getElementById("typeFilter");
+    const priorityFilter = document.getElementById("priorityFilter");
+
+    const totalCount = document.getElementById("totalCount");
+    const newCount = document.getElementById("newCount");
+    const followUpCount = document.getElementById("followUpCount");
+    const wonCount = document.getElementById("wonCount");
+    const lostCount = document.getElementById("lostCount");
+
+    let allLeads = [];
+
+    async function checkAdminSession() {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        window.location.href = "/admin/login/";
+        return false;
+      }
+
+      return true;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+
+      try {
+        return new Intl.DateTimeFormat("en-AE", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(new Date(value));
+      } catch {
+        return value;
+      }
+    }
+
+    function cleanPhone(value) {
+      return String(value || "").replace(/\D/g, "");
+    }
+
+    function getWhatsappNumber(lead) {
+      return cleanPhone(lead.whatsapp || lead.phone || "");
+    }
+
+    function labelStatus(value) {
+      const labels = {
+        new: "New",
+        contacted: "Contacted",
+        quoted: "Quoted",
+        follow_up: "Follow Up",
+        won: "Won",
+        lost: "Lost",
+      };
+
+      return labels[value] || value || "-";
+    }
+
+    function labelPriority(value) {
+      const labels = {
+        urgent: "Urgent",
+        high: "High",
+        normal: "Normal",
+        low: "Low",
+      };
+
+      return labels[value] || value || "-";
+    }
+
+    function statusOptions(current) {
+      const values = ["new", "contacted", "quoted", "follow_up", "won", "lost"];
+
+      return values
+        .map((value) => {
+          const selected = current === value ? "selected" : "";
+          return `<option value="${value}" ${selected}>${labelStatus(value)}</option>`;
+        })
+        .join("");
+    }
+
+    function priorityOptions(current) {
+      const values = ["urgent", "high", "normal", "low"];
+
+      return values
+        .map((value) => {
+          const selected = current === value ? "selected" : "";
+          return `<option value="${value}" ${selected}>${labelPriority(value)}</option>`;
+        })
+        .join("");
+    }
+
+    function typeBadge(type) {
+      const base = "inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide";
+
+      if (type === "tyre") {
+        return `<span class="${base} bg-amber-500/20 text-amber-200">Tyre</span>`;
+      }
+
+      if (type === "rim") {
+        return `<span class="${base} bg-red-500/20 text-red-200">Rim</span>`;
+      }
+
+      if (type === "battery") {
+        return `<span class="${base} bg-green-500/20 text-green-200">Battery</span>`;
+      }
+
+      if (type === "service") {
+        return `<span class="${base} bg-purple-500/20 text-purple-200">Service</span>`;
+      }
+
+      return `<span class="${base} bg-slate-500/20 text-slate-300">General</span>`;
+    }
+
+    function getBranchLabel(lead) {
+      const branchName = lead.branches?.name || "";
+      const city = lead.branches?.city || "";
+      const id = lead.branch_id || "";
+
+      if (city) return city;
+      if (branchName) return branchName;
+      if (id === "dubai") return "Dubai";
+      if (id === "sharjah") return "Sharjah";
+      return "-";
+    }
+
+    function getProductLabel(lead) {
+      return lead.products?.title || lead.product_title_snapshot || "-";
+    }
+
+    function updateSummary() {
+      totalCount.textContent = String(allLeads.length);
+      newCount.textContent = String(allLeads.filter((lead) => lead.status === "new").length);
+      followUpCount.textContent = String(allLeads.filter((lead) => lead.status === "follow_up").length);
+      wonCount.textContent = String(allLeads.filter((lead) => lead.status === "won").length);
+      lostCount.textContent = String(allLeads.filter((lead) => lead.status === "lost").length);
+    }
+
+    function getFilteredLeads() {
+      const search = searchInput.value.trim().toLowerCase();
+      const status = statusFilter.value;
+      const type = typeFilter.value;
+      const priority = priorityFilter.value;
+
+      return allLeads.filter((lead) => {
+        const searchable = [
+          lead.customer_name,
+          lead.phone,
+          lead.whatsapp,
+          lead.car_make,
+          lead.car_model,
+          lead.car_year,
+          lead.tyre_size,
+          lead.rim_size,
+          lead.brand_preference,
+          lead.budget,
+          lead.message,
+          lead.admin_note,
+          lead.product_title_snapshot,
+          lead.products?.title,
+          lead.branches?.city,
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const matchesSearch = !search || searchable.includes(search);
+        const matchesStatus = status === "all" || lead.status === status;
+        const matchesType = type === "all" || lead.lead_type === type;
+        const matchesPriority = priority === "all" || lead.priority === priority;
+
+        return matchesSearch && matchesStatus && matchesType && matchesPriority;
+      });
+    }
+
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.classList.remove(
+        "hidden",
+        "bg-red-500/20",
+        "text-red-200",
+        "bg-green-500/20",
+        "text-green-200"
+      );
+
+      if (type === "success") {
+        message.classList.add("bg-green-500/20", "text-green-200");
+      } else {
+        message.classList.add("bg-red-500/20", "text-red-200");
+      }
+    }
+
+    function renderLeads() {
+      updateSummary();
+
+      const filteredLeads = getFilteredLeads();
+
+      if (filteredLeads.length === 0) {
+        leadsWrap.classList.add("hidden");
+        emptyBox.classList.remove("hidden");
+        return;
+      }
+
+      emptyBox.classList.add("hidden");
+      leadsWrap.classList.remove("hidden");
+
+      leadsTable.innerHTML = filteredLeads
+        .map((lead) => {
+          const whatsappNumber = getWhatsappNumber(lead);
+          const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "";
+          const carText = [lead.car_year, lead.car_make, lead.car_model].filter(Boolean).join(" ");
+          const sizeText = lead.lead_type === "rim" ? lead.rim_size : lead.tyre_size;
+
+          return `
+            <tr class="hover:bg-white/5">
+              <td class="px-5 py-5 align-top">
+                <div>
+                  <p class="font-black text-white">
+                    ${escapeHtml(lead.customer_name || "No Name")}
+                  </p>
+
+                  <p class="mt-2 text-sm font-bold text-slate-400">
+                    ${escapeHtml(lead.phone || lead.whatsapp || "-")}
+                  </p>
+
+                  <p class="mt-2 text-xs font-semibold text-slate-500">
+                    ${escapeHtml(formatDate(lead.created_at))}
+                  </p>
+
+                  ${
+                    whatsappLink
+                      ? `<a href="${whatsappLink}" target="_blank" class="mt-3 inline-flex rounded-xl bg-green-500 px-4 py-2 text-xs font-black text-white transition hover:bg-green-400">WhatsApp</a>`
+                      : `<span class="mt-3 inline-flex rounded-xl bg-white/10 px-4 py-2 text-xs font-black text-slate-400">No WhatsApp</span>`
+                  }
+                </div>
+              </td>
+
+              <td class="px-5 py-5 align-top">
+                <div class="space-y-3">
+                  ${typeBadge(lead.lead_type)}
+
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                      Product
+                    </p>
+                    <p class="mt-1 max-w-xs text-sm font-bold leading-6 text-slate-300">
+                      ${escapeHtml(getProductLabel(lead))}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                      Message
+                    </p>
+                    <p class="mt-1 max-w-xs text-sm font-semibold leading-6 text-slate-400">
+                      ${escapeHtml(lead.message || "-")}
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-5 py-5 align-top">
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                      Car
+                    </p>
+                    <p class="mt-1 text-sm font-bold text-slate-300">
+                      ${escapeHtml(carText || "-")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                      Size
+                    </p>
+                    <p class="mt-1 text-sm font-black text-amber-200">
+                      ${escapeHtml(sizeText || "-")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                      Brand / Budget
+                    </p>
+                    <p class="mt-1 text-sm font-bold text-slate-300">
+                      ${escapeHtml(lead.brand_preference || "-")} / ${escapeHtml(lead.budget || "-")}
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-5 py-5 align-top">
+                <span class="rounded-xl bg-white/10 px-4 py-2 text-xs font-black text-white">
+                  ${escapeHtml(getBranchLabel(lead))}
+                </span>
+
+                <p class="mt-3 text-xs font-semibold text-slate-500">
+                  ${escapeHtml(lead.source_page || "-")}
+                </p>
+              </td>
+
+              <td class="px-5 py-5 align-top">
+                <select
+                  data-action="status"
+                  data-id="${lead.id}"
+                  class="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm font-black text-white outline-none"
+                >
+                  ${statusOptions(lead.status)}
+                </select>
+              </td>
+
+              <td class="px-5 py-5 align-top">
+                <select
+                  data-action="priority"
+                  data-id="${lead.id}"
+                  class="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm font-black text-white outline-none"
+                >
+                  ${priorityOptions(lead.priority)}
+                </select>
+              </td>
+
+              <td class="px-5 py-5 align-top">
+                <textarea
+                  data-note-id="${lead.id}"
+                  class="min-h-28 w-72 rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-white outline-none"
+                  placeholder="Write note..."
+                >${escapeHtml(lead.admin_note || "")}</textarea>
+
+                <button
+                  data-action="save-note"
+                  data-id="${lead.id}"
+                  class="mt-3 rounded-xl bg-amber-400 px-4 py-2 text-xs font-black text-slate-950 transition hover:bg-amber-300"
+                >
+                  Save Note
+                </button>
+              </td>
+
+              <td class="px-5 py-5 text-right align-top">
+                <button
+                  data-action="delete"
+                  data-id="${lead.id}"
+                  class="rounded-xl bg-red-500/20 px-4 py-2 text-xs font-black text-red-200 transition hover:bg-red-500/30"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    async function loadLeads() {
+      const allowed = await checkAdminSession();
+
+      if (!allowed) return;
+
+      const { data, error } = await supabase
+        .from("leads")
+        .select(`
+          *,
+          branches (
+            id,
+            name,
+            city
+          ),
+          products (
+            id,
+            title,
+            product_type,
+            size_display
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      loading.classList.add("hidden");
+
+      if (error) {
+        errorBox.textContent = error.message;
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      allLeads = data || [];
+      renderLeads();
+    }
+
+    async function updateLead(id, payload) {
+      const { error } = await supabase
+        .from("leads")
+        .update(payload)
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return false;
+      }
+
+      allLeads = allLeads.map((lead) =>
+        lead.id === id ? { ...lead, ...payload } : lead
+      );
+
+      renderLeads();
+      return true;
+    }
+
+    async function deleteLead(id) {
+      const confirmed = confirm("Delete this lead?\n\nThis cannot be undone.");
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("leads")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      allLeads = allLeads.filter((lead) => lead.id !== id);
+      renderLeads();
+      showMessage("Lead deleted ✅", "success");
+    }
+
+    leadsTable.addEventListener("change", async (event) => {
+      const field = event.target.closest("select[data-action]");
+      if (!field) return;
+
+      const action = field.dataset.action;
+      const id = field.dataset.id;
+
+      if (action === "status") {
+        await updateLead(id, { status: field.value });
+      }
+
+      if (action === "priority") {
+        await updateLead(id, { priority: field.value });
+      }
+    });
+
+    leadsTable.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+
+      const action = button.dataset.action;
+      const id = button.dataset.id;
+
+      if (action === "save-note") {
+        const noteField = document.querySelector(`[data-note-id="${id}"]`);
+        const adminNote = noteField ? noteField.value.trim() : "";
+
+        const ok = await updateLead(id, { admin_note: adminNote || null });
+
+        if (ok) {
+          showMessage("Admin note saved ✅", "success");
+        }
+      }
+
+      if (action === "delete") {
+        await deleteLead(id);
+      }
+    });
+
+    [searchInput, statusFilter, typeFilter, priorityFilter].forEach((element) => {
+      element.addEventListener("input", renderLeads);
+      element.addEventListener("change", renderLeads);
+    });
+
+    loadLeads();
+  </script>
+</AdminLayout>

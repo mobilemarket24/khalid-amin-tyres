@@ -1,0 +1,735 @@
+﻿---
+import "../../../styles/global.css";
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import AdminShell from "../../../components/admin/AdminShell.astro";
+---
+
+<AdminLayout title="Edit Product | Khalid Amin Tyres Admin">
+  <AdminShell title="Edit Product" eyebrow="Product Management" current="products">
+    <div id="loading" class="rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-black">
+      Loading product...
+    </div>
+
+    <div id="errorBox" class="hidden rounded-[2rem] bg-red-500/20 p-8 font-bold text-red-200"></div>
+
+    <form id="productForm" class="hidden mx-auto max-w-5xl space-y-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <a
+          href="/admin/products/"
+          class="rounded-2xl border border-white/10 bg-white/10 px-6 py-4 text-center font-black text-white transition hover:bg-white/15"
+        >
+          Back to Products
+        </a>
+
+        <a
+          id="viewWebsiteLink"
+          href="/"
+          target="_blank"
+          class="rounded-2xl bg-red-500 px-6 py-4 text-center font-black text-white transition hover:bg-red-400"
+        >
+          View Website
+        </a>
+      </div>
+
+      <div class="rounded-[2rem] border border-white/10 bg-white/10 p-6">
+        <h3 class="text-2xl font-black">Basic Information</h3>
+
+        <div class="mt-6 grid gap-5 md:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Product Type</label>
+            <select id="productType" required class="field">
+              <option value="tyre">Tyre</option>
+              <option value="rim">Rim</option>
+              <option value="battery">Battery</option>
+              <option value="service">Service</option>
+              <option value="accessory">Accessory</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Status</label>
+            <select id="status" required class="field">
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="hidden">Hidden</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Brand</label>
+            <select id="brandId" class="field">
+              <option value="">Select brand</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Model / Pattern</label>
+            <input id="model" class="field" placeholder="Pilot Sport 4 SUV / Alenza / SportContact..." />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Product Title</label>
+            <input id="title" required class="field" placeholder="Michelin Pilot Sport 4 SUV 275/45R21" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Slug</label>
+            <input id="slug" required class="field" placeholder="michelin-pilot-sport-4-suv-275-45r21" />
+            <p class="mt-2 text-xs font-semibold text-slate-500">
+              برای آدرس صفحه محصول در آینده استفاده می‌شود.
+            </p>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Size Display</label>
+            <input id="sizeDisplay" class="field" placeholder="275/45R21 or 20x9 5x112" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Manufacture Year</label>
+            <input
+              id="manufactureYear"
+              type="number"
+              min="2000"
+              max="2035"
+              class="field"
+              placeholder="2025"
+            />
+            <p class="mt-2 text-xs font-semibold text-slate-500">
+              سال تولید تایر، مثلاً 2024 یا 2025.
+            </p>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Origin</label>
+            <input id="origin" class="field" placeholder="Europe / Japan / Thailand / China..." />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Vehicle Type</label>
+            <select id="vehicleType" class="field">
+              <option value="">Select vehicle type</option>
+              <option value="SUV">SUV</option>
+              <option value="Sedan">Sedan</option>
+              <option value="Sports">Sports</option>
+              <option value="Luxury">Luxury</option>
+              <option value="Commercial">Commercial</option>
+              <option value="4x4">4x4</option>
+              <option value="Pickup">Pickup</option>
+              <option value="Van">Van</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Season / Usage</label>
+            <select id="season" class="field">
+              <option value="">Select season / usage</option>
+              <option value="Summer">Summer</option>
+              <option value="All Season">All Season</option>
+              <option value="Performance">Performance</option>
+              <option value="Touring">Touring</option>
+              <option value="Off-road">Off-road</option>
+              <option value="Highway">Highway</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Load Index</label>
+            <input id="loadIndex" class="field" placeholder="105 / 109 / 112" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Speed Rating</label>
+            <input id="speedRating" class="field" placeholder="H / V / W / Y" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Run Flat</label>
+            <select id="runFlat" class="field">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Warranty Text</label>
+            <input id="warrantyText" class="field" placeholder="2 Years Warranty" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Featured</label>
+            <select id="featured" class="field">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Sort Order</label>
+            <input id="sortOrder" type="number" class="field" placeholder="0" />
+            <p class="mt-2 text-xs font-semibold text-slate-500">
+              عدد کمتر یعنی نمایش جلوتر.
+            </p>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Search Keywords</label>
+            <input
+              id="searchKeywords"
+              class="field"
+              placeholder="275/45R21, SUV tyre, Michelin Dubai, BMW X5 tyre"
+            />
+            <p class="mt-2 text-xs font-semibold text-slate-500">
+              کلمات را با کاما جدا کن. برای سرچ داخل سایت و SEO استفاده می‌شود.
+            </p>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Short Description</label>
+            <textarea id="shortDescription" class="field min-h-28" placeholder="Short product description for website card."></textarea>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Full Description</label>
+            <textarea id="description" class="field min-h-36" placeholder="Full product description."></textarea>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Suitable Cars</label>
+            <input id="suitableCars" class="field" placeholder="BMW X5, Range Rover, Mercedes GLE, Lexus LX" />
+            <p class="mt-2 text-xs font-semibold text-slate-500">
+              ماشین‌ها را با کاما جدا کن.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-[2rem] border border-white/10 bg-white/10 p-6">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 class="text-2xl font-black">Product Image</h3>
+            <p class="mt-2 text-sm font-semibold text-slate-400">
+              عکس فعلی را ببین؛ اگر عکس جدید انتخاب کنی، با Save Changes جایگزین می‌شود.
+            </p>
+          </div>
+
+          <span class="rounded-full bg-amber-400/15 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-amber-300">
+            Replace Image
+          </span>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p class="mb-3 text-sm font-black text-slate-300">Current / Preview</p>
+
+            <img
+              id="currentImage"
+              src="/images/hero-banner.png"
+              alt="Product image"
+              class="h-72 w-full rounded-[1.5rem] border border-white/10 bg-slate-950 object-cover"
+            />
+          </div>
+
+          <div class="rounded-[1.5rem] border border-white/10 bg-slate-950/50 p-5">
+            <label class="mb-2 block text-sm font-black text-slate-300">
+              Upload New Image
+            </label>
+
+            <input
+              id="imageFile"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              class="block w-full rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 text-white"
+            />
+
+            <p class="mt-3 text-xs font-semibold leading-6 text-slate-500">
+              JPG, PNG یا WEBP. حداکثر 10MB. بعد از انتخاب عکس، پایین صفحه Save Changes را بزن.
+            </p>
+
+            <div id="imageNotice" class="mt-5 hidden rounded-2xl bg-amber-400/15 p-4 text-sm font-bold text-amber-200">
+              عکس جدید انتخاب شد. برای ذخیره نهایی، Save Changes را بزن.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-[2rem] border border-white/10 bg-white/10 p-6">
+        <h3 class="text-2xl font-black">Branch Availability</h3>
+
+        <div class="mt-6 grid gap-5 md:grid-cols-2">
+          <div class="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+            <h4 class="font-black text-amber-300">Sharjah Branch</h4>
+
+            <label class="mt-4 mb-2 block text-sm font-black text-slate-300">Availability</label>
+            <select id="sharjahAvailability" class="field">
+              <option value="unknown">Unknown</option>
+              <option value="in_stock">In Stock</option>
+              <option value="limited">Limited</option>
+              <option value="order_only">Order Only</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+
+            <label class="mt-4 mb-2 block text-sm font-black text-slate-300">Quantity</label>
+            <input id="sharjahQty" type="number" min="0" class="field" placeholder="Optional" />
+
+            <label class="mt-4 mb-2 block text-sm font-black text-slate-300">Note</label>
+            <input id="sharjahNote" class="field" placeholder="Optional note" />
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+            <h4 class="font-black text-red-300">Dubai Branch</h4>
+
+            <label class="mt-4 mb-2 block text-sm font-black text-slate-300">Availability</label>
+            <select id="dubaiAvailability" class="field">
+              <option value="unknown">Unknown</option>
+              <option value="in_stock">In Stock</option>
+              <option value="limited">Limited</option>
+              <option value="order_only">Order Only</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+
+            <label class="mt-4 mb-2 block text-sm font-black text-slate-300">Quantity</label>
+            <input id="dubaiQty" type="number" min="0" class="field" placeholder="Optional" />
+
+            <label class="mt-4 mb-2 block text-sm font-black text-slate-300">Note</label>
+            <input id="dubaiNote" class="field" placeholder="Optional note" />
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-[2rem] border border-white/10 bg-white/10 p-6">
+        <h3 class="text-2xl font-black">SEO & WhatsApp</h3>
+
+        <div class="mt-6 grid gap-5 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">SEO Title</label>
+            <input id="seoTitle" class="field" placeholder="Michelin Pilot Sport 4 SUV 275/45R21 in Dubai & Sharjah" />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Meta Description</label>
+            <textarea id="metaDescription" class="field min-h-24" placeholder="SEO description for future product page."></textarea>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">WhatsApp Message</label>
+            <textarea id="whatsappMessage" class="field min-h-24" placeholder="Hi, I need price and availability for..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div id="message" class="hidden rounded-2xl p-5 text-sm font-bold"></div>
+
+      <button
+        id="saveButton"
+        type="submit"
+        class="w-full rounded-2xl bg-amber-400 px-8 py-5 text-lg font-black text-slate-950 transition hover:bg-amber-300"
+      >
+        Save Changes
+      </button>
+    </form>
+  </AdminShell>
+
+  <style>
+    .field {
+      width: 100%;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #020617;
+      padding: 1rem 1.25rem;
+      color: white;
+      outline: none;
+    }
+
+    .field:focus {
+      box-shadow: 0 0 0 4px rgba(103, 232, 249, 0.25);
+    }
+  </style>
+
+  <script>
+    import { supabase } from "../../../lib/supabase";
+
+    const loading = document.getElementById("loading");
+    const errorBox = document.getElementById("errorBox");
+    const form = document.getElementById("productForm");
+    const message = document.getElementById("message");
+    const saveButton = document.getElementById("saveButton");
+    const brandSelect = document.getElementById("brandId");
+    const currentImage = document.getElementById("currentImage");
+    const viewWebsiteLink = document.getElementById("viewWebsiteLink");
+    const imageFile = document.getElementById("imageFile");
+    const imageNotice = document.getElementById("imageNotice");
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get("id");
+
+    let loadedProduct = null;
+
+    function element(id) {
+      return document.getElementById(id);
+    }
+
+    function setValue(id, value) {
+      const item = element(id);
+      if (item) item.value = value ?? "";
+    }
+
+    function inputValue(id) {
+      return element(id).value.trim();
+    }
+
+    function numberOrNull(value) {
+      if (value === "") return null;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function booleanValue(id) {
+      return inputValue(id) === "true";
+    }
+
+    function splitList(text) {
+      return text
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function joinList(value) {
+      if (!Array.isArray(value)) return "";
+      return value.join(", ");
+    }
+
+    function slugify(text) {
+      return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/&/g, "and")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.classList.remove("hidden", "bg-red-500/20", "text-red-200", "bg-green-500/20", "text-green-200");
+
+      if (type === "success") {
+        message.classList.add("bg-green-500/20", "text-green-200");
+      } else {
+        message.classList.add("bg-red-500/20", "text-red-200");
+      }
+    }
+
+    function showError(text) {
+      loading.classList.add("hidden");
+      errorBox.textContent = text;
+      errorBox.classList.remove("hidden");
+    }
+
+    async function checkAdminSession() {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        window.location.href = "/admin/login/";
+        return false;
+      }
+
+      return true;
+    }
+
+    async function loadBrands() {
+      const { data, error } = await supabase
+        .from("brands")
+        .select("id, name")
+        .order("sort_order", { ascending: true });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      brandSelect.innerHTML =
+        `<option value="">Select brand</option>` +
+        data
+          .map((brand) => `<option value="${brand.id}">${brand.name}</option>`)
+          .join("");
+    }
+
+    function getBranch(product, branchId) {
+      const rows = product.product_branch_availability || [];
+      return rows.find((row) => row.branch_id === branchId);
+    }
+
+    function getImage(product) {
+      const images = product.product_images || [];
+      const primary = images.find((image) => image.is_primary) || images[0];
+
+      return primary?.image_url || "/images/hero-banner.png";
+    }
+
+    function fillForm(product) {
+      loadedProduct = product;
+
+      setValue("productType", product.product_type);
+      setValue("status", product.status);
+      setValue("brandId", product.brand_id || "");
+      setValue("model", product.model || "");
+      setValue("title", product.title || "");
+      setValue("slug", product.slug || "");
+      setValue("sizeDisplay", product.size_display || "");
+      setValue("manufactureYear", product.manufacture_year ?? "");
+      setValue("origin", product.origin || "");
+      setValue("vehicleType", product.vehicle_type || "");
+      setValue("season", product.season || "");
+      setValue("loadIndex", product.load_index || "");
+      setValue("speedRating", product.speed_rating || "");
+      setValue("runFlat", product.run_flat ? "true" : "false");
+      setValue("warrantyText", product.warranty_text || "");
+      setValue("featured", product.featured ? "true" : "false");
+      setValue("sortOrder", product.sort_order ?? 0);
+      setValue("searchKeywords", joinList(product.search_keywords));
+      setValue("shortDescription", product.short_description || "");
+      setValue("description", product.description || "");
+      setValue("suitableCars", joinList(product.suitable_cars));
+      setValue("seoTitle", product.seo_title || "");
+      setValue("metaDescription", product.meta_description || "");
+      setValue("whatsappMessage", product.whatsapp_message || "");
+
+      const sharjah = getBranch(product, "sharjah");
+      const dubai = getBranch(product, "dubai");
+
+      setValue("sharjahAvailability", sharjah?.availability_status || "unknown");
+      setValue("sharjahQty", sharjah?.quantity ?? "");
+      setValue("sharjahNote", sharjah?.note || "");
+
+      setValue("dubaiAvailability", dubai?.availability_status || "unknown");
+      setValue("dubaiQty", dubai?.quantity ?? "");
+      setValue("dubaiNote", dubai?.note || "");
+
+      currentImage.src = getImage(product);
+      viewWebsiteLink.href = "/";
+    }
+
+    async function loadProduct() {
+      const allowed = await checkAdminSession();
+      if (!allowed) return;
+
+      if (!productId) {
+        showError("Missing product ID.");
+        return;
+      }
+
+      try {
+        await loadBrands();
+
+        const { data, error } = await supabase
+          .from("products")
+          .select(`
+            *,
+            product_images (
+              id,
+              image_url,
+              is_primary,
+              sort_order
+            ),
+            product_branch_availability (
+              branch_id,
+              availability_status,
+              quantity,
+              note
+            )
+          `)
+          .eq("id", productId)
+          .single();
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        fillForm(data);
+
+        loading.classList.add("hidden");
+        form.classList.remove("hidden");
+      } catch (error) {
+        showError(error.message || "Could not load product.");
+      }
+    }
+
+    async function saveBranchAvailability(productIdValue) {
+      const rows = [
+        {
+          product_id: productIdValue,
+          branch_id: "sharjah",
+          availability_status: inputValue("sharjahAvailability"),
+          quantity: numberOrNull(inputValue("sharjahQty")),
+          note: inputValue("sharjahNote") || null,
+        },
+        {
+          product_id: productIdValue,
+          branch_id: "dubai",
+          availability_status: inputValue("dubaiAvailability"),
+          quantity: numberOrNull(inputValue("dubaiQty")),
+          note: inputValue("dubaiNote") || null,
+        },
+      ];
+
+      const { error } = await supabase
+        .from("product_branch_availability")
+        .upsert(rows, {
+          onConflict: "product_id,branch_id",
+        });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    }
+
+    async function uploadReplacementImage(productIdValue, productTitle) {
+      const file = imageFile.files?.[0];
+
+      if (!file) return null;
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error("Only JPG, PNG or WEBP images are allowed.");
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error("Image size must be less than 10MB.");
+      }
+
+      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const filePath = `${productIdValue}/${Date.now()}.${extension}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
+
+      const { data } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      const { error: unsetPrimaryError } = await supabase
+        .from("product_images")
+        .update({ is_primary: false })
+        .eq("product_id", productIdValue);
+
+      if (unsetPrimaryError) {
+        throw new Error(unsetPrimaryError.message);
+      }
+
+      const { error: imageInsertError } = await supabase
+        .from("product_images")
+        .insert({
+          product_id: productIdValue,
+          image_url: publicUrl,
+          alt_text: productTitle,
+          is_primary: true,
+          sort_order: 0,
+        });
+
+      if (imageInsertError) {
+        throw new Error(imageInsertError.message);
+      }
+
+      return publicUrl;
+    }
+
+    imageFile.addEventListener("change", () => {
+      const file = imageFile.files?.[0];
+
+      if (!file) return;
+
+      const previewUrl = URL.createObjectURL(file);
+      currentImage.src = previewUrl;
+      imageNotice.classList.remove("hidden");
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      saveButton.textContent = "Saving...";
+      saveButton.disabled = true;
+
+      try {
+        const title = inputValue("title");
+        const manualSlug = inputValue("slug");
+        const slug = manualSlug || slugify(title);
+
+        if (!title || !slug) {
+          throw new Error("Title and slug are required.");
+        }
+
+        const productPayload = {
+          product_type: inputValue("productType"),
+          status: inputValue("status"),
+          featured: booleanValue("featured"),
+          title,
+          slug,
+          brand_id: inputValue("brandId") || null,
+          model: inputValue("model") || null,
+          short_description: inputValue("shortDescription") || null,
+          description: inputValue("description") || null,
+          size_display: inputValue("sizeDisplay") || null,
+          manufacture_year: numberOrNull(inputValue("manufactureYear")),
+          origin: inputValue("origin") || null,
+          vehicle_type: inputValue("vehicleType") || null,
+          season: inputValue("season") || null,
+          load_index: inputValue("loadIndex") || null,
+          speed_rating: inputValue("speedRating") || null,
+          run_flat: booleanValue("runFlat"),
+          warranty_text: inputValue("warrantyText") || null,
+          suitable_cars: splitList(inputValue("suitableCars")),
+          search_keywords: splitList(inputValue("searchKeywords")),
+          seo_title: inputValue("seoTitle") || null,
+          meta_description: inputValue("metaDescription") || null,
+          whatsapp_message:
+            inputValue("whatsappMessage") ||
+            `Hi, I need price and availability for ${title}.`,
+          sort_order: numberOrNull(inputValue("sortOrder")) || 0,
+        };
+
+        const { error: productError } = await supabase
+          .from("products")
+          .update(productPayload)
+          .eq("id", productId);
+
+        if (productError) {
+          throw new Error(productError.message);
+        }
+
+        await saveBranchAvailability(productId);
+
+        const newImageUrl = await uploadReplacementImage(productId, title);
+
+        if (newImageUrl) {
+          currentImage.src = newImageUrl;
+        }
+
+        showMessage("Product updated successfully ✅", "success");
+
+        setTimeout(() => {
+          window.location.href = "/admin/products/";
+        }, 900);
+      } catch (error) {
+        showMessage(error.message || "Something went wrong.");
+        saveButton.textContent = "Save Changes";
+        saveButton.disabled = false;
+      }
+    });
+
+    loadProduct();
+  </script>
+</AdminLayout>

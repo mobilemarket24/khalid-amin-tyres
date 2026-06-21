@@ -1,0 +1,179 @@
+﻿---
+import HeroSizeSearchBox from "./HeroSizeSearchBox.astro";
+import DynamicSiteImage from "./DynamicSiteImage.astro";
+import DynamicSiteText from "./DynamicSiteText.astro";
+import { getWhatsAppUrl } from "../utils/whatsapp";
+
+const sharjahWhatsApp = getWhatsAppUrl(
+  "sharjah",
+  "Hi, I need tyre price and availability from Khalid Amin Tyres Sharjah."
+);
+
+const dubaiWhatsApp = getWhatsAppUrl(
+  "dubai",
+  "Hi, I need tyre price and availability from Khalid Amin Tyres Dubai."
+);
+---
+
+<section class="relative min-h-[760px] overflow-hidden bg-[#0a0a0e] px-5 py-16 text-white sm:px-8 lg:px-12 lg:py-20">
+  <!-- FULL HERO BACKGROUND IMAGE -->
+  <DynamicSiteImage
+    imageKey="home_hero_banner"
+    fallbackSrc="/images/ferrari-service-bay.jpg.webp"
+    alt="Khalid Amin Tyres Dubai and Sharjah"
+    loading="eager"
+    class="absolute inset-0 h-full w-full object-cover object-center"
+  />
+
+  <!-- DARK OVERLAY FOR READABILITY -->
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0a0a0e]/95 via-[#0a0a0e]/78 to-[#0a0a0e]/30"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0e]/40 via-transparent to-[#0a0a0e]/90"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(239,68,68,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(251,191,36,0.18),transparent_30%)]"></div>
+
+  <div class="relative z-10 mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+    <!-- LEFT CONTENT -->
+    <div>
+      <DynamicSiteText
+        textKey="home_hero_badge"
+        fallback="Premium Tyres • Rims • Two Branches"
+        as="div"
+        class="inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-amber-300 backdrop-blur-xl"
+      />
+
+      <h1 class="mt-6 max-w-3xl text-4xl font-black leading-[1.05] sm:text-5xl lg:text-7xl">
+        <DynamicSiteText
+          textKey="home_hero_title_line1"
+          fallback="Tyres & Rims"
+          as="span"
+          class="block bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent"
+        />
+        <DynamicSiteText
+          textKey="home_hero_title_line2"
+          fallback="in Dubai & Sharjah"
+          as="span"
+          class="block bg-gradient-to-r from-amber-300 via-amber-200 to-red-300 bg-clip-text text-transparent"
+        />
+      </h1>
+
+      <DynamicSiteText
+        textKey="home_hero_subtitle"
+        fallback="Choose your tyre size, rim size or car model and get today’s pricing on WhatsApp."
+        as="p"
+        class="mt-6 max-w-xl text-lg font-semibold leading-8 text-slate-200"
+      />
+
+      <div class="mt-6 grid max-w-xl gap-3 text-sm font-semibold text-slate-100 sm:grid-cols-2">
+        <div class="flex items-center gap-3">
+          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+            ✓
+          </span>
+
+          <DynamicSiteText
+            textKey="home_hero_bullet_1"
+            fallback="Premium tyres"
+            as="span"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+            ✓
+          </span>
+
+          <DynamicSiteText
+            textKey="home_hero_bullet_2"
+            fallback="Rims & alloy wheels"
+            as="span"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+            ✓
+          </span>
+
+          <DynamicSiteText
+            textKey="home_hero_bullet_3"
+            fallback="Fitting & balancing"
+            as="span"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+            ✓
+          </span>
+
+          <DynamicSiteText
+            textKey="home_hero_bullet_4"
+            fallback="Fast WhatsApp support"
+            as="span"
+          />
+        </div>
+      </div>
+
+      <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+        <a
+          href={sharjahWhatsApp}
+          target="_blank"
+          rel="noreferrer"
+          class="animate-glow-pulse inline-flex items-center justify-center gap-3 rounded-2xl bg-amber-400 px-7 py-4 text-center font-black text-slate-950 shadow-xl shadow-amber-400/30 transition hover:bg-amber-300"
+        >
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-4.964-1.344l-.356-.211-3.688.977.983-3.596-.232-.368A9.818 9.818 0 0 1 2.182 12C2.182 6.574 6.574 2.182 12 2.182S21.818 6.574 21.818 12 17.426 21.818 12 21.818z"/>
+          </svg>
+          <span>
+            WhatsApp Sharjah
+            <span class="block text-xs font-black opacity-80">050 351 2023</span>
+          </span>
+        </a>
+
+        <a
+          href={dubaiWhatsApp}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex items-center justify-center gap-3 rounded-2xl bg-red-500 px-7 py-4 text-center font-black text-white shadow-xl shadow-red-500/30 transition hover:bg-red-400"
+        >
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-4.964-1.344l-.356-.211-3.688.977.983-3.596-.232-.368A9.818 9.818 0 0 1 2.182 12C2.182 6.574 6.574 2.182 12 2.182S21.818 6.574 21.818 12 17.426 21.818 12 21.818z"/>
+          </svg>
+          <span>
+            WhatsApp Dubai
+            <span class="block text-xs font-black opacity-90">056 161 5010</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="mt-8 grid max-w-2xl gap-4 sm:grid-cols-2">
+        <div class="rounded-[1.6rem] border border-white/10 bg-[#0e0e12]/65 p-5 backdrop-blur-xl">
+          <p class="text-xs font-black uppercase tracking-[0.22em] text-amber-300">
+            Sharjah Branch
+          </p>
+          <p class="mt-2 text-2xl font-black">050 351 2023</p>
+          <p class="mt-2 text-sm font-semibold text-slate-300">
+            Open 9:00 AM - 11:00 PM
+          </p>
+        </div>
+
+        <div class="rounded-[1.6rem] border border-white/10 bg-[#0e0e12]/65 p-5 backdrop-blur-xl">
+          <p class="text-xs font-black uppercase tracking-[0.22em] text-red-300">
+            Dubai Branch
+          </p>
+          <p class="mt-2 text-2xl font-black">056 161 5010</p>
+          <p class="mt-2 text-sm font-semibold text-slate-300">
+            Open 9:00 AM - 2:00 AM
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SEARCH BOX OVER SAME BACKGROUND -->
+    <div class="flex justify-center lg:justify-end">
+      <div class="w-full max-w-[460px] rounded-[2rem] border border-white/15 bg-[#0e0e12]/70 p-4 shadow-[0_25px_90px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+        <HeroSizeSearchBox />
+      </div>
+    </div>
+  </div>
+</section>

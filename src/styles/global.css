@@ -1,0 +1,111 @@
+﻿@import "tailwindcss";
+
+:root {
+  --ka-dark: #0a0a0e;
+  --ka-dark-2: #0e0e14;
+  --ka-amber: #f59e0b;
+  --ka-red: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--ka-amber);
+  color: #020617;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--ka-amber), var(--ka-red));
+  border-radius: 999px;
+}
+
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: 72px;
+  }
+}
+
+/* Scroll entrance animations */
+@media (prefers-reduced-motion: no-preference) {
+  [data-animate] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  [data-animate].in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  [data-animate-delay="1"] { transition-delay: 80ms; }
+  [data-animate-delay="2"] { transition-delay: 160ms; }
+  [data-animate-delay="3"] { transition-delay: 240ms; }
+  [data-animate-delay="4"] { transition-delay: 320ms; }
+  [data-animate-delay="5"] { transition-delay: 400ms; }
+}
+
+/* Glow pulse on primary CTA buttons */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+  50% { box-shadow: 0 0 0 14px rgba(245, 158, 11, 0); }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+/* Brand scroll strip */
+@keyframes brand-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-brand-scroll {
+  animation: brand-scroll 35s linear infinite;
+}
+.animate-brand-scroll:hover {
+  animation-play-state: paused;
+}

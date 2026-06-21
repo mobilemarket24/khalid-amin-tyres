@@ -1,0 +1,487 @@
+﻿---
+import DynamicSiteImage from "./DynamicSiteImage.astro";
+
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const content = isArabic
+  ? {
+      badge: "طلب سريع",
+      title: "أرسل طلبك واحصل على السعر عبر واتساب",
+      subtitle:
+        "اكتب مقاس الإطار، مقاس الرنق أو موديل السيارة وسنرد عليك بأسرع وقت.",
+      imageTitle: "خدمة سريعة",
+      imageText:
+        "فريق خالد أمين تايرز جاهز لمساعدتك في اختيار الإطارات والرنقات المناسبة.",
+      nameLabel: "الاسم",
+      namePlaceholder: "مثال: محمد",
+      whatsappLabel: "رقم واتساب",
+      whatsappPlaceholder: "مثال: 0501234567",
+      branchLabel: "الفرع",
+      detailsLabel: "تفاصيل الطلب",
+      noteLabel: "ملاحظات إضافية",
+      notePlaceholder: "اكتب أي تفاصيل إضافية هنا...",
+      submit: "إرسال الطلب عبر واتساب",
+      sending: "جاري الإرسال...",
+      success: "تم حفظ الطلب. سيتم فتح واتساب الآن.",
+      error:
+        "لم يتم حفظ الطلب في النظام، لكن سيتم فتح واتساب لإرسال الطلب مباشرة.",
+      types: [
+        { value: "tyre", label: "إطارات", placeholder: "مثال: 275/60R20 أو Land Cruiser 2023" },
+        { value: "rim", label: "رنقات", placeholder: "مثال: R20 للاند كروزر أو نيسان باترول" },
+        { value: "battery", label: "بطارية", placeholder: "مثال: بطارية لكزس LX570 2020" },
+        { value: "service", label: "خدمة", placeholder: "مثال: ميزان، ترصيص، تبديل إطارات" },
+      ],
+    }
+  : {
+      badge: "Quick Request",
+      title: "Send your request and get today’s price on WhatsApp",
+      subtitle:
+        "Enter your tyre size, rim size or car model and our team will reply with pricing and availability.",
+      imageTitle: "Fast tyre & rim support",
+      imageText:
+        "Khalid Amin Tyres helps customers choose the right tyres, rims and wheel services in Dubai and Sharjah.",
+      nameLabel: "Name",
+      namePlaceholder: "Example: Ahmed",
+      whatsappLabel: "WhatsApp Number",
+      whatsappPlaceholder: "Example: 0501234567",
+      branchLabel: "Branch",
+      detailsLabel: "Request Details",
+      noteLabel: "Extra Note",
+      notePlaceholder: "Write any extra details here...",
+      submit: "Send Request on WhatsApp",
+      sending: "Sending...",
+      success: "Request saved. WhatsApp will open now.",
+      error:
+        "Request was not saved in the system, but WhatsApp will open so the customer can send it directly.",
+      types: [
+        { value: "tyre", label: "Tyres", placeholder: "Example: 275/60R20 or Land Cruiser 2023" },
+        { value: "rim", label: "Rims", placeholder: "Example: R20 for Land Cruiser or Nissan Patrol" },
+        { value: "battery", label: "Battery", placeholder: "Example: Battery for Lexus LX570 2020" },
+        { value: "service", label: "Service", placeholder: "Example: balancing, alignment, tyre fitting" },
+      ],
+    };
+
+const initialType = content.types[0];
+---
+
+<section id="request" class="relative overflow-hidden bg-[#0e0e12] px-5 py-16 text-white sm:px-8 lg:px-12">
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.12),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.12),transparent_32%)]"></div>
+
+  <div class="relative mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+    <!-- IMAGE SIDE -->
+    <div data-animate class="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
+      <DynamicSiteImage
+        imageKey="lead_form_banner"
+        fallbackSrc="/images/porsche-service-bay.jpg.webp"
+        alt={content.title}
+        loading="lazy"
+        class="absolute inset-0 h-full w-full object-cover object-center"
+      />
+
+      <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/80"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(239,68,68,0.20),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(251,191,36,0.18),transparent_28%)]"></div>
+
+      <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+        <div class="max-w-xl rounded-[1.7rem] border border-white/15 bg-[#0e0e12]/70 p-6 backdrop-blur-xl">
+          <p class="text-xs font-black uppercase tracking-[0.22em] text-amber-300">
+            {content.badge}
+          </p>
+
+          <h2 class="mt-3 text-3xl font-black leading-tight sm:text-4xl">
+            {content.imageTitle}
+          </h2>
+
+          <p class="mt-3 text-sm font-semibold leading-7 text-slate-300">
+            {content.imageText}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM SIDE -->
+    <div data-animate data-animate-delay="2" class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl sm:p-7 lg:p-8" dir={isArabic ? "rtl" : "ltr"}>
+      <div>
+        <span class="inline-flex rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-950">
+          {content.badge}
+        </span>
+
+        <h2 class="mt-5 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+          {content.title}
+        </h2>
+
+        <p class="mt-4 text-sm font-semibold leading-7 text-slate-300 sm:text-base">
+          {content.subtitle}
+        </p>
+      </div>
+
+      <div id="leadStatus" class="mt-5 hidden rounded-2xl border px-4 py-3 text-sm font-bold"></div>
+
+      <form id="leadRequestForm" class="mt-7 grid gap-5">
+        <input type="hidden" id="leadRequestType" name="request_type" value={initialType.value} />
+
+        <div class="grid gap-3 sm:grid-cols-4">
+          {
+            content.types.map((type, index) => (
+              <button
+                type="button"
+                data-lead-type={type.value}
+                data-placeholder={type.placeholder}
+                class={`lead-type-btn rounded-2xl px-4 py-3 text-sm font-black transition ${
+                  index === 0
+                    ? "bg-amber-400 text-slate-950"
+                    : "border border-white/10 bg-slate-950/60 text-white hover:bg-white/10"
+                }`}
+              >
+                {type.label}
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="leadName" class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+              {content.nameLabel}
+            </label>
+
+            <input
+              id="leadName"
+              name="name"
+              type="text"
+              placeholder={content.namePlaceholder}
+              class="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-4 text-sm font-semibold text-white outline-none placeholder:text-slate-500 focus:border-amber-400"
+            />
+          </div>
+
+          <div>
+            <label for="leadWhatsapp" class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+              {content.whatsappLabel}
+            </label>
+
+            <input
+              id="leadWhatsapp"
+              name="whatsapp"
+              type="tel"
+              required
+              placeholder={content.whatsappPlaceholder}
+              class="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-4 text-sm font-semibold text-white outline-none placeholder:text-slate-500 focus:border-amber-400"
+            />
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-[1fr_180px]">
+          <div>
+            <label for="leadDetails" class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+              {content.detailsLabel}
+            </label>
+
+            <input
+              id="leadDetails"
+              name="details"
+              type="text"
+              required
+              placeholder={initialType.placeholder}
+              class="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-4 text-sm font-semibold text-white outline-none placeholder:text-slate-500 focus:border-amber-400"
+            />
+          </div>
+
+          <div>
+            <label for="leadBranch" class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+              {content.branchLabel}
+            </label>
+
+            <select
+              id="leadBranch"
+              name="branch"
+              class="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-4 text-sm font-black text-white outline-none focus:border-amber-400"
+            >
+              <option value="sharjah">Sharjah</option>
+              <option value="dubai">Dubai</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="leadNote" class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+            {content.noteLabel}
+          </label>
+
+          <textarea
+            id="leadNote"
+            name="note"
+            rows="4"
+            placeholder={content.notePlaceholder}
+            class="w-full resize-none rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-4 text-sm font-semibold text-white outline-none placeholder:text-slate-500 focus:border-amber-400"
+          ></textarea>
+        </div>
+
+        <button
+          id="leadSubmitBtn"
+          type="submit"
+          class="rounded-2xl bg-amber-400 px-7 py-4 text-center font-black text-slate-950 shadow-xl shadow-amber-400/20 transition hover:bg-amber-300"
+        >
+          {content.submit}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    import { createClient } from "@supabase/supabase-js";
+
+    const leadSupabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      }
+    );
+
+    const pageIsArabic = window.location.pathname.startsWith("/ar");
+
+    const uiText = pageIsArabic
+      ? {
+          sending: "جاري الإرسال...",
+          submit: "إرسال الطلب عبر واتساب",
+          success: "تم حفظ الطلب. سيتم فتح واتساب الآن.",
+          error:
+            "لم يتم حفظ الطلب في النظام، لكن سيتم فتح واتساب لإرسال الطلب مباشرة.",
+        }
+      : {
+          sending: "Sending...",
+          submit: "Send Request on WhatsApp",
+          success: "Request saved. WhatsApp will open now.",
+          error:
+            "Request was not saved in the system, but WhatsApp will open so the customer can send it directly.",
+        };
+
+    const typeLabels = {
+      tyre: pageIsArabic ? "إطارات" : "Tyres",
+      rim: pageIsArabic ? "رنقات" : "Rims",
+      battery: pageIsArabic ? "بطارية" : "Battery",
+      service: pageIsArabic ? "خدمة" : "Service",
+    };
+
+    const form = document.getElementById("leadRequestForm");
+    const requestTypeInput = document.getElementById("leadRequestType");
+    const detailsInput = document.getElementById("leadDetails");
+    const statusBox = document.getElementById("leadStatus");
+    const submitBtn = document.getElementById("leadSubmitBtn");
+    const typeButtons = Array.from(document.querySelectorAll(".lead-type-btn"));
+
+    function showLeadStatus(message, type = "success") {
+      statusBox.textContent = message;
+      statusBox.classList.remove(
+        "hidden",
+        "border-emerald-400/30",
+        "bg-emerald-400/10",
+        "text-emerald-200",
+        "border-red-400/30",
+        "bg-red-400/10",
+        "text-red-200"
+      );
+
+      if (type === "error") {
+        statusBox.classList.add("border-red-400/30", "bg-red-400/10", "text-red-200");
+      } else {
+        statusBox.classList.add("border-emerald-400/30", "bg-emerald-400/10", "text-emerald-200");
+      }
+    }
+
+    function setActiveType(button) {
+      const selectedType = button.dataset.leadType;
+      const placeholder = button.dataset.placeholder;
+
+      requestTypeInput.value = selectedType;
+      detailsInput.placeholder = placeholder;
+
+      typeButtons.forEach((item) => {
+        item.classList.remove("bg-amber-400", "text-slate-950");
+        item.classList.add("border", "border-white/10", "bg-slate-950/60", "text-white");
+      });
+
+      button.classList.remove("border", "border-white/10", "bg-slate-950/60", "text-white");
+      button.classList.add("bg-amber-400", "text-slate-950");
+    }
+
+    typeButtons.forEach((button) => {
+      button.addEventListener("click", () => setActiveType(button));
+    });
+
+    function normalizeWhatsAppNumber(value) {
+      const digits = String(value || "").replace(/\D/g, "");
+
+      if (digits.startsWith("971")) return digits;
+      if (digits.startsWith("0")) return `971${digits.slice(1)}`;
+      if (digits.length === 9) return `971${digits}`;
+
+      return digits;
+    }
+
+    function getBranchPhone(branch) {
+      return branch === "dubai" ? "971561615010" : "971503512023";
+    }
+
+    function buildWhatsAppText(data) {
+      const requestLabel = typeLabels[data.requestType] || data.requestType;
+      const branchLabel = data.branch === "dubai" ? "Dubai" : "Sharjah";
+
+      return [
+        "Hi Khalid Amin Tyres,",
+        "",
+        "I sent a request from your website.",
+        `Request Type: ${requestLabel}`,
+        `Details: ${data.details}`,
+        `Preferred Branch: ${branchLabel}`,
+        `Customer WhatsApp: ${data.whatsapp}`,
+        data.name ? `Name: ${data.name}` : "",
+        data.note ? `Note: ${data.note}` : "",
+        "",
+        `Page: ${window.location.pathname}`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    function buildAdminMessage(data) {
+      const requestLabel = typeLabels[data.requestType] || data.requestType;
+      const branchLabel = data.branch === "dubai" ? "Dubai" : "Sharjah";
+
+      return [
+        `Website Lead - ${requestLabel}`,
+        `Details: ${data.details}`,
+        `Branch: ${branchLabel}`,
+        `WhatsApp: ${data.whatsapp}`,
+        data.name ? `Name: ${data.name}` : "",
+        data.note ? `Note: ${data.note}` : "",
+        `Page: ${window.location.pathname}`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    async function insertLeadWithFallback(data) {
+      const adminMessage = buildAdminMessage(data);
+
+      const payloads = [
+        {
+          customer_name: data.name || null,
+          phone: data.whatsapp,
+          branch: data.branch,
+          request_type: data.requestType,
+          request_details: data.details,
+          message: adminMessage,
+          source: "website",
+          source_page: window.location.pathname,
+          status: "new",
+          priority: "normal",
+        },
+        {
+          customer_name: data.name || null,
+          whatsapp: data.whatsapp,
+          branch: data.branch,
+          lead_type: data.requestType,
+          details: data.details,
+          note: data.note || null,
+          status: "new",
+          priority: "normal",
+        },
+        {
+          phone: data.whatsapp,
+          branch: data.branch,
+          request_type: data.requestType,
+          message: adminMessage,
+          status: "new",
+          priority: "normal",
+        },
+        {
+          whatsapp: data.whatsapp,
+          branch: data.branch,
+          type: data.requestType,
+          request_details: data.details,
+          note: data.note || null,
+          status: "new",
+        },
+        {
+          phone: data.whatsapp,
+          message: adminMessage,
+          status: "new",
+        },
+        {
+          whatsapp: data.whatsapp,
+          message: adminMessage,
+          status: "new",
+        },
+      ];
+
+      let lastError = null;
+
+      for (const payload of payloads) {
+        const { error } = await leadSupabase.from("leads").insert(payload);
+
+        if (!error) {
+          return true;
+        }
+
+        lastError = error;
+      }
+
+      throw lastError;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+
+      const data = {
+        name: String(formData.get("name") || "").trim(),
+        whatsapp: normalizeWhatsAppNumber(formData.get("whatsapp")),
+        rawWhatsapp: String(formData.get("whatsapp") || "").trim(),
+        requestType: String(formData.get("request_type") || "tyre").trim(),
+        details: String(formData.get("details") || "").trim(),
+        branch: String(formData.get("branch") || "sharjah").trim(),
+        note: String(formData.get("note") || "").trim(),
+      };
+
+      if (!data.whatsapp || !data.details) {
+        showLeadStatus("Please enter WhatsApp number and request details.", "error");
+        return;
+      }
+
+      const whatsappText = buildWhatsAppText(data);
+      const whatsappUrl = `https://wa.me/${getBranchPhone(data.branch)}?text=${encodeURIComponent(whatsappText)}`;
+
+      submitBtn.textContent = uiText.sending;
+      submitBtn.disabled = true;
+
+      try {
+        await insertLeadWithFallback(data);
+        showLeadStatus(uiText.success, "success");
+
+        setTimeout(() => {
+          window.open(whatsappUrl, "_blank");
+          form.reset();
+
+          if (typeButtons[0]) {
+            setActiveType(typeButtons[0]);
+          }
+        }, 700);
+      } catch (error) {
+        console.error(error);
+        showLeadStatus(uiText.error, "error");
+
+        setTimeout(() => {
+          window.open(whatsappUrl, "_blank");
+        }, 900);
+      } finally {
+        submitBtn.textContent = uiText.submit;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</section>

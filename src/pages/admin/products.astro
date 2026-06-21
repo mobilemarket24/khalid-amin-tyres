@@ -1,0 +1,863 @@
+﻿---
+import "../../styles/global.css";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<AdminLayout title="Products | Khalid Amin Tyres Admin">
+  <AdminShell title="Products" eyebrow="Tyres & Rims Management" current="products">
+    <div class="space-y-6">
+      <div class="rounded-[2rem] border border-white/10 bg-white/10 p-5">
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search product, brand, size, year, keyword..."
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4 md:col-span-2 xl:col-span-2"
+          />
+
+          <select
+            id="typeFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Types</option>
+            <option value="tyre">Tyres</option>
+            <option value="rim">Rims</option>
+            <option value="battery">Battery</option>
+            <option value="service">Service</option>
+            <option value="accessory">Accessory</option>
+          </select>
+
+          <select
+            id="statusFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+            <option value="hidden">Hidden</option>
+            <option value="archived">Archived</option>
+          </select>
+
+          <select
+            id="featuredFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Featured</option>
+            <option value="yes">Featured</option>
+            <option value="no">Not Featured</option>
+          </select>
+
+          <a
+            href="/admin/products/new/"
+            class="rounded-2xl bg-amber-400 px-6 py-4 text-center font-black text-slate-950 transition hover:bg-amber-300"
+          >
+            Add Product
+          </a>
+
+          <select
+            id="yearFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Years</option>
+          </select>
+
+          <select
+            id="vehicleFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Vehicles</option>
+          </select>
+
+          <select
+            id="seasonFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Season / Usage</option>
+          </select>
+
+          <select
+            id="runFlatFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Run Flat</option>
+            <option value="yes">Run Flat</option>
+            <option value="no">Not Run Flat</option>
+          </select>
+
+          <select
+            id="branchFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Branches</option>
+            <option value="sharjah">Available in Sharjah</option>
+            <option value="dubai">Available in Dubai</option>
+            <option value="both">Available in Both</option>
+          </select>
+
+          <select
+            id="stockFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All Stock</option>
+            <option value="available">Available</option>
+            <option value="limited">Limited</option>
+            <option value="order_only">Order Only</option>
+            <option value="out">Out / Unknown</option>
+          </select>
+
+          <select
+            id="seoFilter"
+            class="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 font-bold text-white outline-none ring-amber-300/30 transition focus:ring-4"
+          >
+            <option value="all">All SEO</option>
+            <option value="ready">SEO Ready</option>
+            <option value="missing">SEO Missing</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="summaryCards" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <div class="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Total</p>
+          <p id="totalCount" class="mt-3 text-4xl font-black">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-green-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-green-300">Active</p>
+          <p id="activeCount" class="mt-3 text-4xl font-black text-green-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-amber-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-amber-300">Featured</p>
+          <p id="featuredCount" class="mt-3 text-4xl font-black text-amber-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-blue-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-blue-300">Available</p>
+          <p id="availableCount" class="mt-3 text-4xl font-black text-blue-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-purple-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-purple-300">SEO Ready</p>
+          <p id="seoReadyCount" class="mt-3 text-4xl font-black text-purple-200">0</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-red-500/10 p-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-red-300">Showing</p>
+          <p id="showingCount" class="mt-3 text-4xl font-black text-red-200">0</p>
+        </div>
+      </div>
+
+      <div id="loading" class="rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-black">
+        Loading products...
+      </div>
+
+      <div id="errorBox" class="hidden rounded-[2rem] bg-red-500/20 p-8 font-bold text-red-200"></div>
+
+      <div id="emptyBox" class="hidden rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center">
+        <h3 class="text-2xl font-black">No products found</h3>
+        <p class="mt-3 text-sm font-semibold text-slate-400">
+          Add your first tyre or rim from the button above.
+        </p>
+      </div>
+
+      <div id="productsWrap" class="hidden overflow-hidden rounded-[2rem] border border-white/10 bg-white/10">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[1450px] text-left">
+            <thead class="bg-slate-950/70 text-xs uppercase tracking-[0.2em] text-slate-400">
+              <tr>
+                <th class="px-5 py-4">Product</th>
+                <th class="px-5 py-4">Type</th>
+                <th class="px-5 py-4">Specs</th>
+                <th class="px-5 py-4">Branch Stock</th>
+                <th class="px-5 py-4">SEO</th>
+                <th class="px-5 py-4">Status</th>
+                <th class="px-5 py-4">Featured</th>
+                <th class="px-5 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="productsTable" class="divide-y divide-white/10"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </AdminShell>
+
+  <script>
+    import { supabase } from "../../lib/supabase";
+
+    const loading = document.getElementById("loading");
+    const errorBox = document.getElementById("errorBox");
+    const emptyBox = document.getElementById("emptyBox");
+    const productsWrap = document.getElementById("productsWrap");
+    const productsTable = document.getElementById("productsTable");
+
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const statusFilter = document.getElementById("statusFilter");
+    const featuredFilter = document.getElementById("featuredFilter");
+    const yearFilter = document.getElementById("yearFilter");
+    const vehicleFilter = document.getElementById("vehicleFilter");
+    const seasonFilter = document.getElementById("seasonFilter");
+    const runFlatFilter = document.getElementById("runFlatFilter");
+    const branchFilter = document.getElementById("branchFilter");
+    const stockFilter = document.getElementById("stockFilter");
+    const seoFilter = document.getElementById("seoFilter");
+
+    const totalCount = document.getElementById("totalCount");
+    const activeCount = document.getElementById("activeCount");
+    const featuredCount = document.getElementById("featuredCount");
+    const availableCount = document.getElementById("availableCount");
+    const seoReadyCount = document.getElementById("seoReadyCount");
+    const showingCount = document.getElementById("showingCount");
+
+    let allProducts = [];
+
+    async function checkAdminSession() {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        window.location.href = "/admin/login/";
+        return false;
+      }
+
+      return true;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatValue(value) {
+      return value ? escapeHtml(value) : "-";
+    }
+
+    function statusBadge(status) {
+      const base = "inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide";
+
+      if (status === "active") {
+        return `<span class="${base} bg-green-500/20 text-green-200">Active</span>`;
+      }
+
+      if (status === "draft") {
+        return `<span class="${base} bg-yellow-500/20 text-yellow-200">Draft</span>`;
+      }
+
+      if (status === "hidden") {
+        return `<span class="${base} bg-slate-500/20 text-slate-200">Hidden</span>`;
+      }
+
+      return `<span class="${base} bg-red-500/20 text-red-200">${escapeHtml(status)}</span>`;
+    }
+
+    function availabilityBadge(status, quantity) {
+      const base = "inline-flex rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide";
+      const quantityText = quantity === null || quantity === undefined ? "" : ` (${quantity})`;
+
+      if (status === "in_stock") {
+        return `<span class="${base} bg-green-500/20 text-green-200">In Stock${quantityText}</span>`;
+      }
+
+      if (status === "limited") {
+        return `<span class="${base} bg-red-500/20 text-red-200">Limited${quantityText}</span>`;
+      }
+
+      if (status === "order_only") {
+        return `<span class="${base} bg-amber-500/20 text-amber-200">Order${quantityText}</span>`;
+      }
+
+      if (status === "out_of_stock") {
+        return `<span class="${base} bg-red-500/20 text-red-200">Out${quantityText}</span>`;
+      }
+
+      return `<span class="${base} bg-slate-500/20 text-slate-300">Unknown${quantityText}</span>`;
+    }
+
+    function simpleBadge(text, tone = "slate") {
+      const tones = {
+        slate: "bg-slate-500/20 text-slate-300",
+        cyan: "bg-amber-500/20 text-amber-200",
+        orange: "bg-red-500/20 text-red-200",
+        green: "bg-green-500/20 text-green-200",
+        red: "bg-red-500/20 text-red-200",
+        purple: "bg-purple-500/20 text-purple-200",
+      };
+
+      return `<span class="inline-flex rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${tones[tone] || tones.slate}">
+        ${escapeHtml(text)}
+      </span>`;
+    }
+
+    function getPrimaryImage(product) {
+      const images = product.product_images || [];
+      const primary = images.find((image) => image.is_primary) || images[0];
+
+      return primary?.image_url || "/images/hero-banner.png";
+    }
+
+    function hasImage(product) {
+      return Boolean((product.product_images || []).length);
+    }
+
+    function getBranchAvailability(product, branchId) {
+      const rows = product.product_branch_availability || [];
+      return rows.find((row) => row.branch_id === branchId);
+    }
+
+    function isAvailableStatus(status) {
+      return status === "in_stock" || status === "limited" || status === "order_only";
+    }
+
+    function isProductAvailable(product) {
+      const rows = product.product_branch_availability || [];
+      return rows.some((row) => isAvailableStatus(row.availability_status));
+    }
+
+    function isSeoReady(product) {
+      return Boolean(
+        product.seo_title &&
+        product.meta_description &&
+        product.short_description &&
+        hasImage(product)
+      );
+    }
+
+    function getKeywordsText(product) {
+      if (!Array.isArray(product.search_keywords)) return "";
+      return product.search_keywords.join(" ");
+    }
+
+    function populateDynamicFilters() {
+      const currentYear = yearFilter.value;
+      const currentVehicle = vehicleFilter.value;
+      const currentSeason = seasonFilter.value;
+
+      const years = [
+        ...new Set(
+          allProducts
+            .map((product) => product.manufacture_year)
+            .filter(Boolean)
+            .map(String)
+        ),
+      ].sort((a, b) => Number(b) - Number(a));
+
+      const vehicles = [
+        ...new Set(
+          allProducts
+            .map((product) => product.vehicle_type)
+            .filter(Boolean)
+        ),
+      ].sort();
+
+      const seasons = [
+        ...new Set(
+          allProducts
+            .map((product) => product.season)
+            .filter(Boolean)
+        ),
+      ].sort();
+
+      yearFilter.innerHTML =
+        `<option value="all">All Years</option>` +
+        years.map((year) => `<option value="${escapeHtml(year)}">${escapeHtml(year)}</option>`).join("");
+
+      vehicleFilter.innerHTML =
+        `<option value="all">All Vehicles</option>` +
+        vehicles.map((vehicle) => `<option value="${escapeHtml(vehicle)}">${escapeHtml(vehicle)}</option>`).join("");
+
+      seasonFilter.innerHTML =
+        `<option value="all">All Season / Usage</option>` +
+        seasons.map((season) => `<option value="${escapeHtml(season)}">${escapeHtml(season)}</option>`).join("");
+
+      if (years.includes(currentYear)) yearFilter.value = currentYear;
+      if (vehicles.includes(currentVehicle)) vehicleFilter.value = currentVehicle;
+      if (seasons.includes(currentSeason)) seasonFilter.value = currentSeason;
+    }
+
+    function updateSummary(filteredProducts) {
+      totalCount.textContent = String(allProducts.length);
+      activeCount.textContent = String(allProducts.filter((p) => p.status === "active").length);
+      featuredCount.textContent = String(allProducts.filter((p) => p.featured).length);
+      availableCount.textContent = String(allProducts.filter(isProductAvailable).length);
+      seoReadyCount.textContent = String(allProducts.filter(isSeoReady).length);
+      showingCount.textContent = String(filteredProducts.length);
+    }
+
+    function matchesBranchFilter(product, branchValue) {
+      if (branchValue === "all") return true;
+
+      const sharjah = getBranchAvailability(product, "sharjah");
+      const dubai = getBranchAvailability(product, "dubai");
+
+      const sharjahAvailable = isAvailableStatus(sharjah?.availability_status);
+      const dubaiAvailable = isAvailableStatus(dubai?.availability_status);
+
+      if (branchValue === "sharjah") return sharjahAvailable;
+      if (branchValue === "dubai") return dubaiAvailable;
+      if (branchValue === "both") return sharjahAvailable && dubaiAvailable;
+
+      return true;
+    }
+
+    function matchesStockFilter(product, stockValue) {
+      if (stockValue === "all") return true;
+
+      const rows = product.product_branch_availability || [];
+      const statuses = rows.map((row) => row.availability_status);
+
+      if (stockValue === "available") {
+        return statuses.some((status) => status === "in_stock" || status === "limited" || status === "order_only");
+      }
+
+      if (stockValue === "limited") {
+        return statuses.includes("limited");
+      }
+
+      if (stockValue === "order_only") {
+        return statuses.includes("order_only");
+      }
+
+      if (stockValue === "out") {
+        return !statuses.some((status) => status === "in_stock" || status === "limited" || status === "order_only");
+      }
+
+      return true;
+    }
+
+    function getFilteredProducts() {
+      const search = searchInput.value.trim().toLowerCase();
+      const type = typeFilter.value;
+      const status = statusFilter.value;
+      const featured = featuredFilter.value;
+      const year = yearFilter.value;
+      const vehicle = vehicleFilter.value;
+      const season = seasonFilter.value;
+      const runFlat = runFlatFilter.value;
+      const branch = branchFilter.value;
+      const stock = stockFilter.value;
+      const seo = seoFilter.value;
+
+      return allProducts.filter((product) => {
+        const brandName = product.brands?.name || "";
+        const searchable = [
+          product.title,
+          product.slug,
+          product.product_type,
+          product.size_display,
+          product.model,
+          product.origin,
+          product.vehicle_type,
+          product.season,
+          product.load_index,
+          product.speed_rating,
+          product.manufacture_year,
+          product.seo_title,
+          product.meta_description,
+          brandName,
+          getKeywordsText(product),
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const matchesSearch = !search || searchable.includes(search);
+        const matchesType = type === "all" || product.product_type === type;
+        const matchesStatus = status === "all" || product.status === status;
+        const matchesFeatured =
+          featured === "all" ||
+          (featured === "yes" && product.featured) ||
+          (featured === "no" && !product.featured);
+        const matchesYear = year === "all" || String(product.manufacture_year || "") === year;
+        const matchesVehicle = vehicle === "all" || product.vehicle_type === vehicle;
+        const matchesSeason = season === "all" || product.season === season;
+        const matchesRunFlat =
+          runFlat === "all" ||
+          (runFlat === "yes" && product.run_flat) ||
+          (runFlat === "no" && !product.run_flat);
+        const matchesBranch = matchesBranchFilter(product, branch);
+        const matchesStock = matchesStockFilter(product, stock);
+        const matchesSeo =
+          seo === "all" ||
+          (seo === "ready" && isSeoReady(product)) ||
+          (seo === "missing" && !isSeoReady(product));
+
+        return (
+          matchesSearch &&
+          matchesType &&
+          matchesStatus &&
+          matchesFeatured &&
+          matchesYear &&
+          matchesVehicle &&
+          matchesSeason &&
+          matchesRunFlat &&
+          matchesBranch &&
+          matchesStock &&
+          matchesSeo
+        );
+      });
+    }
+
+    function renderSpecs(product, brandName) {
+      const badges = [];
+
+      if (product.size_display) badges.push(simpleBadge(product.size_display, "cyan"));
+      if (product.manufacture_year) badges.push(simpleBadge(String(product.manufacture_year), "green"));
+      if (product.origin) badges.push(simpleBadge(product.origin, "slate"));
+      if (product.vehicle_type) badges.push(simpleBadge(product.vehicle_type, "orange"));
+      if (product.season) badges.push(simpleBadge(product.season, "purple"));
+      if (product.run_flat) badges.push(simpleBadge("Run Flat", "red"));
+
+      return `
+        <div class="max-w-[360px]">
+          <p class="font-black text-white">${escapeHtml(brandName)}</p>
+          <p class="mt-1 text-xs font-semibold text-slate-500">
+            Model: ${formatValue(product.model)}
+          </p>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            ${badges.length ? badges.join("") : `<span class="text-sm font-bold text-slate-500">No specs</span>`}
+          </div>
+
+          <p class="mt-3 text-xs font-semibold text-slate-500">
+            Load: ${formatValue(product.load_index)} · Speed: ${formatValue(product.speed_rating)}
+          </p>
+        </div>
+      `;
+    }
+
+    function renderSeoStatus(product) {
+      const ready = isSeoReady(product);
+
+      const checks = [
+        {
+          label: "Title",
+          ok: Boolean(product.seo_title),
+        },
+        {
+          label: "Meta",
+          ok: Boolean(product.meta_description),
+        },
+        {
+          label: "Desc",
+          ok: Boolean(product.short_description),
+        },
+        {
+          label: "Image",
+          ok: hasImage(product),
+        },
+      ];
+
+      return `
+        <div class="max-w-[240px]">
+          ${
+            ready
+              ? simpleBadge("SEO Ready", "green")
+              : simpleBadge("SEO Missing", "red")
+          }
+
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            ${checks
+              .map(
+                (check) => `
+                  <span class="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wide ${
+                    check.ok
+                      ? "bg-green-500/15 text-green-200"
+                      : "bg-red-500/15 text-red-200"
+                  }">
+                    ${check.ok ? "✓" : "×"} ${escapeHtml(check.label)}
+                  </span>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProducts() {
+      const filteredProducts = getFilteredProducts();
+
+      updateSummary(filteredProducts);
+
+      if (filteredProducts.length === 0) {
+        productsWrap.classList.add("hidden");
+        emptyBox.classList.remove("hidden");
+        return;
+      }
+
+      emptyBox.classList.add("hidden");
+      productsWrap.classList.remove("hidden");
+
+      productsTable.innerHTML = filteredProducts
+        .map((product) => {
+          const imageUrl = getPrimaryImage(product);
+          const brandName = product.brands?.name || "-";
+          const sharjah = getBranchAvailability(product, "sharjah");
+          const dubai = getBranchAvailability(product, "dubai");
+
+          const nextStatus = product.status === "active" ? "hidden" : "active";
+          const nextFeatured = product.featured ? "false" : "true";
+
+          return `
+            <tr class="hover:bg-white/5">
+              <td class="px-5 py-5">
+                <div class="flex items-center gap-4">
+                  <img
+                    src="${escapeHtml(imageUrl)}"
+                    alt="${escapeHtml(product.title)}"
+                    class="h-16 w-16 rounded-2xl object-cover"
+                  />
+
+                  <div class="max-w-[320px]">
+                    <p class="font-black text-white">${escapeHtml(product.title)}</p>
+                    <p class="mt-1 text-xs font-semibold text-slate-500">${escapeHtml(product.slug)}</p>
+                    ${
+                      product.search_keywords?.length
+                        ? `<p class="mt-2 line-clamp-1 text-xs font-semibold text-amber-300">
+                            ${escapeHtml(product.search_keywords.join(", "))}
+                          </p>`
+                        : ""
+                    }
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-5 py-5">
+                <span class="font-bold capitalize text-slate-300">${escapeHtml(product.product_type)}</span>
+              </td>
+
+              <td class="px-5 py-5">
+                ${renderSpecs(product, brandName)}
+              </td>
+
+              <td class="px-5 py-5">
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="w-14 text-xs font-black text-amber-300">SHJ</span>
+                    ${availabilityBadge(sharjah?.availability_status, sharjah?.quantity)}
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <span class="w-14 text-xs font-black text-red-300">DXB</span>
+                    ${availabilityBadge(dubai?.availability_status, dubai?.quantity)}
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-5 py-5">
+                ${renderSeoStatus(product)}
+              </td>
+
+              <td class="px-5 py-5">
+                ${statusBadge(product.status)}
+              </td>
+
+              <td class="px-5 py-5">
+                <button
+                  data-action="toggle-featured"
+                  data-id="${product.id}"
+                  data-value="${nextFeatured}"
+                  class="rounded-xl px-4 py-2 text-xs font-black transition ${
+                    product.featured
+                      ? "bg-amber-400 text-slate-950 hover:bg-amber-300"
+                      : "bg-white/10 text-slate-300 hover:bg-white/15"
+                  }"
+                >
+                  ${product.featured ? "Featured" : "No"}
+                </button>
+              </td>
+
+              <td class="px-5 py-5 text-right">
+                <div class="flex justify-end gap-2">
+                  <a
+                    href="/admin/products/edit/?id=${product.id}"
+                    class="rounded-xl bg-amber-400 px-4 py-2 text-xs font-black text-slate-950 transition hover:bg-amber-300"
+                  >
+                    Edit
+                  </a>
+
+                  <button
+                    data-action="toggle-status"
+                    data-id="${product.id}"
+                    data-status="${nextStatus}"
+                    class="rounded-xl bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/15"
+                  >
+                    ${product.status === "active" ? "Hide" : "Activate"}
+                  </button>
+
+                  <button
+                    data-action="delete"
+                    data-id="${product.id}"
+                    data-title="${escapeHtml(product.title)}"
+                    class="rounded-xl bg-red-500/20 px-4 py-2 text-xs font-black text-red-200 transition hover:bg-red-500/30"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    async function loadProducts() {
+      const allowed = await checkAdminSession();
+
+      if (!allowed) return;
+
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          id,
+          title,
+          slug,
+          product_type,
+          status,
+          featured,
+          model,
+          size_display,
+          manufacture_year,
+          origin,
+          vehicle_type,
+          season,
+          load_index,
+          speed_rating,
+          run_flat,
+          seo_title,
+          meta_description,
+          short_description,
+          search_keywords,
+          created_at,
+          brands (
+            name
+          ),
+          product_images (
+            image_url,
+            is_primary,
+            sort_order
+          ),
+          product_branch_availability (
+            branch_id,
+            availability_status,
+            quantity,
+            note
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      loading.classList.add("hidden");
+
+      if (error) {
+        errorBox.textContent = error.message;
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      allProducts = data || [];
+      populateDynamicFilters();
+      renderProducts();
+    }
+
+    async function updateProductStatus(id, status) {
+      const { error } = await supabase
+        .from("products")
+        .update({ status })
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      allProducts = allProducts.map((product) =>
+        product.id === id ? { ...product, status } : product
+      );
+
+      renderProducts();
+    }
+
+    async function updateProductFeatured(id, featured) {
+      const { error } = await supabase
+        .from("products")
+        .update({ featured })
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      allProducts = allProducts.map((product) =>
+        product.id === id ? { ...product, featured } : product
+      );
+
+      renderProducts();
+    }
+
+    async function deleteProduct(id, title) {
+      const confirmed = confirm(`Delete product?\n\n${title}\n\nThis cannot be undone.`);
+
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      allProducts = allProducts.filter((product) => product.id !== id);
+      populateDynamicFilters();
+      renderProducts();
+    }
+
+    productsTable.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+
+      const action = button.dataset.action;
+      const id = button.dataset.id;
+
+      if (action === "toggle-status") {
+        await updateProductStatus(id, button.dataset.status);
+      }
+
+      if (action === "toggle-featured") {
+        await updateProductFeatured(id, button.dataset.value === "true");
+      }
+
+      if (action === "delete") {
+        await deleteProduct(id, button.dataset.title || "Product");
+      }
+    });
+
+    [
+      searchInput,
+      typeFilter,
+      statusFilter,
+      featuredFilter,
+      yearFilter,
+      vehicleFilter,
+      seasonFilter,
+      runFlatFilter,
+      branchFilter,
+      stockFilter,
+      seoFilter,
+    ].forEach((element) => {
+      element.addEventListener("input", renderProducts);
+      element.addEventListener("change", renderProducts);
+    });
+
+    loadProducts();
+  </script>
+</AdminLayout>

@@ -1,0 +1,522 @@
+﻿---
+interface Props {
+  productType?: "all" | "tyre" | "rim" | "battery" | "service" | "accessory";
+  branch?: "all" | "dubai" | "sharjah";
+  featuredOnly?: boolean;
+  limit?: number;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  emptyText?: string;
+}
+
+const {
+  productType = "all",
+  branch = "all",
+  featuredOnly = true,
+  limit = 8,
+  badge,
+  title,
+  subtitle,
+  emptyText,
+} = Astro.props;
+
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const text = isArabic
+  ? {
+      badge: badge || "منتجات مميزة",
+      title: title || "إطارات ورنقات متوفرة",
+      subtitle:
+        subtitle ||
+        "اختر المنتج والفرع وتواصل معنا مباشرة عبر واتساب للحصول على السعر والتوفر.",
+      loading: "جاري تحميل المنتجات...",
+      empty: emptyText || "لا توجد منتجات متوفرة حالياً.",
+      askSharjah: "واتساب الشارقة",
+      askDubai: "واتساب دبي",
+      inStock: "متوفر",
+      limited: "كمية محدودة",
+      orderOnly: "بالطلب",
+      outOfStock: "غير متوفر",
+      unknown: "اسألنا",
+      messagePrefix: "Hi, I need price and availability for",
+      size: "Size",
+      warranty: "Warranty",
+      year: "Year",
+      origin: "Origin",
+      vehicle: "Vehicle",
+      season: "Usage",
+      load: "Load",
+      speed: "Speed",
+      runFlat: "Run Flat",
+      specs: "Product Specs",
+    }
+  : {
+      badge: badge || "Featured Products",
+      title: title || "Available tyres & rims",
+      subtitle:
+        subtitle ||
+        "Choose a product and branch, then contact us directly on WhatsApp for price and availability.",
+      loading: "Loading products...",
+      empty: emptyText || "No products available right now.",
+      askSharjah: "WhatsApp Sharjah",
+      askDubai: "WhatsApp Dubai",
+      inStock: "In Stock",
+      limited: "Limited",
+      orderOnly: "Order Only",
+      outOfStock: "Out of Stock",
+      unknown: "Ask Us",
+      messagePrefix: "Hi, I need price and availability for",
+      size: "Size",
+      warranty: "Warranty",
+      year: "Year",
+      origin: "Origin",
+      vehicle: "Vehicle",
+      season: "Usage",
+      load: "Load",
+      speed: "Speed",
+      runFlat: "Run Flat",
+      specs: "Product Specs",
+    };
+
+const labelsJson = JSON.stringify(text);
+const configJson = JSON.stringify({
+  productType,
+  branch,
+  featuredOnly,
+  limit,
+});
+---
+
+<section class="relative overflow-hidden bg-slate-950 px-5 py-16 text-white sm:px-8 lg:px-12">
+  <script
+    id="featuredProductsLabels"
+    type="application/json"
+    set:html={labelsJson}
+  />
+
+  <script
+    id="featuredProductsConfig"
+    type="application/json"
+    set:html={configJson}
+  />
+
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.14),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.12),transparent_35%)]"></div>
+
+  <div class="relative mx-auto max-w-7xl">
+    <div data-animate class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <span class="inline-flex rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-950">
+          {text.badge}
+        </span>
+
+        <h2 class="mt-5 text-3xl font-black leading-tight sm:text-4xl">
+          {text.title}
+        </h2>
+
+        <p class="mt-4 max-w-2xl text-base font-semibold leading-8 text-slate-400">
+          {text.subtitle}
+        </p>
+      </div>
+    </div>
+
+    <div
+      id="featuredProductsLoading"
+      class="mt-10 rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-black"
+    >
+      {text.loading}
+    </div>
+
+    <div
+      id="featuredProductsEmpty"
+      class="mt-10 hidden rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-bold text-slate-300"
+    >
+      {text.empty}
+    </div>
+
+    <div
+      id="featuredProductsGrid"
+      class="mt-10 hidden grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+    ></div>
+  </div>
+
+  <script>
+    import { createClient } from "@supabase/supabase-js";
+
+    const labelsElement = document.getElementById("featuredProductsLabels");
+    const configElement = document.getElementById("featuredProductsConfig");
+
+    const labels = JSON.parse(labelsElement?.textContent || "{}");
+    const config = JSON.parse(configElement?.textContent || "{}");
+
+    const publicSupabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      }
+    );
+
+    const loading = document.getElementById("featuredProductsLoading");
+    const empty = document.getElementById("featuredProductsEmpty");
+    const grid = document.getElementById("featuredProductsGrid");
+
+    const whatsappNumbers = {
+      sharjah: "971503512023",
+      dubai: "971561615010",
+    };
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getPrimaryImage(product) {
+      const images = product.product_images || [];
+      const primary = images.find((image) => image.is_primary) || images[0];
+
+      return primary?.image_url || "/images/hero-banner.png";
+    }
+
+    function getBrandName(product) {
+      return product.brands?.name || "";
+    }
+
+    function getAvailability(product, branchId) {
+      const rows = product.product_branch_availability || [];
+      return rows.find((row) => row.branch_id === branchId);
+    }
+
+    function isAvailableStatus(status) {
+      return status === "in_stock" || status === "limited" || status === "order_only";
+    }
+
+    function availabilityText(status) {
+      if (status === "in_stock") return labels.inStock || "In Stock";
+      if (status === "limited") return labels.limited || "Limited";
+      if (status === "order_only") return labels.orderOnly || "Order Only";
+      if (status === "out_of_stock") return labels.outOfStock || "Out of Stock";
+      return labels.unknown || "Ask Us";
+    }
+
+    function availabilityClass(status) {
+      if (status === "in_stock") return "bg-green-500/20 text-green-200";
+      if (status === "limited") return "bg-red-500/20 text-red-200";
+      if (status === "order_only") return "bg-amber-500/20 text-amber-200";
+      if (status === "out_of_stock") return "bg-red-500/20 text-red-200";
+      return "bg-white/10 text-slate-300";
+    }
+
+    function productSpecItems(product) {
+      return [
+        {
+          label: labels.size || "Size",
+          value: product.size_display,
+          tone: "cyan",
+        },
+        {
+          label: labels.year || "Year",
+          value: product.manufacture_year,
+          tone: "green",
+        },
+        {
+          label: labels.origin || "Origin",
+          value: product.origin,
+          tone: "slate",
+        },
+        {
+          label: labels.vehicle || "Vehicle",
+          value: product.vehicle_type,
+          tone: "orange",
+        },
+        {
+          label: labels.season || "Usage",
+          value: product.season,
+          tone: "purple",
+        },
+        {
+          label: labels.load || "Load",
+          value: product.load_index,
+          tone: "slate",
+        },
+        {
+          label: labels.speed || "Speed",
+          value: product.speed_rating,
+          tone: "slate",
+        },
+        {
+          label: product.run_flat ? labels.runFlat || "Run Flat" : "",
+          value: product.run_flat ? "Yes" : "",
+          tone: "red",
+          compact: true,
+        },
+      ].filter((item) => item.value);
+    }
+
+    function specToneClass(tone) {
+      if (tone === "cyan") return "bg-amber-400/15 text-amber-200";
+      if (tone === "green") return "bg-green-400/15 text-green-200";
+      if (tone === "orange") return "bg-red-400/15 text-red-200";
+      if (tone === "purple") return "bg-purple-400/15 text-purple-200";
+      if (tone === "red") return "bg-red-400/15 text-red-200";
+      return "bg-slate-900/80 text-slate-300";
+    }
+
+    function renderSpecBadges(product) {
+      const specs = productSpecItems(product);
+
+      if (!specs.length) return "";
+
+      return `
+        <div class="mt-4">
+          <p class="mb-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
+            ${escapeHtml(labels.specs || "Product Specs")}
+          </p>
+
+          <div class="flex flex-wrap gap-2">
+            ${specs
+              .map((spec) => {
+                if (spec.compact) {
+                  return `
+                    <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${specToneClass(spec.tone)}">
+                      ${escapeHtml(spec.label)}
+                    </span>
+                  `;
+                }
+
+                return `
+                  <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${specToneClass(spec.tone)}">
+                    ${escapeHtml(spec.label)}: ${escapeHtml(spec.value)}
+                  </span>
+                `;
+              })
+              .join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function buildWhatsAppLink(product, branchId) {
+      const brandName = getBrandName(product);
+      const branchName = branchId === "dubai" ? "Dubai" : "Sharjah";
+
+      const parts = [
+        labels.messagePrefix || "Hi, I need price and availability for",
+        product.title,
+        product.size_display ? `Size: ${product.size_display}` : "",
+        product.manufacture_year ? `Year: ${product.manufacture_year}` : "",
+        brandName ? `Brand: ${brandName}` : "",
+        product.model ? `Model: ${product.model}` : "",
+        product.origin ? `Origin: ${product.origin}` : "",
+        product.vehicle_type ? `Vehicle Type: ${product.vehicle_type}` : "",
+        product.season ? `Usage: ${product.season}` : "",
+        product.load_index ? `Load Index: ${product.load_index}` : "",
+        product.speed_rating ? `Speed Rating: ${product.speed_rating}` : "",
+        product.run_flat ? `Run Flat: Yes` : "",
+        product.warranty_text ? `Warranty: ${product.warranty_text}` : "",
+        `Branch: ${branchName}`,
+      ].filter(Boolean);
+
+      const message = parts.join("\n");
+      const number = whatsappNumbers[branchId];
+
+      return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    }
+
+    function renderBranchBlock(product, branchId) {
+      const branch = getAvailability(product, branchId);
+      const status = branch?.availability_status || "unknown";
+      const link = buildWhatsAppLink(product, branchId);
+
+      const isDubai = branchId === "dubai";
+
+      return `
+        <div class="flex items-center justify-between gap-3 rounded-2xl bg-slate-950/60 p-3">
+          <span class="text-xs font-black uppercase tracking-[0.2em] ${
+            isDubai ? "text-red-300" : "text-amber-300"
+          }">
+            ${isDubai ? "DXB" : "SHJ"}
+          </span>
+
+          <span class="rounded-full px-3 py-1 text-xs font-black ${availabilityClass(status)}">
+            ${availabilityText(status)}
+          </span>
+        </div>
+
+        <a
+          href="${link}"
+          target="_blank"
+          class="rounded-2xl ${
+            isDubai
+              ? "bg-red-500 text-white hover:bg-red-400"
+              : "bg-amber-400 text-slate-950 hover:bg-amber-300"
+          } px-5 py-4 text-center text-sm font-black transition"
+        >
+          ${escapeHtml(isDubai ? labels.askDubai || "WhatsApp Dubai" : labels.askSharjah || "WhatsApp Sharjah")}
+        </a>
+      `;
+    }
+
+    function shouldShowProductForBranch(product) {
+      if (config.branch === "all") return true;
+
+      const branch = getAvailability(product, config.branch);
+      return isAvailableStatus(branch?.availability_status);
+    }
+
+    function renderProducts(products) {
+      const branchFilteredProducts = products
+        .filter(shouldShowProductForBranch)
+        .slice(0, Number(config.limit || 8));
+
+      if (!branchFilteredProducts.length) {
+        empty.classList.remove("hidden");
+        grid.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      grid.classList.remove("hidden");
+
+      grid.innerHTML = branchFilteredProducts
+        .map((product) => {
+          const imageUrl = getPrimaryImage(product);
+          const brandName = getBrandName(product);
+
+          return `
+            <article class="group overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/[0.13]">
+              <div class="relative">
+                <img
+                  src="${escapeHtml(imageUrl)}"
+                  alt="${escapeHtml(product.title)}"
+                  class="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+
+                <div class="absolute left-4 top-4 rounded-full bg-slate-950/80 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
+                  ${escapeHtml(product.product_type || "product")}
+                </div>
+
+                ${
+                  product.manufacture_year
+                    ? `<div class="absolute right-4 top-4 rounded-full bg-green-400 px-4 py-2 text-xs font-black text-slate-950">
+                        ${escapeHtml(product.manufacture_year)}
+                      </div>`
+                    : ""
+                }
+              </div>
+
+              <div class="p-5">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                  ${escapeHtml(brandName || "Khalid Amin Tyres")}
+                </p>
+
+                <h3 class="mt-2 line-clamp-2 text-xl font-black leading-tight">
+                  ${escapeHtml(product.title)}
+                </h3>
+
+                <p class="mt-3 line-clamp-2 text-sm font-semibold leading-6 text-slate-400">
+                  ${escapeHtml(product.short_description || product.size_display || "Contact us for price and availability.")}
+                </p>
+
+                ${renderSpecBadges(product)}
+
+                ${
+                  product.warranty_text
+                    ? `<div class="mt-4 rounded-2xl bg-slate-950/60 px-4 py-3 text-sm font-bold text-slate-300">
+                        ${escapeHtml(labels.warranty || "Warranty")}: ${escapeHtml(product.warranty_text)}
+                      </div>`
+                    : ""
+                }
+
+                <div class="mt-5 grid gap-3">
+                  ${
+                    config.branch === "dubai"
+                      ? renderBranchBlock(product, "dubai")
+                      : config.branch === "sharjah"
+                        ? renderBranchBlock(product, "sharjah")
+                        : renderBranchBlock(product, "sharjah") + renderBranchBlock(product, "dubai")
+                  }
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    async function loadProducts() {
+      let query = publicSupabase
+        .from("products")
+        .select(`
+          id,
+          title,
+          slug,
+          product_type,
+          status,
+          featured,
+          model,
+          short_description,
+          size_display,
+          manufacture_year,
+          origin,
+          vehicle_type,
+          season,
+          load_index,
+          speed_rating,
+          run_flat,
+          warranty_text,
+          sort_order,
+          brands (
+            name
+          ),
+          product_images (
+            image_url,
+            is_primary,
+            sort_order
+          ),
+          product_branch_availability (
+            branch_id,
+            availability_status,
+            quantity
+          )
+        `)
+        .eq("status", "active")
+        .order("sort_order", { ascending: true });
+
+      if (config.featuredOnly) {
+        query = query.eq("featured", true);
+      }
+
+      if (config.productType && config.productType !== "all") {
+        query = query.eq("product_type", config.productType);
+      }
+
+      const queryLimit =
+        config.branch && config.branch !== "all"
+          ? Math.max(Number(config.limit || 8) * 4, 32)
+          : Number(config.limit || 8);
+
+      const { data, error } = await query.limit(queryLimit);
+
+      loading.classList.add("hidden");
+
+      if (error) {
+        empty.textContent = error.message;
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      renderProducts(data || []);
+    }
+
+    loadProducts();
+  </script>
+</section>

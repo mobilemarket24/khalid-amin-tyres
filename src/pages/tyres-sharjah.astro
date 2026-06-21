@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SeoPageHero from "../components/SeoPageHero.astro";
+import FeaturedProductsSection from "../components/FeaturedProductsSection.astro";
+import LeadCaptureSection from "../components/LeadCaptureSection.astro";
+import BranchesSection from "../components/BranchesSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import FinalCtaSection from "../components/FinalCtaSection.astro";
+---
+
+<BaseLayout
+  title="Tyres Sharjah | Buy Premium Tyres in Sharjah UAE | Khalid Amin Tyres"
+  description="Buy tyres in Sharjah with fast WhatsApp pricing. Khalid Amin Tyres offers premium tyres, fitting, balancing and tyre services in Sharjah and Dubai."
+  metaTitleKey="meta_tyres_sharjah_title"
+  metaDescriptionKey="meta_tyres_sharjah_description"
+>
+  <main>
+    <SeoPageHero
+      imageKey="tyres_sharjah_hero"
+      badge="Tyres Sharjah"
+      titleKey="tyres_sharjah_hero_title"
+      subtitleKey="tyres_sharjah_hero_subtitle"
+      title="Buy Tyres in Sharjah"
+      subtitle="Looking for tyres in Sharjah? Get fast pricing, availability and fitting support from Khalid Amin Tyres."
+      branch="sharjah"
+      bullets={[
+        "Premium tyre brands",
+        "Tyre fitting support",
+        "Wheel balancing",
+        "Fast WhatsApp pricing",
+      ]}
+    />
+
+    <FeaturedProductsSection
+      productType="tyre"
+      branch="sharjah"
+      featuredOnly={false}
+      limit={12}
+      badge="Tyres Available in Sharjah"
+      title="Shop tyres available from our Sharjah branch"
+      subtitle="Browse active tyre options available for Sharjah customers, including tyre size, year, origin, vehicle type and direct WhatsApp pricing."
+      emptyText="No active Sharjah tyres are available right now. Please contact us on WhatsApp for current stock."
+    />
+
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

@@ -1,0 +1,274 @@
+﻿---
+import DynamicSiteText from "./DynamicSiteText.astro";
+import DynamicSiteImage from "./DynamicSiteImage.astro";
+
+const isArabic = Astro.url.pathname.startsWith("/ar");
+
+const content = isArabic
+  ? {
+      badgeKey: "branches_ar_badge",
+      titleKey: "branches_ar_title",
+      subtitleKey: "branches_ar_subtitle",
+      fallbackBadge: "فروعنا",
+      fallbackTitle: "زوروا خالد أمين تايرز في دبي أو الشارقة",
+      fallbackSubtitle:
+        "اختر أقرب فرع وتواصل مع فريقنا عبر واتساب لأسعار الإطارات، الرنقات، التركيب، الترصيص وخدمات السيارات.",
+    }
+  : {
+      badgeKey: "branches_badge",
+      titleKey: "branches_title",
+      subtitleKey: "branches_subtitle",
+      fallbackBadge: "Our Branches",
+      fallbackTitle: "Visit Khalid Amin Tyres in Dubai or Sharjah",
+      fallbackSubtitle:
+        "Choose the nearest branch and contact our team on WhatsApp for tyre prices, rims, fitting, balancing and service support.",
+    };
+
+const addressLabel = isArabic ? "العنوان" : "Address";
+
+const branches = isArabic
+  ? [
+      {
+        imageKey: "dubai_branch_image",
+        fallbackImage: "/images/branch-dubai-night.jpg.webp",
+        nameKey: "branch_ar_dubai_name",
+        areaKey: "branch_ar_dubai_area",
+        addressKey: "branch_ar_dubai_address",
+        hoursLabelKey: "branch_ar_dubai_hours_label",
+        hoursKey: "branch_ar_dubai_hours",
+        whatsappLabelKey: "branch_ar_dubai_whatsapp_label",
+        directionsLabelKey: "branch_ar_dubai_directions_label",
+        fallbackName: "فرع دبي",
+        fallbackArea: "القوز 1 - دبي",
+        fallbackAddress: "شارع المنارة - القوز الصناعية الأولى - القوز 1 - دبي",
+        fallbackHoursLabel: "ساعات العمل",
+        fallbackHours: "9:00 صباحاً - 2:00 بعد منتصف الليل",
+        fallbackWhatsappLabel: "واتساب دبي",
+        fallbackDirectionsLabel: "الاتجاهات",
+        whatsappUrl:
+          "https://wa.me/971561615010?text=Hello%20Khalid%20Amin%20Tyres%20Dubai%2C%20I%20need%20tyre%20or%20rim%20service.",
+        directionsUrl:
+          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Al%20Manara%20St%20Al%20Quoz%201%20Dubai",
+        accent: "orange",
+      },
+      {
+        imageKey: "sharjah_branch_image",
+        fallbackImage: "/images/branch-exterior-day.jpg.webp",
+        nameKey: "branch_ar_sharjah_name",
+        areaKey: "branch_ar_sharjah_area",
+        addressKey: "branch_ar_sharjah_address",
+        hoursLabelKey: "branch_ar_sharjah_hours_label",
+        hoursKey: "branch_ar_sharjah_hours",
+        whatsappLabelKey: "branch_ar_sharjah_whatsapp_label",
+        directionsLabelKey: "branch_ar_sharjah_directions_label",
+        fallbackName: "فرع الشارقة",
+        fallbackArea: "الصناعية 4 - الشارقة",
+        fallbackAddress: "الصناعية 4 - المنطقة الصناعية - الشارقة",
+        fallbackHoursLabel: "ساعات العمل",
+        fallbackHours: "9:00 صباحاً - 11:00 مساءً",
+        fallbackWhatsappLabel: "واتساب الشارقة",
+        fallbackDirectionsLabel: "الاتجاهات",
+        whatsappUrl:
+          "https://wa.me/971503512023?text=Hello%20Khalid%20Amin%20Tyres%20Sharjah%2C%20I%20need%20tyre%20or%20rim%20service.",
+        directionsUrl:
+          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Industrial%20Area%204%20Sharjah",
+        accent: "cyan",
+      },
+    ]
+  : [
+      {
+        imageKey: "dubai_branch_image",
+        fallbackImage: "/images/branch-dubai-night.jpg.webp",
+        nameKey: "branch_dubai_name",
+        areaKey: "branch_dubai_area",
+        addressKey: "branch_dubai_address",
+        hoursLabelKey: "branch_dubai_hours_label",
+        hoursKey: "branch_dubai_hours",
+        whatsappLabelKey: "branch_dubai_whatsapp_label",
+        directionsLabelKey: "branch_dubai_directions_label",
+        fallbackName: "Dubai Branch",
+        fallbackArea: "Al Quoz 1 - Dubai",
+        fallbackAddress: "Al Manara St - Al Qouz Ind.first - Al Quoz 1 - Dubai",
+        fallbackHoursLabel: "Working Hours",
+        fallbackHours: "9:00 AM - 2:00 AM",
+        fallbackWhatsappLabel: "WhatsApp Dubai",
+        fallbackDirectionsLabel: "Get Directions",
+        whatsappUrl:
+          "https://wa.me/971561615010?text=Hello%20Khalid%20Amin%20Tyres%20Dubai%2C%20I%20need%20tyre%20or%20rim%20service.",
+        directionsUrl:
+          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Al%20Manara%20St%20Al%20Quoz%201%20Dubai",
+        accent: "orange",
+      },
+      {
+        imageKey: "sharjah_branch_image",
+        fallbackImage: "/images/branch-exterior-day.jpg.webp",
+        nameKey: "branch_sharjah_name",
+        areaKey: "branch_sharjah_area",
+        addressKey: "branch_sharjah_address",
+        hoursLabelKey: "branch_sharjah_hours_label",
+        hoursKey: "branch_sharjah_hours",
+        whatsappLabelKey: "branch_sharjah_whatsapp_label",
+        directionsLabelKey: "branch_sharjah_directions_label",
+        fallbackName: "Sharjah Branch",
+        fallbackArea: "Industrial Area 4 - Sharjah",
+        fallbackAddress: "Industrial Area 4 - Industrial Area - Sharjah",
+        fallbackHoursLabel: "Working Hours",
+        fallbackHours: "9:00 AM - 11:00 PM",
+        fallbackWhatsappLabel: "WhatsApp Sharjah",
+        fallbackDirectionsLabel: "Get Directions",
+        whatsappUrl:
+          "https://wa.me/971503512023?text=Hello%20Khalid%20Amin%20Tyres%20Sharjah%2C%20I%20need%20tyre%20or%20rim%20service.",
+        directionsUrl:
+          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Industrial%20Area%204%20Sharjah",
+        accent: "cyan",
+      },
+    ];
+---
+
+<section
+  id="branches"
+  class="relative overflow-hidden bg-[#0a0a0e] px-5 py-16 text-white sm:px-8 lg:px-12"
+  dir={isArabic ? "rtl" : "ltr"}
+>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.12),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.12),transparent_32%)]"></div>
+
+  <div class="relative mx-auto max-w-7xl">
+    <div class="mx-auto max-w-3xl text-center" data-animate>
+      <DynamicSiteText
+        textKey={content.badgeKey}
+        fallback={content.fallbackBadge}
+        as="span"
+        class="inline-flex rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-slate-950"
+      />
+
+      <DynamicSiteText
+        textKey={content.titleKey}
+        fallback={content.fallbackTitle}
+        as="h2"
+        class="mt-5 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+      />
+
+      <DynamicSiteText
+        textKey={content.subtitleKey}
+        fallback={content.fallbackSubtitle}
+        as="p"
+        class="mt-4 text-base font-semibold leading-8 text-slate-300"
+      />
+    </div>
+
+    <div class="mt-10 grid gap-6 lg:grid-cols-2">
+      {
+        branches.map((branch, i) => (
+          <article
+            data-animate
+            data-animate-delay={String(i + 1)}
+            class="group overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-amber-400/30 hover:bg-white/10"
+          >
+            <div class="relative h-72 overflow-hidden bg-slate-950">
+              <DynamicSiteImage
+                imageKey={branch.imageKey}
+                fallbackSrc={branch.fallbackImage}
+                alt={branch.fallbackName}
+                loading="lazy"
+                class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"
+              />
+
+              <div class="absolute inset-0 bg-gradient-to-b from-black/5 via-black/20 to-black/80"></div>
+
+              <div class="absolute left-5 top-5">
+                <span
+                  class={`inline-flex rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] ${
+                    branch.accent === "cyan"
+                      ? "bg-amber-400 text-slate-950"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  KHALID AMIN TYRES
+                </span>
+              </div>
+
+              <div class="absolute bottom-5 left-5 right-5">
+                <DynamicSiteText
+                  textKey={branch.nameKey}
+                  fallback={branch.fallbackName}
+                  as="h3"
+                  class="text-3xl font-black leading-tight text-white"
+                />
+
+                <DynamicSiteText
+                  textKey={branch.areaKey}
+                  fallback={branch.fallbackArea}
+                  as="p"
+                  class="mt-2 text-sm font-black uppercase tracking-[0.16em] text-amber-300"
+                />
+              </div>
+            </div>
+
+            <div class="grid gap-5 p-6">
+              <div class="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+                <p class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                  {addressLabel}
+                </p>
+
+                <DynamicSiteText
+                  textKey={branch.addressKey}
+                  fallback={branch.fallbackAddress}
+                  as="p"
+                  class="mt-2 text-sm font-semibold leading-7 text-slate-300"
+                />
+              </div>
+
+              <div class="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+                <DynamicSiteText
+                  textKey={branch.hoursLabelKey}
+                  fallback={branch.fallbackHoursLabel}
+                  as="p"
+                  class="text-xs font-black uppercase tracking-[0.18em] text-slate-500"
+                />
+
+                <DynamicSiteText
+                  textKey={branch.hoursKey}
+                  fallback={branch.fallbackHours}
+                  as="p"
+                  class="mt-2 text-xl font-black text-white"
+                />
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <a
+                  href={branch.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class={`rounded-2xl px-5 py-4 text-center text-sm font-black transition ${
+                    branch.accent === "cyan"
+                      ? "bg-amber-400 text-slate-950 hover:bg-amber-300"
+                      : "bg-red-500 text-white hover:bg-red-400"
+                  }`}
+                >
+                  <DynamicSiteText
+                    textKey={branch.whatsappLabelKey}
+                    fallback={branch.fallbackWhatsappLabel}
+                    as="span"
+                  />
+                </a>
+
+                <a
+                  href={branch.directionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-2xl border border-white/10 bg-white/10 px-5 py-4 text-center text-sm font-black text-white transition hover:bg-white/15"
+                >
+                  <DynamicSiteText
+                    textKey={branch.directionsLabelKey}
+                    fallback={branch.fallbackDirectionsLabel}
+                    as="span"
+                  />
+                </a>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

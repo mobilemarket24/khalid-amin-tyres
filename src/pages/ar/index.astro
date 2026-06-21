@@ -1,0 +1,182 @@
+﻿---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HeroSizeSearchBox from "../../components/HeroSizeSearchBox.astro";
+import DynamicSiteImage from "../../components/DynamicSiteImage.astro";
+import DynamicSiteText from "../../components/DynamicSiteText.astro";
+import ServicesSection from "../../components/ServicesSection.astro";
+import FeaturedProductsSection from "../../components/FeaturedProductsSection.astro";
+import LeadCaptureSection from "../../components/LeadCaptureSection.astro";
+import BranchesSection from "../../components/BranchesSection.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import FinalCtaSection from "../../components/FinalCtaSection.astro";
+import { getWhatsAppUrl } from "../../utils/whatsapp";
+
+const sharjahWhatsApp = getWhatsAppUrl(
+  "sharjah",
+  "Hi, I need tyre price and availability from Khalid Amin Tyres Sharjah."
+);
+
+const dubaiWhatsApp = getWhatsAppUrl(
+  "dubai",
+  "Hi, I need tyre price and availability from Khalid Amin Tyres Dubai."
+);
+---
+
+<BaseLayout
+  title="خالد أمين تايرز | إطارات ورنقات في دبي والشارقة"
+  description="اشترِ الإطارات والرنقات في دبي والشارقة. خالد أمين تايرز يقدم تركيب الإطارات، ميزان، ترصيص، وفحص سريع عبر واتساب."
+  lang="ar"
+  dir="rtl"
+>
+  <main>
+    <section class="relative min-h-[760px] overflow-hidden bg-[#0a0a0e] px-5 py-16 text-white sm:px-8 lg:px-12 lg:py-20">
+      <!-- FULL HERO BACKGROUND IMAGE -->
+      <DynamicSiteImage
+        imageKey="home_ar_hero_banner"
+        fallbackSrc="/images/hero-banner.png"
+        alt="خالد أمين تايرز دبي والشارقة"
+        loading="eager"
+        class="absolute inset-0 h-full w-full object-cover object-center"
+      />
+
+      <!-- DARK OVERLAY FOR READABILITY -->
+      <div class="absolute inset-0 bg-gradient-to-l from-[#0a0a0e]/95 via-[#0a0a0e]/78 to-[#0a0a0e]/30"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0e]/40 via-transparent to-[#0a0a0e]/90"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.22),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(251,191,36,0.18),transparent_30%)]"></div>
+
+      <div class="relative z-10 mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <!-- ARABIC CONTENT -->
+        <div>
+          <DynamicSiteText
+            textKey="home_ar_hero_badge"
+            fallback="إطارات فاخرة • رنقات • فرعين"
+            as="div"
+            class="inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-amber-300 backdrop-blur-xl"
+          />
+
+          <DynamicSiteText
+            textKey="home_ar_hero_title"
+            fallback="إطارات ورنقات في دبي والشارقة"
+            as="h1"
+            class="mt-6 max-w-3xl text-4xl font-black leading-[1.08] sm:text-5xl lg:text-7xl"
+          />
+
+          <DynamicSiteText
+            textKey="home_ar_hero_subtitle"
+            fallback="اختر مقاس الإطار، مقاس الرنق أو موديل السيارة واحصل على سعر اليوم بسرعة عبر واتساب."
+            as="p"
+            class="mt-6 max-w-xl text-lg font-semibold leading-9 text-slate-200"
+          />
+
+          <div class="mt-6 grid max-w-xl gap-3 text-sm font-semibold text-slate-100 sm:grid-cols-2">
+            <div class="flex items-center gap-3">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+                ✓
+              </span>
+
+              <DynamicSiteText
+                textKey="home_ar_hero_bullet_1"
+                fallback="إطارات فاخرة"
+                as="span"
+              />
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+                ✓
+              </span>
+
+              <DynamicSiteText
+                textKey="home_ar_hero_bullet_2"
+                fallback="رنقات وألوي ويلز"
+                as="span"
+              />
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+                ✓
+              </span>
+
+              <DynamicSiteText
+                textKey="home_ar_hero_bullet_3"
+                fallback="تركيب وميزان"
+                as="span"
+              />
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+                ✓
+              </span>
+
+              <DynamicSiteText
+                textKey="home_ar_hero_bullet_4"
+                fallback="رد سريع عبر واتساب"
+                as="span"
+              />
+            </div>
+          </div>
+
+          <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+            <a
+              href={sharjahWhatsApp}
+              target="_blank"
+              rel="noreferrer"
+              class="rounded-2xl bg-amber-400 px-7 py-4 text-center font-black text-slate-950 shadow-xl shadow-amber-400/20 transition hover:bg-amber-300"
+            >
+              واتساب الشارقة
+              <span class="block text-xs font-black opacity-80">050 351 2023</span>
+            </a>
+
+            <a
+              href={dubaiWhatsApp}
+              target="_blank"
+              rel="noreferrer"
+              class="rounded-2xl bg-red-500 px-7 py-4 text-center font-black text-white shadow-xl shadow-red-500/20 transition hover:bg-red-400"
+            >
+              واتساب دبي
+              <span class="block text-xs font-black opacity-90">056 161 5010</span>
+            </a>
+          </div>
+
+          <div class="mt-8 grid max-w-2xl gap-4 sm:grid-cols-2">
+            <div class="rounded-[1.6rem] border border-white/10 bg-[#0e0e12]/65 p-5 backdrop-blur-xl">
+              <p class="text-xs font-black uppercase tracking-[0.22em] text-amber-300">
+                فرع الشارقة
+              </p>
+              <p class="mt-2 text-2xl font-black">050 351 2023</p>
+              <p class="mt-2 text-sm font-semibold text-slate-300">
+                مفتوح 9:00 صباحاً - 11:00 مساءً
+              </p>
+            </div>
+
+            <div class="rounded-[1.6rem] border border-white/10 bg-[#0e0e12]/65 p-5 backdrop-blur-xl">
+              <p class="text-xs font-black uppercase tracking-[0.22em] text-red-300">
+                فرع دبي
+              </p>
+              <p class="mt-2 text-2xl font-black">056 161 5010</p>
+              <p class="mt-2 text-sm font-semibold text-slate-300">
+                مفتوح 9:00 صباحاً - 2:00 بعد منتصف الليل
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEARCH BOX OVER SAME BACKGROUND -->
+        <div class="flex justify-center lg:justify-start">
+          <div class="w-full max-w-[460px] rounded-[2rem] border border-white/15 bg-[#0e0e12]/70 p-4 shadow-[0_25px_90px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+            <HeroSizeSearchBox />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <ServicesSection />
+    <FeaturedProductsSection />
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

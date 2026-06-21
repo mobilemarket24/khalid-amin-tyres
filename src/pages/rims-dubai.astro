@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SeoPageHero from "../components/SeoPageHero.astro";
+import FeaturedProductsSection from "../components/FeaturedProductsSection.astro";
+import LeadCaptureSection from "../components/LeadCaptureSection.astro";
+import BranchesSection from "../components/BranchesSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import FinalCtaSection from "../components/FinalCtaSection.astro";
+---
+
+<BaseLayout
+  title="Rims Dubai | Buy Alloy Wheels & Car Rims in Dubai UAE | Khalid Amin Tyres"
+  description="Buy car rims and alloy wheels in Dubai with fast WhatsApp pricing. Khalid Amin Tyres offers premium rims, fitting support and wheel services in Dubai and Sharjah."
+  metaTitleKey="meta_rims_dubai_title"
+  metaDescriptionKey="meta_rims_dubai_description"
+>
+  <main>
+    <SeoPageHero
+      imageKey="rims_dubai_hero"
+      badge="Rims Dubai"
+      titleKey="rims_dubai_hero_title"
+      subtitleKey="rims_dubai_hero_subtitle"
+      title="Rims & Alloy Wheels in Dubai"
+      subtitle="Upgrade your car with premium rims and alloy wheels from Khalid Amin Tyres Dubai."
+      branch="dubai"
+      bullets={[
+        "Alloy wheels",
+        "Rims for SUV and sedan",
+        "Fitment support",
+        "WhatsApp quotation",
+      ]}
+    />
+
+    <FeaturedProductsSection
+      productType="rim"
+      branch="dubai"
+      featuredOnly={false}
+      limit={12}
+      badge="Rims Available in Dubai"
+      title="Shop rims available from our Dubai branch"
+      subtitle="Browse active rim options available for Dubai customers, including size, fitment details, origin and direct WhatsApp pricing."
+      emptyText="No active Dubai rims are available right now. Please contact us on WhatsApp for current stock."
+    />
+
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

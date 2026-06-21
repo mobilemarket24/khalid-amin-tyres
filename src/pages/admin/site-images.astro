@@ -1,0 +1,763 @@
+﻿---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminShell from "../../components/admin/AdminShell.astro";
+---
+
+<AdminLayout title="Site Images | Admin Panel">
+  <AdminShell current="site-images">
+    <main class="min-h-screen bg-[#0a0a0e] px-4 py-6 text-white sm:px-6 lg:px-8">
+      <section class="mx-auto max-w-7xl">
+        <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[0.25em] text-amber-300">
+              Website Media Manager
+            </p>
+
+            <h1 class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
+              Site Images
+            </h1>
+
+            <p class="mt-3 max-w-3xl text-sm font-semibold leading-7 text-slate-400">
+              Manage all important website images from one place. Each image includes usage location,
+              recommended size, SEO alt text status and page preview.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-xl">
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+              Recommended
+            </p>
+            <p class="mt-1 text-sm font-bold text-slate-200">
+              Use WebP / JPG under 500KB for best speed
+            </p>
+          </div>
+        </div>
+
+        <div id="statusBox" class="mb-6 hidden rounded-2xl border px-5 py-4 text-sm font-bold"></div>
+
+        <div class="mb-6 grid gap-4 md:grid-cols-4">
+          <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Total Slots</p>
+            <p id="totalSlots" class="mt-2 text-3xl font-black text-white">0</p>
+          </div>
+
+          <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Active</p>
+            <p id="activeSlots" class="mt-2 text-3xl font-black text-amber-300">0</p>
+          </div>
+
+          <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">SEO Ready</p>
+            <p id="seoReadySlots" class="mt-2 text-3xl font-black text-emerald-300">0</p>
+          </div>
+
+          <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Need SEO</p>
+            <p id="needSeoSlots" class="mt-2 text-3xl font-black text-red-300">0</p>
+          </div>
+        </div>
+
+        <div class="mb-6 rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+          <div class="grid gap-4 md:grid-cols-[1fr_220px_220px]">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Search by title, image key, page, usage..."
+              class="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-slate-500 focus:border-amber-400"
+            />
+
+            <select
+              id="categoryFilter"
+              class="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm font-bold text-white outline-none focus:border-amber-400"
+            >
+              <option value="all">All Categories</option>
+              <option value="homepage">Homepage</option>
+              <option value="arabic">Arabic</option>
+              <option value="branches">Branches</option>
+              <option value="services">Services</option>
+              <option value="seo">SEO Pages</option>
+              <option value="lead">Lead Form</option>
+            </select>
+
+            <select
+              id="seoFilter"
+              class="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm font-bold text-white outline-none focus:border-amber-400"
+            >
+              <option value="all">All SEO Status</option>
+              <option value="ready">SEO Ready</option>
+              <option value="missing">Need SEO Fix</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="loadingBox" class="rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center backdrop-blur-xl">
+          <p class="text-sm font-bold text-slate-300">Loading site images...</p>
+        </div>
+
+        <div id="imagesGrid" class="grid gap-6 xl:grid-cols-2"></div>
+      </section>
+    </main>
+
+    <script>
+      import { supabase } from "../../lib/supabase";
+
+      const slotGuide = {
+        home_hero_banner: {
+          category: "homepage",
+          usage: "English homepage main Hero background",
+          pageUrl: "/",
+          pageLabel: "Preview Home",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "High",
+          advice: "Use a wide premium car / tyre showroom image. Keep important car area near center or right side.",
+        },
+        home_ar_hero_banner: {
+          category: "arabic",
+          usage: "Arabic homepage main Hero background",
+          pageUrl: "/ar/",
+          pageLabel: "Preview Arabic Home",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "High",
+          advice: "Use a wide image. Arabic text is on the right, so keep the clean/dark area around right side.",
+        },
+        lead_form_banner: {
+          category: "lead",
+          usage: "Lead / request form visual image",
+          pageUrl: "/#request",
+          pageLabel: "Preview Lead Form",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "Medium",
+          advice: "Use service, tyre fitting, wheel or showroom image. Avoid very busy text inside image.",
+        },
+        dubai_branch_image: {
+          category: "branches",
+          usage: "Dubai branch card image inside Branches section",
+          pageUrl: "/#branches",
+          pageLabel: "Preview Branches",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "High",
+          advice: "Use real Dubai shop/showroom photo. Bright and clean image improves trust.",
+        },
+        sharjah_branch_image: {
+          category: "branches",
+          usage: "Sharjah branch card image inside Branches section",
+          pageUrl: "/#branches",
+          pageLabel: "Preview Branches",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "High",
+          advice: "Use real Sharjah branch/shop photo. Keep shop sign or tyre wall visible.",
+        },
+
+        services_tyres_image: {
+          category: "services",
+          usage: "Tyres service card image inside Services section",
+          pageUrl: "/#services",
+          pageLabel: "Preview Services",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "High",
+          advice: "Use a real tyre wall, tyre fitting or premium tyre display image.",
+        },
+        services_rims_image: {
+          category: "services",
+          usage: "Rims service card image inside Services section",
+          pageUrl: "/#services",
+          pageLabel: "Preview Services",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "High",
+          advice: "Use a rims display wall, alloy wheel close-up or premium wheel image.",
+        },
+        services_batteries_image: {
+          category: "services",
+          usage: "Batteries service card image inside Services section",
+          pageUrl: "/#services",
+          pageLabel: "Preview Services",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "Medium",
+          advice: "Use a car battery, battery replacement or workshop service image. Avoid phone battery icons.",
+        },
+        services_alignment_image: {
+          category: "services",
+          usage: "Wheel Alignment service card image inside Services section",
+          pageUrl: "/#services",
+          pageLabel: "Preview Services",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "Medium",
+          advice: "Use alignment machine, car lift or wheel alignment workshop image.",
+        },
+        services_balancing_image: {
+          category: "services",
+          usage: "Wheel Balancing service card image inside Services section",
+          pageUrl: "/#services",
+          pageLabel: "Preview Services",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "Medium",
+          advice: "Use wheel balancing machine, tyre fitting or wheel service image.",
+        },
+        services_onsite_image: {
+          category: "services",
+          usage: "On-site / WhatsApp support service card image inside Services section",
+          pageUrl: "/#services",
+          pageLabel: "Preview Services",
+          size: "1200 × 800",
+          ratio: "3:2",
+          priority: "Medium",
+          advice: "Use mobile tyre service, WhatsApp support, mechanic service or branch support image.",
+        },
+
+        tyres_dubai_hero: {
+          category: "seo",
+          usage: "Hero image for Tyres Dubai SEO page",
+          pageUrl: "/tyres-dubai/",
+          pageLabel: "Preview Tyres Dubai",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "High",
+          advice: "Use tyre shop / tyre wall / luxury car image suitable for Dubai tyre search.",
+        },
+        tyres_sharjah_hero: {
+          category: "seo",
+          usage: "Hero image for Tyres Sharjah SEO page",
+          pageUrl: "/tyres-sharjah/",
+          pageLabel: "Preview Tyres Sharjah",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "High",
+          advice: "Use image related to tyre sales or fitting in Sharjah.",
+        },
+        rims_dubai_hero: {
+          category: "seo",
+          usage: "Hero image for Rims Dubai SEO page",
+          pageUrl: "/rims-dubai/",
+          pageLabel: "Preview Rims Dubai",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "High",
+          advice: "Use premium rims / alloy wheels / luxury car wheel close-up.",
+        },
+        rims_sharjah_hero: {
+          category: "seo",
+          usage: "Hero image for Rims Sharjah SEO page",
+          pageUrl: "/rims-sharjah/",
+          pageLabel: "Preview Rims Sharjah",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "High",
+          advice: "Use rims display wall or alloy wheel image.",
+        },
+        wheel_alignment_dubai_hero: {
+          category: "seo",
+          usage: "Hero image for Wheel Alignment Dubai SEO page",
+          pageUrl: "/wheel-alignment-dubai/",
+          pageLabel: "Preview Alignment",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "Medium",
+          advice: "Use alignment machine, car on lift, or workshop service image.",
+        },
+        wheel_balancing_dubai_hero: {
+          category: "seo",
+          usage: "Hero image for Wheel Balancing Dubai SEO page",
+          pageUrl: "/wheel-balancing-dubai/",
+          pageLabel: "Preview Balancing",
+          size: "1920 × 1080",
+          ratio: "16:9",
+          priority: "Medium",
+          advice: "Use balancing machine, wheel service, or tyre fitting image.",
+        },
+      };
+
+      let siteImages = [];
+
+      const loadingBox = document.getElementById("loadingBox");
+      const imagesGrid = document.getElementById("imagesGrid");
+      const statusBox = document.getElementById("statusBox");
+      const searchInput = document.getElementById("searchInput");
+      const categoryFilter = document.getElementById("categoryFilter");
+      const seoFilter = document.getElementById("seoFilter");
+
+      const totalSlots = document.getElementById("totalSlots");
+      const activeSlots = document.getElementById("activeSlots");
+      const seoReadySlots = document.getElementById("seoReadySlots");
+      const needSeoSlots = document.getElementById("needSeoSlots");
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function showStatus(message, type = "success") {
+        statusBox.textContent = message;
+        statusBox.classList.remove(
+          "hidden",
+          "border-emerald-400/30",
+          "bg-emerald-400/10",
+          "text-emerald-200",
+          "border-red-400/30",
+          "bg-red-400/10",
+          "text-red-200",
+          "border-amber-400/30",
+          "bg-amber-400/10",
+          "text-amber-200"
+        );
+
+        if (type === "error") {
+          statusBox.classList.add("border-red-400/30", "bg-red-400/10", "text-red-200");
+        } else if (type === "info") {
+          statusBox.classList.add("border-amber-400/30", "bg-amber-400/10", "text-amber-200");
+        } else {
+          statusBox.classList.add("border-emerald-400/30", "bg-emerald-400/10", "text-emerald-200");
+        }
+
+        setTimeout(() => {
+          statusBox.classList.add("hidden");
+        }, 4500);
+      }
+
+      function getSeoStatus(image) {
+        const alt = String(image.alt_text || "").trim();
+        const description = String(image.description || "").trim();
+
+        const hasGoodAlt =
+          alt.length >= 20 &&
+          !["image", "photo", "banner", "hero"].includes(alt.toLowerCase());
+
+        const hasDescription = description.length >= 20;
+
+        return {
+          ready: hasGoodAlt && hasDescription,
+          hasGoodAlt,
+          hasDescription,
+        };
+      }
+
+      function getGuide(imageKey) {
+        return (
+          slotGuide[imageKey] || {
+            category: "other",
+            usage: "Custom website image slot",
+            pageUrl: "/",
+            pageLabel: "Preview Website",
+            size: "1600 × 900",
+            ratio: "16:9",
+            priority: "Normal",
+            advice: "Use optimized WebP / JPG image and write a clear SEO alt text.",
+          }
+        );
+      }
+
+      function getCategoryBadge(category) {
+        const classes = {
+          homepage: "bg-amber-400 text-slate-950",
+          arabic: "bg-emerald-400 text-slate-950",
+          branches: "bg-red-500 text-white",
+          services: "bg-blue-400 text-slate-950",
+          seo: "bg-purple-500 text-white",
+          lead: "bg-yellow-400 text-slate-950",
+          other: "bg-slate-600 text-white",
+        };
+
+        const labels = {
+          homepage: "Homepage",
+          arabic: "Arabic",
+          branches: "Branches",
+          services: "Services",
+          seo: "SEO Page",
+          lead: "Lead Form",
+          other: "Other",
+        };
+
+        return `<span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] ${classes[category] || classes.other}">
+          ${labels[category] || labels.other}
+        </span>`;
+      }
+
+      function updateStats(items) {
+        const seoStatuses = items.map((item) => getSeoStatus(item));
+
+        totalSlots.textContent = String(items.length);
+        activeSlots.textContent = String(items.filter((item) => item.is_active).length);
+        seoReadySlots.textContent = String(seoStatuses.filter((item) => item.ready).length);
+        needSeoSlots.textContent = String(seoStatuses.filter((item) => !item.ready).length);
+      }
+
+      function renderImages() {
+        const query = String(searchInput.value || "").toLowerCase().trim();
+        const category = categoryFilter.value;
+        const seo = seoFilter.value;
+
+        const filtered = siteImages.filter((image) => {
+          const guide = getGuide(image.image_key);
+          const seoStatus = getSeoStatus(image);
+
+          const searchable = [
+            image.image_key,
+            image.title,
+            image.alt_text,
+            image.description,
+            guide.usage,
+            guide.category,
+            guide.pageUrl,
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          const matchesSearch = !query || searchable.includes(query);
+          const matchesCategory = category === "all" || guide.category === category;
+          const matchesSeo =
+            seo === "all" ||
+            (seo === "ready" && seoStatus.ready) ||
+            (seo === "missing" && !seoStatus.ready);
+
+          return matchesSearch && matchesCategory && matchesSeo;
+        });
+
+        updateStats(siteImages);
+
+        if (!filtered.length) {
+          imagesGrid.innerHTML = `
+            <div class="xl:col-span-2 rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center">
+              <p class="text-sm font-bold text-slate-300">No images found for this filter.</p>
+            </div>
+          `;
+          return;
+        }
+
+        imagesGrid.innerHTML = filtered
+          .map((image) => {
+            const guide = getGuide(image.image_key);
+            const seoStatus = getSeoStatus(image);
+            const categoryBadge = getCategoryBadge(guide.category);
+            const imageUrl = image.image_url || "/images/hero-banner.png";
+
+            const seoBadge = seoStatus.ready
+              ? `<span class="rounded-full bg-emerald-400 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-slate-950">SEO Ready</span>`
+              : `<span class="rounded-full bg-red-500 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-white">Need SEO Fix</span>`;
+
+            const activeBadge = image.is_active
+              ? `<span class="rounded-full bg-amber-400/15 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">Active</span>`
+              : `<span class="rounded-full bg-red-400/15 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-red-200">Hidden</span>`;
+
+            return `
+              <article class="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl" data-card="${escapeHtml(image.image_key)}">
+                <div class="relative h-72 overflow-hidden bg-slate-950">
+                  <img
+                    src="${escapeHtml(imageUrl)}"
+                    alt="${escapeHtml(image.alt_text || image.title || image.image_key)}"
+                    class="h-full w-full object-cover object-center"
+                    loading="lazy"
+                  />
+
+                  <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/80"></div>
+
+                  <div class="absolute left-5 top-5 flex flex-wrap gap-2">
+                    ${categoryBadge}
+                    ${seoBadge}
+                    ${activeBadge}
+                  </div>
+
+                  <div class="absolute bottom-5 left-5 right-5">
+                    <p class="text-xs font-black uppercase tracking-[0.2em] text-amber-300">
+                      ${escapeHtml(image.image_key)}
+                    </p>
+                    <h2 class="mt-2 text-2xl font-black text-white">
+                      ${escapeHtml(image.title || image.image_key)}
+                    </h2>
+                  </div>
+                </div>
+
+                <div class="grid gap-5 p-5">
+                  <div class="grid gap-3 sm:grid-cols-3">
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <p class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Used In</p>
+                      <p class="mt-2 text-sm font-bold leading-6 text-slate-200">${escapeHtml(guide.usage)}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <p class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Best Size</p>
+                      <p class="mt-2 text-sm font-black text-white">${escapeHtml(guide.size)}</p>
+                      <p class="mt-1 text-xs font-bold text-slate-400">Ratio: ${escapeHtml(guide.ratio)}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <p class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Priority</p>
+                      <p class="mt-2 text-sm font-black text-white">${escapeHtml(guide.priority)}</p>
+                      <p class="mt-1 text-xs font-bold text-slate-400">Optimize before upload</p>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-amber-400/15 bg-amber-400/10 p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.18em] text-amber-300">Upload Advice</p>
+                    <p class="mt-2 text-sm font-semibold leading-6 text-slate-200">${escapeHtml(guide.advice)}</p>
+                  </div>
+
+                  <form class="site-image-form grid gap-4" data-image-key="${escapeHtml(image.image_key)}">
+                    <div>
+                      <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                        Title
+                      </label>
+                      <input
+                        name="title"
+                        value="${escapeHtml(image.title || "")}"
+                        class="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-white outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                        SEO Alt Text
+                      </label>
+                      <input
+                        name="alt_text"
+                        value="${escapeHtml(image.alt_text || "")}"
+                        placeholder="Example: Tyres shop in Dubai - Khalid Amin Tyres"
+                        class="w-full rounded-2xl border ${seoStatus.hasGoodAlt ? "border-white/10" : "border-red-400/50"} bg-slate-950/70 px-4 py-3 text-sm font-semibold text-white outline-none focus:border-amber-400"
+                      />
+                      <p class="mt-2 text-xs font-semibold ${seoStatus.hasGoodAlt ? "text-emerald-300" : "text-red-300"}">
+                        ${seoStatus.hasGoodAlt ? "Alt text looks good." : "Alt text should be clear and at least 20 characters."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                        Description
+                      </label>
+                      <textarea
+                        name="description"
+                        rows="3"
+                        placeholder="Short internal note about this image..."
+                        class="w-full resize-none rounded-2xl border ${seoStatus.hasDescription ? "border-white/10" : "border-red-400/50"} bg-slate-950/70 px-4 py-3 text-sm font-semibold text-white outline-none focus:border-amber-400"
+                      >${escapeHtml(image.description || "")}</textarea>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-[1fr_160px]">
+                      <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                          Replace Image
+                        </label>
+                        <input
+                          name="image_file"
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          class="w-full cursor-pointer rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-slate-300 file:mr-4 file:rounded-xl file:border-0 file:bg-amber-400 file:px-4 file:py-2 file:text-sm file:font-black file:text-slate-950"
+                        />
+                      </div>
+
+                      <label class="flex items-end gap-3 rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3">
+                        <input
+                          name="is_active"
+                          type="checkbox"
+                          ${image.is_active ? "checked" : ""}
+                          class="h-5 w-5 accent-amber-400"
+                        />
+                        <span class="pb-1 text-sm font-black text-white">Active</span>
+                      </label>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-4">
+                      <button
+                        type="submit"
+                        class="rounded-2xl bg-amber-400 px-5 py-4 text-sm font-black text-slate-950 transition hover:bg-amber-300"
+                      >
+                        Save Changes
+                      </button>
+
+                      <a
+                        href="${escapeHtml(guide.pageUrl)}"
+                        target="_blank"
+                        class="rounded-2xl bg-white/10 px-5 py-4 text-center text-sm font-black text-white transition hover:bg-white/15"
+                      >
+                        ${escapeHtml(guide.pageLabel)}
+                      </a>
+
+                      <a
+                        href="${escapeHtml(imageUrl)}"
+                        target="_blank"
+                        class="rounded-2xl bg-white/10 px-5 py-4 text-center text-sm font-black text-white transition hover:bg-white/15"
+                      >
+                        Open Image
+                      </a>
+
+                      <button
+                        type="button"
+                        data-copy-key="${escapeHtml(image.image_key)}"
+                        class="rounded-2xl bg-white/10 px-5 py-4 text-sm font-black text-white transition hover:bg-white/15"
+                      >
+                        Copy Key
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      async function checkAdminSession() {
+        const { data } = await supabase.auth.getSession();
+
+        if (!data.session) {
+          window.location.href = "/admin/login/";
+          return false;
+        }
+
+        return true;
+      }
+
+      async function loadImages() {
+        const isLoggedIn = await checkAdminSession();
+        if (!isLoggedIn) return;
+
+        loadingBox.classList.remove("hidden");
+        imagesGrid.innerHTML = "";
+
+        const { data, error } = await supabase
+          .from("site_images")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: true });
+
+        loadingBox.classList.add("hidden");
+
+        if (error) {
+          showStatus(error.message || "Could not load site images.", "error");
+          return;
+        }
+
+        siteImages = data || [];
+        renderImages();
+      }
+
+      function sanitizeFileName(fileName) {
+        return String(fileName || "image")
+          .toLowerCase()
+          .replace(/[^a-z0-9._-]+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      async function uploadImageFile(imageKey, file) {
+        if (!file) return null;
+
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+          throw new Error("Image is too large. Maximum allowed size is 10MB.");
+        }
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(file.type)) {
+          throw new Error("Only JPG, PNG and WebP images are allowed.");
+        }
+
+        const safeName = sanitizeFileName(file.name);
+        const filePath = `${imageKey}/${Date.now()}-${safeName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("site-images")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data } = supabase.storage.from("site-images").getPublicUrl(filePath);
+
+        return data.publicUrl;
+      }
+
+      async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const form = event.target.closest(".site-image-form");
+        if (!form) return;
+
+        const imageKey = form.dataset.imageKey;
+        const formData = new FormData(form);
+        const file = formData.get("image_file");
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+
+        try {
+          submitButton.textContent = "Saving...";
+          submitButton.disabled = true;
+
+          let imageUrl = null;
+
+          if (file && file instanceof File && file.size > 0) {
+            imageUrl = await uploadImageFile(imageKey, file);
+          }
+
+          const updatePayload = {
+            title: String(formData.get("title") || "").trim(),
+            alt_text: String(formData.get("alt_text") || "").trim(),
+            description: String(formData.get("description") || "").trim(),
+            is_active: formData.get("is_active") === "on",
+            ...(imageUrl ? { image_url: imageUrl } : {}),
+          };
+
+          const { error } = await supabase
+            .from("site_images")
+            .update(updatePayload)
+            .eq("image_key", imageKey);
+
+          if (error) {
+            throw error;
+          }
+
+          showStatus("Site image updated successfully.");
+          await loadImages();
+        } catch (error) {
+          showStatus(error.message || "Could not update site image.", "error");
+        } finally {
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+        }
+      }
+
+      async function handleCopyKey(event) {
+        const button = event.target.closest("[data-copy-key]");
+        if (!button) return;
+
+        const key = button.dataset.copyKey;
+        await navigator.clipboard.writeText(key);
+        showStatus(`Copied image key: ${key}`, "info");
+      }
+
+      searchInput.addEventListener("input", renderImages);
+      categoryFilter.addEventListener("change", renderImages);
+      seoFilter.addEventListener("change", renderImages);
+
+      document.addEventListener("submit", (event) => {
+        if (event.target.closest(".site-image-form")) {
+          handleFormSubmit(event);
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (event.target.closest("[data-copy-key]")) {
+          handleCopyKey(event);
+        }
+      });
+
+      loadImages();
+    </script>
+  </AdminShell>
+</AdminLayout>

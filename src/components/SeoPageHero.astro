@@ -1,0 +1,122 @@
+﻿---
+import DynamicSiteImage from "./DynamicSiteImage.astro";
+import DynamicSiteText from "./DynamicSiteText.astro";
+import { getWhatsAppUrl } from "../utils/whatsapp";
+
+interface Props {
+  imageKey: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  titleKey?: string;
+  subtitleKey?: string;
+  bullets: string[];
+  branch?: "dubai" | "sharjah";
+}
+
+const {
+  imageKey,
+  badge,
+  title,
+  subtitle,
+  titleKey,
+  subtitleKey,
+  bullets,
+  branch = "dubai",
+} = Astro.props;
+
+const whatsappText =
+  branch === "sharjah"
+    ? `Hi, I need price and availability from Khalid Amin Tyres Sharjah. Page: ${title}`
+    : `Hi, I need price and availability from Khalid Amin Tyres Dubai. Page: ${title}`;
+
+const whatsappUrl = getWhatsAppUrl(branch, whatsappText);
+
+const branchLabel = branch === "sharjah" ? "WhatsApp Sharjah" : "WhatsApp Dubai";
+const branchPhone = branch === "sharjah" ? "050 351 2023" : "056 161 5010";
+---
+
+<section class="relative min-h-[620px] overflow-hidden bg-[#0a0a0e] px-5 py-16 text-white sm:px-8 lg:px-12 lg:py-20">
+  <DynamicSiteImage
+    imageKey={imageKey}
+    fallbackSrc="/images/hero-banner.png"
+    alt={title}
+    loading="eager"
+    class="absolute inset-0 h-full w-full object-cover object-center"
+  />
+
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0a0a0e]/95 via-[#0a0a0e]/78 to-[#0a0a0e]/35"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0e]/35 via-transparent to-[#0a0a0e]/90"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(239,68,68,0.20),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(251,191,36,0.18),transparent_30%)]"></div>
+
+  <div class="relative z-10 mx-auto max-w-7xl">
+    <div class="max-w-3xl">
+      <div class="inline-flex rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-amber-300 backdrop-blur-xl">
+        {badge}
+      </div>
+
+      {
+        titleKey ? (
+          <DynamicSiteText
+            textKey={titleKey}
+            fallback={title}
+            as="h1"
+            class="mt-6 text-4xl font-black leading-[1.05] sm:text-5xl lg:text-7xl"
+          />
+        ) : (
+          <h1 class="mt-6 text-4xl font-black leading-[1.05] sm:text-5xl lg:text-7xl">
+            {title}
+          </h1>
+        )
+      }
+
+      {
+        subtitleKey ? (
+          <DynamicSiteText
+            textKey={subtitleKey}
+            fallback={subtitle}
+            as="p"
+            class="mt-6 max-w-2xl text-lg font-semibold leading-8 text-slate-200"
+          />
+        ) : (
+          <p class="mt-6 max-w-2xl text-lg font-semibold leading-8 text-slate-200">
+            {subtitle}
+          </p>
+        )
+      }
+
+      <div class="mt-7 grid max-w-2xl gap-3 text-sm font-semibold text-slate-100 sm:grid-cols-2">
+        {
+          bullets.map((bullet) => (
+            <div class="flex items-center gap-3">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950">
+                ✓
+              </span>
+              {bullet}
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-9 flex flex-col gap-4 sm:flex-row">
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noreferrer"
+          class="rounded-2xl bg-amber-400 px-7 py-4 text-center font-black text-slate-950 shadow-xl shadow-amber-400/20 transition hover:bg-amber-300"
+        >
+          {branchLabel}
+          <span class="block text-xs font-black opacity-80">{branchPhone}</span>
+        </a>
+
+        <a
+          href="#branches"
+          class="rounded-2xl border border-white/15 bg-white/10 px-7 py-4 text-center font-black text-white backdrop-blur-xl transition hover:bg-white/15"
+        >
+          View Branches
+          <span class="block text-xs font-black text-slate-300">Dubai & Sharjah</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

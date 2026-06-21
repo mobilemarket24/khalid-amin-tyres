@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /admin/login/
+Disallow: /admin/dashboard/
+Disallow: /admin/products/
+Disallow: /admin/brands/
+Disallow: /admin/branches/
+Disallow: /admin/leads/
+Disallow: /admin/site-images/
+Disallow: /admin/site-texts/
+Disallow: /admin/media/
+Disallow: /admin/settings/
+
+Sitemap: https://khalidamintyres.com/sitemap-index.xml
