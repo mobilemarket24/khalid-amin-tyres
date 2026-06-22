@@ -3,20 +3,20 @@ import BrandLogo from "./BrandLogo.astro";
 import DynamicSiteText from "./DynamicSiteText.astro";
 import { business } from "../data/business";
 import { getWhatsAppUrl } from "../utils/whatsapp";
-import { getActiveBrands } from "../lib/brands";
-import { CAR_MAKES } from "../lib/carMakes";
+import { getBrandsByCategory } from "../lib/brands";
 
 const isAr = Astro.url.pathname.startsWith("/ar");
 
 const homeUrl = isAr ? "/ar/" : "/";
 const langUrl = isAr ? "/" : "/ar/";
 
-const brands = await getActiveBrands();
+// Tyres are organised by tyre brand, rims by car make — both managed from the
+// admin Brands page (category field) and refreshed live below.
+const tyreBrands = await getBrandsByCategory("tyre");
+const rimBrands = await getBrandsByCategory("rim");
 
-// Tyres are organised by tyre brand (live from the brands table); rims are
-// organised by car make (curated list). Both link to English product pages.
-const tyreBrandLinks = brands.map((b) => ({ label: b.name, href: `/tyres/${b.slug}/` }));
-const rimBrandLinks = CAR_MAKES.map((m) => ({ label: m.name, href: `/rims/${m.slug}/` }));
+const tyreBrandLinks = tyreBrands.map((b) => ({ label: b.name, href: `/tyres/${b.slug}/` }));
+const rimBrandLinks = rimBrands.map((b) => ({ label: b.name, href: `/rims/${b.slug}/` }));
 
 const serviceLinks = isAr
   ? [
@@ -60,7 +60,7 @@ const navGroups: NavGroup[] = isAr
   ? [
       { labelKey: "header_ar_nav_home", fallbackLabel: "الرئيسية", href: "/ar/" },
       { labelKey: "header_ar_nav_tyres", fallbackLabel: "الإطارات", href: "/ar/#tyres", children: tyreBrandLinks, wide: true, brandType: "tyres" },
-      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true },
+      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true, brandType: "rims" },
       { labelKey: "header_ar_nav_services", fallbackLabel: "الخدمات", href: "/ar/#services", children: serviceLinks },
       { labelKey: "header_ar_nav_branches", fallbackLabel: "الفروع", href: "/ar/#branches", children: branchLinks },
       { labelKey: "header_ar_nav_faq", fallbackLabel: "الأسئلة", href: "/ar/#faq" },
@@ -69,7 +69,7 @@ const navGroups: NavGroup[] = isAr
   : [
       { labelKey: "header_nav_home", fallbackLabel: "Home", href: "/" },
       { labelKey: "header_nav_tyres", fallbackLabel: "Tyres", href: "/#tyres", children: tyreBrandLinks, wide: true, brandType: "tyres" },
-      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true },
+      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true, brandType: "rims" },
       { labelKey: "header_nav_services", fallbackLabel: "Services", href: "/#services", children: serviceLinks },
       { labelKey: "header_nav_branches", fallbackLabel: "Branches", href: "/#branches", children: branchLinks },
       { labelKey: "header_nav_faq", fallbackLabel: "FAQ", href: "/#faq" },
@@ -338,27 +338,47 @@ const text = isAr
         .replaceAll("'", "&#039;");
     }
 
+    function brandCategory(b) {
+      const v = String(b.category || "").toLowerCase();
+      return v === "rim" || v === "both" ? v : "tyre";
+    }
+
     async function refreshBrandMenus() {
       const lists = Array.from(document.querySelectorAll("[data-brand-list]"));
       if (!lists.length) return;
 
+      // select("*") is resilient whether or not the `category` column exists.
       const { data, error } = await headerSupabase
         .from("brands")
-        .select("name, slug")
+        .select("*")
         .eq("is_active", true)
         .order("sort_order", { ascending: true })
         .order("name", { ascending: true });
 
       if (error || !data || data.length === 0) return;
 
+      const valid = data.filter((b) => b.slug && b.name);
+      const tyreBrands = valid.filter((b) => {
+        const c = brandCategory(b);
+        return c === "tyre" || c === "both";
+      });
+      const rimBrands = valid.filter((b) => {
+        const c = brandCategory(b);
+        return c === "rim" || c === "both";
+      });
+
       lists.forEach((el) => {
         const type = el.getAttribute("data-brand-list"); // "tyres" | "rims"
         if (type !== "tyres" && type !== "rims") return;
 
+        const items = type === "rims" ? rimBrands : tyreBrands;
+        // Don't wipe the build-time fallback list if this category has no rows
+        // yet (e.g. before the category column/seed exists).
+        if (!items.length) return;
+
         const linkClass = el.getAttribute("data-link-class") || "";
 
-        el.innerHTML = data
-          .filter((b) => b.slug && b.name)
+        el.innerHTML = items
           .map(
             (b) =>
               `<a href="/${type}/${escapeHtmlAttr(b.slug)}/" class="${linkClass}">${escapeHtmlAttr(b.name)}</a>`

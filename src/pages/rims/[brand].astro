@@ -6,10 +6,11 @@ import LeadCaptureSection from "../../components/LeadCaptureSection.astro";
 import BranchesSection from "../../components/BranchesSection.astro";
 import FAQSection from "../../components/FAQSection.astro";
 import FinalCtaSection from "../../components/FinalCtaSection.astro";
-import { CAR_MAKES } from "../../lib/carMakes";
+import { getBrandsByCategory } from "../../lib/brands";
 
 export async function getStaticPaths() {
-  return CAR_MAKES.map((make) => ({
+  const makes = await getBrandsByCategory("rim");
+  return makes.map((make) => ({
     params: { brand: make.slug },
     props: { makeName: make.name, makeSlug: make.slug },
   }));
