@@ -4,6 +4,7 @@ import DynamicSiteText from "./DynamicSiteText.astro";
 import { business } from "../data/business";
 import { getWhatsAppUrl } from "../utils/whatsapp";
 import { getActiveBrands } from "../lib/brands";
+import { CAR_MAKES } from "../lib/carMakes";
 
 const isAr = Astro.url.pathname.startsWith("/ar");
 
@@ -12,9 +13,10 @@ const langUrl = isAr ? "/" : "/ar/";
 
 const brands = await getActiveBrands();
 
-// Brand pages are English-only product pages; link to them from both locales.
+// Tyres are organised by tyre brand (live from the brands table); rims are
+// organised by car make (curated list). Both link to English product pages.
 const tyreBrandLinks = brands.map((b) => ({ label: b.name, href: `/tyres/${b.slug}/` }));
-const rimBrandLinks = brands.map((b) => ({ label: b.name, href: `/rims/${b.slug}/` }));
+const rimBrandLinks = CAR_MAKES.map((m) => ({ label: m.name, href: `/rims/${m.slug}/` }));
 
 const serviceLinks = isAr
   ? [
@@ -58,7 +60,7 @@ const navGroups: NavGroup[] = isAr
   ? [
       { labelKey: "header_ar_nav_home", fallbackLabel: "الرئيسية", href: "/ar/" },
       { labelKey: "header_ar_nav_tyres", fallbackLabel: "الإطارات", href: "/ar/#tyres", children: tyreBrandLinks, wide: true, brandType: "tyres" },
-      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true, brandType: "rims" },
+      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true },
       { labelKey: "header_ar_nav_services", fallbackLabel: "الخدمات", href: "/ar/#services", children: serviceLinks },
       { labelKey: "header_ar_nav_branches", fallbackLabel: "الفروع", href: "/ar/#branches", children: branchLinks },
       { labelKey: "header_ar_nav_faq", fallbackLabel: "الأسئلة", href: "/ar/#faq" },
@@ -67,7 +69,7 @@ const navGroups: NavGroup[] = isAr
   : [
       { labelKey: "header_nav_home", fallbackLabel: "Home", href: "/" },
       { labelKey: "header_nav_tyres", fallbackLabel: "Tyres", href: "/#tyres", children: tyreBrandLinks, wide: true, brandType: "tyres" },
-      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true, brandType: "rims" },
+      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true },
       { labelKey: "header_nav_services", fallbackLabel: "Services", href: "/#services", children: serviceLinks },
       { labelKey: "header_nav_branches", fallbackLabel: "Branches", href: "/#branches", children: branchLinks },
       { labelKey: "header_nav_faq", fallbackLabel: "FAQ", href: "/#faq" },

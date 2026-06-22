@@ -6,32 +6,31 @@ import LeadCaptureSection from "../../components/LeadCaptureSection.astro";
 import BranchesSection from "../../components/BranchesSection.astro";
 import FAQSection from "../../components/FAQSection.astro";
 import FinalCtaSection from "../../components/FinalCtaSection.astro";
-import { getActiveBrands } from "../../lib/brands";
+import { CAR_MAKES } from "../../lib/carMakes";
 
 export async function getStaticPaths() {
-  const brands = await getActiveBrands();
-  return brands.map((brand) => ({
-    params: { brand: brand.slug },
-    props: { brandName: brand.name, brandSlug: brand.slug },
+  return CAR_MAKES.map((make) => ({
+    params: { brand: make.slug },
+    props: { makeName: make.name, makeSlug: make.slug },
   }));
 }
 
-const { brandName, brandSlug } = Astro.props;
+const { makeName } = Astro.props;
 
-const title = `${brandName} Rims & Alloy Wheels in Dubai & Sharjah | Khalid Amin Tyres`;
-const description = `Shop ${brandName} rims and alloy wheels in Dubai and Sharjah. Khalid Amin Tyres offers ${brandName} rims with fitment support and fast WhatsApp pricing across both branches.`;
+const title = `${makeName} Rims & Alloy Wheels in Dubai & Sharjah | Khalid Amin Tyres`;
+const description = `Buy ${makeName} rims and alloy wheels in Dubai and Sharjah. Khalid Amin Tyres offers the right rim sizes and fitment for your ${makeName} with fast WhatsApp pricing.`;
 ---
 
 <BaseLayout title={title} description={description}>
   <main>
     <SeoPageHero
       imageKey="rims_dubai_hero"
-      badge={`${brandName} Rims`}
-      title={`${brandName} Rims & Alloy Wheels`}
-      subtitle={`Looking for ${brandName} rims? Get sizes, fitment support and availability from Khalid Amin Tyres in Dubai and Sharjah.`}
+      badge={`${makeName} Rims`}
+      title={`${makeName} Rims & Alloy Wheels`}
+      subtitle={`Looking for rims for your ${makeName}? Get the correct sizes, fitment support and availability from Khalid Amin Tyres in Dubai and Sharjah.`}
       branch="dubai"
       bullets={[
-        `Genuine ${brandName} rims`,
+        `Rims that fit your ${makeName}`,
         "Alloy wheel sizes",
         "Fitment support",
         "Fast WhatsApp pricing",
@@ -40,13 +39,12 @@ const description = `Shop ${brandName} rims and alloy wheels in Dubai and Sharja
 
     <FeaturedProductsSection
       productType="rim"
-      brand={brandSlug}
       featuredOnly={false}
       limit={24}
-      badge={`${brandName} Rims`}
-      title={`Available ${brandName} rims & alloy wheels`}
-      subtitle={`Browse ${brandName} rim options with size and fitment details, then get today's price on WhatsApp from your nearest branch.`}
-      emptyText={`No ${brandName} rims are listed online right now. Message us on WhatsApp for current ${brandName} stock and pricing.`}
+      badge={`${makeName} Rims`}
+      title={`Rims & alloy wheels for ${makeName}`}
+      subtitle={`Browse rim and alloy wheel options suitable for ${makeName}, then get today's price on WhatsApp from your nearest branch.`}
+      emptyText={`No ${makeName} rims are listed online right now. Message us on WhatsApp for current ${makeName} rim sizes and pricing.`}
     />
 
     <LeadCaptureSection />
