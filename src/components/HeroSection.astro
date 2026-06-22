@@ -1,6 +1,7 @@
 ---
 import HeroSizeSearchBox from "./HeroSizeSearchBox.astro";
 import DynamicSiteText from "./DynamicSiteText.astro";
+import DynamicSiteImage from "./DynamicSiteImage.astro";
 import { getWhatsAppUrl } from "../utils/whatsapp";
 
 const sharjahWhatsApp = getWhatsAppUrl(
@@ -16,8 +17,9 @@ const dubaiWhatsApp = getWhatsAppUrl(
 
 <section class="relative min-h-[680px] overflow-hidden bg-[#0a0a0e] text-white">
   <!-- BANNER IMAGE — full bleed background -->
-  <img
-    src="/images/hero-banner.png"
+  <DynamicSiteImage
+    imageKey="home_hero_banner"
+    fallbackSrc="/images/hero-banner.png"
     alt="Khalid Amin Tyres Dubai and Sharjah"
     loading="eager"
     class="absolute inset-0 h-full w-full object-cover object-right"
