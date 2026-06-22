@@ -51,13 +51,14 @@ interface NavGroup {
   href: string;
   children?: NavChild[];
   wide?: boolean;
+  brandType?: "tyres" | "rims";
 }
 
 const navGroups: NavGroup[] = isAr
   ? [
       { labelKey: "header_ar_nav_home", fallbackLabel: "الرئيسية", href: "/ar/" },
-      { labelKey: "header_ar_nav_tyres", fallbackLabel: "الإطارات", href: "/ar/#tyres", children: tyreBrandLinks, wide: true },
-      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true },
+      { labelKey: "header_ar_nav_tyres", fallbackLabel: "الإطارات", href: "/ar/#tyres", children: tyreBrandLinks, wide: true, brandType: "tyres" },
+      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true, brandType: "rims" },
       { labelKey: "header_ar_nav_services", fallbackLabel: "الخدمات", href: "/ar/#services", children: serviceLinks },
       { labelKey: "header_ar_nav_branches", fallbackLabel: "الفروع", href: "/ar/#branches", children: branchLinks },
       { labelKey: "header_ar_nav_faq", fallbackLabel: "الأسئلة", href: "/ar/#faq" },
@@ -65,8 +66,8 @@ const navGroups: NavGroup[] = isAr
     ]
   : [
       { labelKey: "header_nav_home", fallbackLabel: "Home", href: "/" },
-      { labelKey: "header_nav_tyres", fallbackLabel: "Tyres", href: "/#tyres", children: tyreBrandLinks, wide: true },
-      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true },
+      { labelKey: "header_nav_tyres", fallbackLabel: "Tyres", href: "/#tyres", children: tyreBrandLinks, wide: true, brandType: "tyres" },
+      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true, brandType: "rims" },
       { labelKey: "header_nav_services", fallbackLabel: "Services", href: "/#services", children: serviceLinks },
       { labelKey: "header_nav_branches", fallbackLabel: "Branches", href: "/#branches", children: branchLinks },
       { labelKey: "header_nav_faq", fallbackLabel: "FAQ", href: "/#faq" },
@@ -143,6 +144,8 @@ const text = isAr
                 >
                   <div
                     class={`max-h-[70vh] overflow-auto rounded-2xl border border-white/10 bg-[#0e0e14] p-3 shadow-2xl shadow-black/50 ${item.wide ? "grid w-[420px] grid-cols-2 gap-1" : "grid w-56 gap-1"}`}
+                    data-brand-list={item.brandType}
+                    data-link-class="rounded-xl px-3 py-2 text-sm font-bold text-slate-300 transition hover:bg-amber-400/10 hover:text-amber-300"
                   >
                     {item.children.map((child) => (
                       <a
@@ -224,7 +227,11 @@ const text = isAr
                   >
                     {isAr ? "عرض الكل" : "View all"}
                   </a>
-                  <div class="grid grid-cols-2 gap-1">
+                  <div
+                    class="grid grid-cols-2 gap-1"
+                    data-brand-list={item.brandType}
+                    data-link-class="rounded-xl px-3 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-amber-300"
+                  >
                     {item.children.map((child) => (
                       <a
                         href={child.href}
@@ -300,5 +307,64 @@ const text = isAr
         mobileMenu.classList.add("hidden");
       });
     });
+  </script>
+
+  <script>
+    // Live brand menus: refresh the Tyres/Rims dropdowns from Supabase so brands
+    // added or hidden in the admin appear instantly (the dedicated brand pages
+    // themselves are static and regenerate on the next deploy).
+    import { createClient } from "@supabase/supabase-js";
+
+    const headerSupabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      }
+    );
+
+    function escapeHtmlAttr(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function refreshBrandMenus() {
+      const lists = Array.from(document.querySelectorAll("[data-brand-list]"));
+      if (!lists.length) return;
+
+      const { data, error } = await headerSupabase
+        .from("brands")
+        .select("name, slug")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true });
+
+      if (error || !data || data.length === 0) return;
+
+      lists.forEach((el) => {
+        const type = el.getAttribute("data-brand-list"); // "tyres" | "rims"
+        if (type !== "tyres" && type !== "rims") return;
+
+        const linkClass = el.getAttribute("data-link-class") || "";
+
+        el.innerHTML = data
+          .filter((b) => b.slug && b.name)
+          .map(
+            (b) =>
+              `<a href="/${type}/${escapeHtmlAttr(b.slug)}/" class="${linkClass}">${escapeHtmlAttr(b.name)}</a>`
+          )
+          .join("");
+      });
+    }
+
+    refreshBrandMenus();
   </script>
 </header>
