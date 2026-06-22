@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SeoPageHero from "../../components/SeoPageHero.astro";
+import FeaturedProductsSection from "../../components/FeaturedProductsSection.astro";
+import LeadCaptureSection from "../../components/LeadCaptureSection.astro";
+import BranchesSection from "../../components/BranchesSection.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import FinalCtaSection from "../../components/FinalCtaSection.astro";
+import { getActiveBrands } from "../../lib/brands";
+
+export async function getStaticPaths() {
+  const brands = await getActiveBrands();
+  return brands.map((brand) => ({
+    params: { brand: brand.slug },
+    props: { brandName: brand.name, brandSlug: brand.slug },
+  }));
+}
+
+const { brandName, brandSlug } = Astro.props;
+
+const title = `${brandName} Tyres in Dubai & Sharjah | Khalid Amin Tyres`;
+const description = `Buy ${brandName} tyres in Dubai and Sharjah. Khalid Amin Tyres offers ${brandName} tyres with fitting, balancing and fast WhatsApp pricing across both branches.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <main>
+    <SeoPageHero
+      imageKey="tyres_dubai_hero"
+      badge={`${brandName} Tyres`}
+      title={`${brandName} Tyres in Dubai & Sharjah`}
+      subtitle={`Looking for ${brandName} tyres? Get pricing, sizes and availability from Khalid Amin Tyres with fitting and balancing support in Dubai and Sharjah.`}
+      branch="dubai"
+      bullets={[
+        `Genuine ${brandName} tyres`,
+        "All popular sizes",
+        "Fitting & balancing",
+        "Fast WhatsApp pricing",
+      ]}
+    />
+
+    <FeaturedProductsSection
+      productType="tyre"
+      brand={brandSlug}
+      featuredOnly={false}
+      limit={24}
+      badge={`${brandName} Tyres`}
+      title={`Available ${brandName} tyres`}
+      subtitle={`Browse ${brandName} tyre options with size, year, origin and vehicle type, then get today's price on WhatsApp from your nearest branch.`}
+      emptyText={`No ${brandName} tyres are listed online right now. Message us on WhatsApp for current ${brandName} stock and pricing.`}
+    />
+
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

@@ -1,88 +1,76 @@
-﻿---
+---
 import BrandLogo from "./BrandLogo.astro";
 import DynamicSiteText from "./DynamicSiteText.astro";
 import { business } from "../data/business";
 import { getWhatsAppUrl } from "../utils/whatsapp";
+import { getActiveBrands } from "../lib/brands";
 
 const isAr = Astro.url.pathname.startsWith("/ar");
 
 const homeUrl = isAr ? "/ar/" : "/";
 const langUrl = isAr ? "/" : "/ar/";
 
-const navItems = isAr
+const brands = await getActiveBrands();
+
+// Brand pages are English-only product pages; link to them from both locales.
+const tyreBrandLinks = brands.map((b) => ({ label: b.name, href: `/tyres/${b.slug}/` }));
+const rimBrandLinks = brands.map((b) => ({ label: b.name, href: `/rims/${b.slug}/` }));
+
+const serviceLinks = isAr
   ? [
-      {
-        labelKey: "header_ar_nav_home",
-        fallbackLabel: "الرئيسية",
-        href: "/ar/",
-      },
-      {
-        labelKey: "header_ar_nav_tyres",
-        fallbackLabel: "الإطارات",
-        href: "/ar/#tyres",
-      },
-      {
-        labelKey: "header_ar_nav_rims",
-        fallbackLabel: "الجنوط",
-        href: "/ar/#rims",
-      },
-      {
-        labelKey: "header_ar_nav_services",
-        fallbackLabel: "الخدمات",
-        href: "/ar/#services",
-      },
-      {
-        labelKey: "header_ar_nav_branches",
-        fallbackLabel: "الفروع",
-        href: "/ar/#branches",
-      },
-      {
-        labelKey: "header_ar_nav_faq",
-        fallbackLabel: "الأسئلة",
-        href: "/ar/#faq",
-      },
-      {
-        labelKey: "header_ar_nav_contact",
-        fallbackLabel: "تواصل معنا",
-        href: "/ar/#contact",
-      },
+      { label: "ضبط الزوايا", href: "/wheel-alignment-dubai/" },
+      { label: "ميزان العجلات", href: "/wheel-balancing-dubai/" },
+      { label: "تركيب الإطارات", href: "/ar/#services" },
+      { label: "البطاريات", href: "/ar/#services" },
     ]
   : [
-      {
-        labelKey: "header_nav_home",
-        fallbackLabel: "Home",
-        href: "/",
-      },
-      {
-        labelKey: "header_nav_tyres",
-        fallbackLabel: "Tyres",
-        href: "/#tyres",
-      },
-      {
-        labelKey: "header_nav_rims",
-        fallbackLabel: "Rims",
-        href: "/#rims",
-      },
-      {
-        labelKey: "header_nav_services",
-        fallbackLabel: "Services",
-        href: "/#services",
-      },
-      {
-        labelKey: "header_nav_branches",
-        fallbackLabel: "Branches",
-        href: "/#branches",
-      },
-      {
-        labelKey: "header_nav_faq",
-        fallbackLabel: "FAQ",
-        href: "/#faq",
-      },
-      {
-        labelKey: "header_nav_contact",
-        fallbackLabel: "Contact",
-        href: "/#contact",
-      },
+      { label: "Wheel Alignment", href: "/wheel-alignment-dubai/" },
+      { label: "Wheel Balancing", href: "/wheel-balancing-dubai/" },
+      { label: "Tyre Fitting", href: "/#services" },
+      { label: "Batteries", href: "/#services" },
+    ];
+
+const branchLinks = isAr
+  ? [
+      { label: "فرع دبي", href: "/tyres-dubai/" },
+      { label: "فرع الشارقة", href: "/tyres-sharjah/" },
+    ]
+  : [
+      { label: "Dubai Branch", href: "/tyres-dubai/" },
+      { label: "Sharjah Branch", href: "/tyres-sharjah/" },
+    ];
+
+interface NavChild {
+  label: string;
+  href: string;
+}
+
+interface NavGroup {
+  labelKey: string;
+  fallbackLabel: string;
+  href: string;
+  children?: NavChild[];
+  wide?: boolean;
+}
+
+const navGroups: NavGroup[] = isAr
+  ? [
+      { labelKey: "header_ar_nav_home", fallbackLabel: "الرئيسية", href: "/ar/" },
+      { labelKey: "header_ar_nav_tyres", fallbackLabel: "الإطارات", href: "/ar/#tyres", children: tyreBrandLinks, wide: true },
+      { labelKey: "header_ar_nav_rims", fallbackLabel: "الجنوط", href: "/ar/#rims", children: rimBrandLinks, wide: true },
+      { labelKey: "header_ar_nav_services", fallbackLabel: "الخدمات", href: "/ar/#services", children: serviceLinks },
+      { labelKey: "header_ar_nav_branches", fallbackLabel: "الفروع", href: "/ar/#branches", children: branchLinks },
+      { labelKey: "header_ar_nav_faq", fallbackLabel: "الأسئلة", href: "/ar/#faq" },
+      { labelKey: "header_ar_nav_contact", fallbackLabel: "تواصل معنا", href: "/ar/#contact" },
+    ]
+  : [
+      { labelKey: "header_nav_home", fallbackLabel: "Home", href: "/" },
+      { labelKey: "header_nav_tyres", fallbackLabel: "Tyres", href: "/#tyres", children: tyreBrandLinks, wide: true },
+      { labelKey: "header_nav_rims", fallbackLabel: "Rims", href: "/#rims", children: rimBrandLinks, wide: true },
+      { labelKey: "header_nav_services", fallbackLabel: "Services", href: "/#services", children: serviceLinks },
+      { labelKey: "header_nav_branches", fallbackLabel: "Branches", href: "/#branches", children: branchLinks },
+      { labelKey: "header_nav_faq", fallbackLabel: "FAQ", href: "/#faq" },
+      { labelKey: "header_nav_contact", fallbackLabel: "Contact", href: "/#contact" },
     ];
 
 const text = isAr
@@ -98,10 +86,6 @@ const text = isAr
       mobileMenu: "القائمة",
       whatsappKey: "header_ar_mobile_whatsapp",
       whatsappFallback: "واتساب",
-      sharjahBranchKey: "header_ar_branch_sharjah_label",
-      sharjahBranchFallback: "فرع الشارقة",
-      dubaiBranchKey: "header_ar_branch_dubai_label",
-      dubaiBranchFallback: "فرع دبي",
     }
   : {
       logoKey: "header_logo_text",
@@ -115,10 +99,6 @@ const text = isAr
       mobileMenu: "Menu",
       whatsappKey: "header_mobile_whatsapp",
       whatsappFallback: "WhatsApp",
-      sharjahBranchKey: "header_branch_sharjah_label",
-      sharjahBranchFallback: "Sharjah Branch",
-      dubaiBranchKey: "header_branch_dubai_label",
-      dubaiBranchFallback: "Dubai Branch",
     };
 ---
 
@@ -147,18 +127,43 @@ const text = isAr
 
       <nav class="hidden items-center gap-1 lg:flex">
         {
-          navItems.map((item) => (
-            <a
-              href={item.href}
-              class="rounded-xl px-3 py-3 text-sm font-black text-slate-200 transition hover:bg-white/10 hover:text-amber-300 xl:px-4"
-            >
-              <DynamicSiteText
-                textKey={item.labelKey}
-                fallback={item.fallbackLabel}
-                as="span"
-              />
-            </a>
-          ))
+          navGroups.map((item) =>
+            item.children ? (
+              <div class="group relative">
+                <a
+                  href={item.href}
+                  class="flex items-center gap-1 rounded-xl px-3 py-3 text-sm font-black text-slate-200 transition hover:bg-white/10 hover:text-amber-300 xl:px-4"
+                >
+                  <DynamicSiteText textKey={item.labelKey} fallback={item.fallbackLabel} as="span" />
+                  <span class="text-[10px] opacity-70 transition group-hover:rotate-180">▾</span>
+                </a>
+
+                <div
+                  class={`invisible absolute top-full z-50 ${isAr ? "right-0" : "left-0"} pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100`}
+                >
+                  <div
+                    class={`max-h-[70vh] overflow-auto rounded-2xl border border-white/10 bg-[#0e0e14] p-3 shadow-2xl shadow-black/50 ${item.wide ? "grid w-[420px] grid-cols-2 gap-1" : "grid w-56 gap-1"}`}
+                  >
+                    {item.children.map((child) => (
+                      <a
+                        href={child.href}
+                        class="rounded-xl px-3 py-2 text-sm font-bold text-slate-300 transition hover:bg-amber-400/10 hover:text-amber-300"
+                      >
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <a
+                href={item.href}
+                class="rounded-xl px-3 py-3 text-sm font-black text-slate-200 transition hover:bg-white/10 hover:text-amber-300 xl:px-4"
+              >
+                <DynamicSiteText textKey={item.labelKey} fallback={item.fallbackLabel} as="span" />
+              </a>
+            )
+          )
         }
       </nav>
 
@@ -174,27 +179,17 @@ const text = isAr
           href={langUrl}
           class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white transition hover:border-amber-300/50 hover:bg-amber-400/10 hover:text-amber-300"
         >
-          <DynamicSiteText
-            textKey={text.langKey}
-            fallback={text.langFallback}
-            as="span"
-          />
+          <DynamicSiteText textKey={text.langKey} fallback={text.langFallback} as="span" />
         </a>
 
         <a
           href={getWhatsAppUrl(
             "sharjah",
-            isAr
-              ? "مرحبا، أريد معرفة السعر والتوفر."
-              : "Hi, I need price and availability."
+            isAr ? "مرحبا، أريد معرفة السعر والتوفر." : "Hi, I need price and availability."
           )}
           class="rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-slate-950 shadow-lg shadow-amber-400/20 transition hover:bg-amber-300"
         >
-          <DynamicSiteText
-            textKey={text.quoteKey}
-            fallback={text.quoteFallback}
-            as="span"
-          />
+          <DynamicSiteText textKey={text.quoteKey} fallback={text.quoteFallback} as="span" />
         </a>
       </div>
 
@@ -211,18 +206,45 @@ const text = isAr
     <div id="siteMobileMenu" class="hidden border-t border-white/10 py-4 lg:hidden">
       <nav class="grid gap-2">
         {
-          navItems.map((item) => (
-            <a
-              href={item.href}
-              class="rounded-2xl bg-white/5 px-4 py-4 text-sm font-black text-white transition hover:bg-white/10 hover:text-amber-300"
-            >
-              <DynamicSiteText
-                textKey={item.labelKey}
-                fallback={item.fallbackLabel}
-                as="span"
-              />
-            </a>
-          ))
+          navGroups.map((item) =>
+            item.children ? (
+              <div class="rounded-2xl bg-white/5">
+                <button
+                  type="button"
+                  class="mobile-accordion-btn flex w-full items-center justify-between px-4 py-4 text-sm font-black text-white"
+                >
+                  <DynamicSiteText textKey={item.labelKey} fallback={item.fallbackLabel} as="span" />
+                  <span class="accordion-icon text-xs opacity-70">▾</span>
+                </button>
+
+                <div class="mobile-accordion-panel hidden px-3 pb-3">
+                  <a
+                    href={item.href}
+                    class="block rounded-xl px-3 py-3 text-sm font-black text-amber-300 hover:bg-white/10"
+                  >
+                    {isAr ? "عرض الكل" : "View all"}
+                  </a>
+                  <div class="grid grid-cols-2 gap-1">
+                    {item.children.map((child) => (
+                      <a
+                        href={child.href}
+                        class="rounded-xl px-3 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-amber-300"
+                      >
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <a
+                href={item.href}
+                class="rounded-2xl bg-white/5 px-4 py-4 text-sm font-black text-white transition hover:bg-white/10 hover:text-amber-300"
+              >
+                <DynamicSiteText textKey={item.labelKey} fallback={item.fallbackLabel} as="span" />
+              </a>
+            )
+          )
         }
 
         <a
@@ -237,69 +259,17 @@ const text = isAr
             href={langUrl}
             class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-center text-sm font-black text-white"
           >
-            <DynamicSiteText
-              textKey={text.langKey}
-              fallback={text.langFallback}
-              as="span"
-            />
+            <DynamicSiteText textKey={text.langKey} fallback={text.langFallback} as="span" />
           </a>
 
           <a
             href={getWhatsAppUrl(
               "sharjah",
-              isAr
-                ? "مرحبا، أريد معرفة السعر والتوفر."
-                : "Hi, I need price and availability."
+              isAr ? "مرحبا، أريد معرفة السعر والتوفر." : "Hi, I need price and availability."
             )}
             class="rounded-2xl bg-amber-400 px-4 py-4 text-center text-sm font-black text-slate-950"
           >
-            <DynamicSiteText
-              textKey={text.whatsappKey}
-              fallback={text.whatsappFallback}
-              as="span"
-            />
-          </a>
-        </div>
-
-        <div class="grid gap-2 pt-2 sm:grid-cols-2">
-          <a
-            href={getWhatsAppUrl(
-              "sharjah",
-              isAr
-                ? "مرحبا، أريد التواصل مع فرع الشارقة."
-                : "Hi, I want to contact Sharjah branch."
-            )}
-            class="rounded-2xl border border-amber-300/20 bg-amber-400/10 px-4 py-4 text-center text-sm font-black text-amber-300"
-          >
-            <DynamicSiteText
-              textKey={text.sharjahBranchKey}
-              fallback={text.sharjahBranchFallback}
-              as="span"
-            />
-            <br />
-            <span class="text-xs text-slate-300">
-              {business.branches.sharjah.whatsappLocal}
-            </span>
-          </a>
-
-          <a
-            href={getWhatsAppUrl(
-              "dubai",
-              isAr
-                ? "مرحبا، أريد التواصل مع فرع دبي."
-                : "Hi, I want to contact Dubai branch."
-            )}
-            class="rounded-2xl border border-red-300/20 bg-red-500/10 px-4 py-4 text-center text-sm font-black text-red-300"
-          >
-            <DynamicSiteText
-              textKey={text.dubaiBranchKey}
-              fallback={text.dubaiBranchFallback}
-              as="span"
-            />
-            <br />
-            <span class="text-xs text-slate-300">
-              {business.branches.dubai.whatsappLocal}
-            </span>
+            <DynamicSiteText textKey={text.whatsappKey} fallback={text.whatsappFallback} as="span" />
           </a>
         </div>
       </nav>
@@ -314,6 +284,17 @@ const text = isAr
       mobileMenu?.classList.toggle("hidden");
     });
 
+    // Accordion toggles inside the mobile menu
+    document.querySelectorAll(".mobile-accordion-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        const panel = button.nextElementSibling;
+        const icon = button.querySelector(".accordion-icon");
+        panel?.classList.toggle("hidden");
+        icon?.classList.toggle("rotate-180");
+      });
+    });
+
+    // Close the whole menu when a real link (not an accordion toggle) is clicked
     mobileMenu?.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => {
         mobileMenu.classList.add("hidden");

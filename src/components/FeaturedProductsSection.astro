@@ -2,6 +2,7 @@
 interface Props {
   productType?: "all" | "tyre" | "rim" | "battery" | "service" | "accessory";
   branch?: "all" | "dubai" | "sharjah";
+  brand?: string;
   featuredOnly?: boolean;
   limit?: number;
   badge?: string;
@@ -13,6 +14,7 @@ interface Props {
 const {
   productType = "all",
   branch = "all",
+  brand = "all",
   featuredOnly = true,
   limit = 8,
   badge,
@@ -83,6 +85,7 @@ const labelsJson = JSON.stringify(text);
 const configJson = JSON.stringify({
   productType,
   branch,
+  brand,
   featuredOnly,
   limit,
 });
@@ -474,8 +477,9 @@ const configJson = JSON.stringify({
           run_flat,
           warranty_text,
           sort_order,
-          brands (
-            name
+          brands${config.brand && config.brand !== "all" ? "!inner" : ""} (
+            name,
+            slug
           ),
           product_images (
             image_url,
@@ -497,6 +501,10 @@ const configJson = JSON.stringify({
 
       if (config.productType && config.productType !== "all") {
         query = query.eq("product_type", config.productType);
+      }
+
+      if (config.brand && config.brand !== "all") {
+        query = query.eq("brands.slug", config.brand);
       }
 
       const queryLimit =
