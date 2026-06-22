@@ -589,11 +589,23 @@ import AdminShell from "../../components/admin/AdminShell.astro";
           is_active: brandIsActiveInput.value === "true",
         };
 
-        if (brandId) {
+        // If not editing, but a brand with the same name/slug already exists,
+        // update that one instead of inserting a duplicate (avoids unique-key error).
+        let targetId = brandId;
+        if (!targetId) {
+          const existing = allBrands.find(
+            (b) =>
+              String(b.name).toLowerCase() === name.toLowerCase() ||
+              String(b.slug).toLowerCase() === slug.toLowerCase()
+          );
+          if (existing) targetId = existing.id;
+        }
+
+        if (targetId) {
           const { error } = await supabase
             .from("brands")
             .update(payload)
-            .eq("id", brandId);
+            .eq("id", targetId);
 
           if (error) throw new Error(error.message);
 
