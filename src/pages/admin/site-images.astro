@@ -276,6 +276,31 @@ import AdminShell from "../../components/admin/AdminShell.astro";
         },
       };
 
+      // Clear Persian location label for each image slot — shown as a big banner on each card
+      const placeFa = {
+        home_hero_banner: "صفحه اصلی ← بنر بزرگ بالای سایت",
+        home_ar_hero_banner: "صفحه عربی ← بنر بزرگ بالای سایت",
+        lead_form_banner: "صفحه اصلی ← بخش فرم درخواست / تماس",
+        dubai_branch_image: "بخش شعبه‌ها ← کارت شعبه دبی",
+        sharjah_branch_image: "بخش شعبه‌ها ← کارت شعبه شارجه",
+        services_tyres_image: "بخش خدمات ← کارت لاستیک (TYRES)",
+        services_rims_image: "بخش خدمات ← کارت رینگ (RIMS)",
+        services_batteries_image: "بخش خدمات ← کارت باتری (BATTERY)",
+        services_alignment_image: "بخش خدمات ← کارت تنظیم فرمان (ALIGNMENT)",
+        services_balancing_image: "بخش خدمات ← کارت بالانس چرخ (BALANCING)",
+        services_onsite_image: "بخش خدمات ← کارت پشتیبانی / امداد (SUPPORT)",
+        tyres_dubai_hero: "صفحه فرود «لاستیک دبی» ← بنر بالا",
+        tyres_sharjah_hero: "صفحه فرود «لاستیک شارجه» ← بنر بالا",
+        rims_dubai_hero: "صفحه فرود «رینگ دبی» ← بنر بالا",
+        rims_sharjah_hero: "صفحه فرود «رینگ شارجه» ← بنر بالا",
+        wheel_alignment_dubai_hero: "صفحه فرود «تنظیم فرمان دبی» ← بنر بالا",
+        wheel_balancing_dubai_hero: "صفحه فرود «بالانس چرخ دبی» ← بنر بالا",
+      };
+
+      function getPlaceFa(imageKey) {
+        return placeFa[imageKey] || "قسمت دیگر سایت";
+      }
+
       let siteImages = [];
 
       const loadingBox = document.getElementById("loadingBox");
@@ -480,6 +505,14 @@ import AdminShell from "../../components/admin/AdminShell.astro";
                 </div>
 
                 <div class="grid gap-5 p-5">
+                  <div class="flex items-center gap-3 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4" dir="rtl">
+                    <span class="text-2xl leading-none">📍</span>
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.18em] text-amber-300">این عکس برای کجاست</p>
+                      <p class="mt-1 text-base font-black text-white">${escapeHtml(getPlaceFa(image.image_key))}</p>
+                    </div>
+                  </div>
+
                   <div class="grid gap-3 sm:grid-cols-3">
                     <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                       <p class="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Used In</p>
