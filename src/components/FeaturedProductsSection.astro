@@ -52,6 +52,8 @@ const text = isArabic
       speed: "Speed",
       runFlat: "Run Flat",
       specs: "Product Specs",
+      perTyre: "للإطار",
+      setOfFour: "طقم 4 إطارات",
     }
   : {
       badge: badge || "Featured Products",
@@ -79,6 +81,8 @@ const text = isArabic
       speed: "Speed",
       runFlat: "Run Flat",
       specs: "Product Specs",
+      perTyre: "per tyre",
+      setOfFour: "Set of 4",
     };
 
 const labelsJson = JSON.stringify(text);
@@ -195,6 +199,33 @@ const configJson = JSON.stringify({
 
     function getBrandLogo(product) {
       return product.brands?.logo_url || "";
+    }
+
+    function formatAed(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number) || number <= 0) return "";
+      return "AED " + number.toLocaleString("en-AE");
+    }
+
+    function renderPrice(product) {
+      const price = formatAed(product.price);
+      if (!price) return "";
+
+      const setOfFour = formatAed(Number(product.price) * 4);
+
+      return `
+        <div class="mt-3 border-t border-slate-100 pt-3">
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-black text-slate-900">${escapeHtml(price)}</span>
+            <span class="text-[11px] font-bold text-slate-400">/ ${escapeHtml(labels.perTyre || "per tyre")}</span>
+          </div>
+          ${
+            setOfFour
+              ? `<p class="mt-0.5 text-xs font-bold text-slate-500">${escapeHtml(labels.setOfFour || "Set of 4")}: ${escapeHtml(setOfFour)}</p>`
+              : ""
+          }
+        </div>
+      `;
     }
 
     function getAvailability(product, branchId) {
@@ -442,6 +473,8 @@ const configJson = JSON.stringify({
 
                 ${renderSpecBadges(product)}
 
+                ${renderPrice(product)}
+
                 <div class="mt-auto grid gap-2 pt-4">
                   ${
                     config.branch === "dubai"
@@ -471,6 +504,7 @@ const configJson = JSON.stringify({
           model,
           short_description,
           size_display,
+          price,
           manufacture_year,
           origin,
           vehicle_type,

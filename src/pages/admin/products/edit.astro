@@ -87,6 +87,14 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
           </div>
 
           <div>
+            <label class="mb-2 block text-sm font-black text-slate-300">Price (AED)</label>
+            <input id="price" type="number" min="0" step="1" class="field" placeholder="512" />
+            <p class="mt-2 text-xs font-semibold text-slate-500">
+              قیمت یک عدد به درهم. خالی بگذاری، روی سایت «Ask Us» می‌ماند.
+            </p>
+          </div>
+
+          <div>
             <label class="mb-2 block text-sm font-black text-slate-300">Manufacture Year</label>
             <input
               id="manufactureYear"
@@ -479,6 +487,7 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
       setValue("title", product.title || "");
       setValue("slug", product.slug || "");
       setValue("sizeDisplay", product.size_display || "");
+      setValue("price", product.price ?? "");
       setValue("manufactureYear", product.manufacture_year ?? "");
       setValue("origin", product.origin || "");
       setValue("vehicleType", product.vehicle_type || "");
@@ -683,6 +692,7 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
           short_description: inputValue("shortDescription") || null,
           description: inputValue("description") || null,
           size_display: inputValue("sizeDisplay") || null,
+          price: numberOrNull(inputValue("price")),
           manufacture_year: numberOrNull(inputValue("manufactureYear")),
           origin: inputValue("origin") || null,
           vehicle_type: inputValue("vehicleType") || null,
