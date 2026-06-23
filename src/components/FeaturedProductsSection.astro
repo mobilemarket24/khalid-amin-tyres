@@ -193,6 +193,10 @@ const configJson = JSON.stringify({
       return product.brands?.name || "";
     }
 
+    function getBrandLogo(product) {
+      return product.brands?.logo_url || "";
+    }
+
     function getAvailability(product, branchId) {
       const rows = product.product_branch_availability || [];
       return rows.find((row) => row.branch_id === branchId);
@@ -211,25 +215,15 @@ const configJson = JSON.stringify({
     }
 
     function availabilityClass(status) {
-      if (status === "in_stock") return "bg-green-500/20 text-green-200";
-      if (status === "limited") return "bg-red-500/20 text-red-200";
-      if (status === "order_only") return "bg-amber-500/20 text-amber-200";
-      if (status === "out_of_stock") return "bg-red-500/20 text-red-200";
-      return "bg-white/10 text-slate-300";
+      if (status === "in_stock") return "bg-green-100 text-green-700";
+      if (status === "limited") return "bg-amber-100 text-amber-700";
+      if (status === "order_only") return "bg-blue-100 text-blue-700";
+      if (status === "out_of_stock") return "bg-red-100 text-red-600";
+      return "bg-slate-100 text-slate-500";
     }
 
     function productSpecItems(product) {
       return [
-        {
-          label: labels.size || "Size",
-          value: product.size_display,
-          tone: "cyan",
-        },
-        {
-          label: labels.year || "Year",
-          value: product.manufacture_year,
-          tone: "green",
-        },
         {
           label: labels.origin || "Origin",
           value: product.origin,
@@ -265,12 +259,12 @@ const configJson = JSON.stringify({
     }
 
     function specToneClass(tone) {
-      if (tone === "cyan") return "bg-amber-400/15 text-amber-200";
-      if (tone === "green") return "bg-green-400/15 text-green-200";
-      if (tone === "orange") return "bg-red-400/15 text-red-200";
-      if (tone === "purple") return "bg-purple-400/15 text-purple-200";
-      if (tone === "red") return "bg-red-400/15 text-red-200";
-      return "bg-slate-900/80 text-slate-300";
+      if (tone === "cyan") return "bg-amber-50 text-amber-700";
+      if (tone === "green") return "bg-green-50 text-green-700";
+      if (tone === "orange") return "bg-blue-50 text-blue-700";
+      if (tone === "purple") return "bg-purple-50 text-purple-700";
+      if (tone === "red") return "bg-red-50 text-red-600";
+      return "bg-slate-100 text-slate-600";
     }
 
     function renderSpecBadges(product) {
@@ -279,12 +273,8 @@ const configJson = JSON.stringify({
       if (!specs.length) return "";
 
       return `
-        <div class="mt-4">
-          <p class="mb-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
-            ${escapeHtml(labels.specs || "Product Specs")}
-          </p>
-
-          <div class="flex flex-wrap gap-2">
+        <div class="mt-3">
+          <div class="flex flex-wrap gap-1.5">
             ${specs
               .map((spec) => {
                 if (spec.compact) {
@@ -342,28 +332,26 @@ const configJson = JSON.stringify({
       const isDubai = branchId === "dubai";
 
       return `
-        <div class="flex items-center justify-between gap-3 rounded-2xl bg-slate-950/60 p-3">
-          <span class="text-xs font-black uppercase tracking-[0.2em] ${
-            isDubai ? "text-red-300" : "text-amber-300"
-          }">
-            ${isDubai ? "DXB" : "SHJ"}
-          </span>
-
-          <span class="rounded-full px-3 py-1 text-xs font-black ${availabilityClass(status)}">
-            ${availabilityText(status)}
-          </span>
-        </div>
-
         <a
           href="${link}"
           target="_blank"
-          class="rounded-2xl ${
+          class="flex items-center justify-between gap-3 rounded-xl ${
             isDubai
-              ? "bg-red-500 text-white hover:bg-red-400"
+              ? "bg-slate-900 text-white hover:bg-slate-800"
               : "bg-amber-400 text-slate-950 hover:bg-amber-300"
-          } px-5 py-4 text-center text-sm font-black transition"
+          } px-4 py-3 transition"
         >
-          ${escapeHtml(isDubai ? labels.askDubai || "WhatsApp Dubai" : labels.askSharjah || "WhatsApp Sharjah")}
+          <span class="flex items-center gap-2 text-sm font-black">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
+            </svg>
+            ${escapeHtml(isDubai ? labels.askDubai || "WhatsApp Dubai" : labels.askSharjah || "WhatsApp Sharjah")}
+          </span>
+
+          <span class="rounded-full px-2.5 py-1 text-[11px] font-black ${availabilityClass(status)}">
+            ${availabilityText(status)}
+          </span>
         </a>
       `;
     }
@@ -393,53 +381,68 @@ const configJson = JSON.stringify({
         .map((product) => {
           const imageUrl = getPrimaryImage(product);
           const brandName = getBrandName(product);
+          const brandLogo = getBrandLogo(product);
+
+          const brandVisual = brandLogo
+            ? `<img src="${escapeHtml(brandLogo)}" alt="${escapeHtml(brandName)}"
+                  class="h-6 w-auto max-w-[105px] object-contain object-left"
+                  loading="lazy"
+                  onerror="this.outerHTML='<span class=\\'text-sm font-black uppercase tracking-[0.12em] text-slate-800\\'>${escapeHtml(brandName || "Khalid Amin Tyres")}</span>'" />`
+            : `<span class="text-sm font-black uppercase tracking-[0.12em] text-slate-800">${escapeHtml(brandName || "Khalid Amin Tyres")}</span>`;
 
           return `
-            <article class="group overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/[0.13]">
-              <div class="relative">
-                <img
-                  src="${escapeHtml(imageUrl)}"
-                  alt="${escapeHtml(product.title)}"
-                  class="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
-                />
+            <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_25px_60px_-20px_rgba(15,23,42,0.45)]">
+              <div class="flex items-center justify-between gap-2 px-5 pt-4">
+                ${brandVisual}
 
-                <div class="absolute left-4 top-4 rounded-full bg-slate-950/80 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
+                <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">
                   ${escapeHtml(product.product_type || "product")}
+                </span>
+              </div>
+
+              <div class="relative mt-1 px-5">
+                <div class="h-44 w-full overflow-hidden">
+                  <img
+                    src="${escapeHtml(imageUrl)}"
+                    alt="${escapeHtml(product.title)}"
+                    class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+                  />
                 </div>
 
                 ${
-                  product.manufacture_year
-                    ? `<div class="absolute right-4 top-4 rounded-full bg-green-400 px-4 py-2 text-xs font-black text-slate-950">
-                        ${escapeHtml(product.manufacture_year)}
-                      </div>`
+                  product.warranty_text
+                    ? `<span class="absolute bottom-1 left-5 inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+                        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        ${escapeHtml(product.warranty_text)}
+                      </span>`
                     : ""
                 }
               </div>
 
-              <div class="p-5">
-                <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-                  ${escapeHtml(brandName || "Khalid Amin Tyres")}
-                </p>
-
-                <h3 class="mt-2 line-clamp-2 text-xl font-black leading-tight">
+              <div class="flex flex-1 flex-col px-5 pb-4 pt-3">
+                <p class="line-clamp-1 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
                   ${escapeHtml(product.title)}
-                </h3>
-
-                <p class="mt-3 line-clamp-2 text-sm font-semibold leading-6 text-slate-400">
-                  ${escapeHtml(product.short_description || product.size_display || "Contact us for price and availability.")}
                 </p>
+
+                <div class="mt-1 flex items-end justify-between gap-2">
+                  ${
+                    product.size_display
+                      ? `<p class="text-2xl font-black leading-none tracking-tight text-slate-900">
+                          ${escapeHtml(product.size_display)}
+                        </p>`
+                      : `<p class="text-lg font-black leading-tight text-slate-900">${escapeHtml(product.title)}</p>`
+                  }
+
+                  ${
+                    product.manufacture_year
+                      ? `<span class="shrink-0 text-sm font-black text-slate-400">${escapeHtml(product.manufacture_year)}</span>`
+                      : ""
+                  }
+                </div>
 
                 ${renderSpecBadges(product)}
 
-                ${
-                  product.warranty_text
-                    ? `<div class="mt-4 rounded-2xl bg-slate-950/60 px-4 py-3 text-sm font-bold text-slate-300">
-                        ${escapeHtml(labels.warranty || "Warranty")}: ${escapeHtml(product.warranty_text)}
-                      </div>`
-                    : ""
-                }
-
-                <div class="mt-5 grid gap-3">
+                <div class="mt-auto grid gap-2 pt-4">
                   ${
                     config.branch === "dubai"
                       ? renderBranchBlock(product, "dubai")
@@ -479,7 +482,8 @@ const configJson = JSON.stringify({
           sort_order,
           brands${config.brand && config.brand !== "all" ? "!inner" : ""} (
             name,
-            slug
+            slug,
+            logo_url
           ),
           product_images (
             image_url,
