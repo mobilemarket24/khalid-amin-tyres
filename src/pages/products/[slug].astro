@@ -6,20 +6,6 @@ import FinalCtaSection from "../../components/FinalCtaSection.astro";
 
 const SITE_URL = "https://khalidamintyres.com";
 
-const PRODUCT_SELECT = `
-  id, title, slug, sku, product_type, status, model,
-  short_description, description, size_display, origin,
-  price, price_aed, price_visible,
-  warranty_text, warranty_months, manufacture_year, tire_year,
-  vehicle_type, season, run_flat,
-  load_index, speed_rating, tire_load_index, tire_speed_rating,
-  rim_diameter, rim_width, rim_pcd, rim_offset, rim_center_bore, rim_finish,
-  seo_title, meta_description, whatsapp_message,
-  brands ( name, slug, logo_url ),
-  product_images ( image_url, alt_text, is_primary, sort_order ),
-  product_branch_availability ( branch_id, availability_status, quantity )
-`;
-
 export async function getStaticPaths() {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -32,14 +18,7 @@ export async function getStaticPaths() {
   const { data, error } = await supabase
     .from("products")
     .select(`
-      id, title, slug, sku, product_type, status, model,
-      short_description, description, size_display, origin,
-      price, price_aed, price_visible,
-      warranty_text, warranty_months, manufacture_year, tire_year,
-      vehicle_type, season, run_flat,
-      load_index, speed_rating, tire_load_index, tire_speed_rating,
-      rim_diameter, rim_width, rim_pcd, rim_offset, rim_center_bore, rim_finish,
-      seo_title, meta_description, whatsapp_message,
+      *,
       brands ( name, slug, logo_url ),
       product_images ( image_url, alt_text, is_primary, sort_order ),
       product_branch_availability ( branch_id, availability_status, quantity )
@@ -207,6 +186,22 @@ const productSchema = {
     seller: { "@id": `${SITE_URL}/#organization` },
   },
 };
+
+const faqItems = Array.isArray(product.faq)
+  ? product.faq.filter((q) => q && q.question && q.answer)
+  : [];
+
+const faqSchema = faqItems.length
+  ? {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((q) => ({
+        "@type": "Question",
+        name: q.question,
+        acceptedAnswer: { "@type": "Answer", text: q.answer },
+      })),
+    }
+  : null;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -391,12 +386,32 @@ const breadcrumbSchema = {
       </div>
     </section>
 
+    {faqItems.length > 0 && (
+      <section class="mx-auto max-w-7xl px-5 pb-14 sm:px-8 lg:px-12">
+        <div class="rounded-[2rem] border border-white/10 bg-white/5 p-7">
+          <h2 class="text-xl font-black text-white">Frequently asked questions</h2>
+          <div class="mt-5 divide-y divide-white/10">
+            {faqItems.map((q) => (
+              <details class="group py-4">
+                <summary class="flex cursor-pointer items-center justify-between gap-4 text-base font-black text-slate-100">
+                  {q.question}
+                  <span class="text-amber-300 transition group-open:rotate-45">+</span>
+                </summary>
+                <p class="mt-3 text-sm font-semibold leading-7 text-slate-300">{q.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
     <BranchesSection />
     <FinalCtaSection />
   </main>
 
   <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
   <script>
     const main = document.getElementById("productMainImage");

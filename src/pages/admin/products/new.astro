@@ -306,6 +306,16 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
             <div id="imageNotice" class="mt-5 hidden rounded-2xl bg-amber-400/15 p-4 text-sm font-bold text-amber-200">
               عکس انتخاب شد. برای ذخیره محصول، پایین صفحه Save Product را بزن.
             </div>
+
+            <label class="mt-5 mb-2 block text-sm font-black text-slate-300">Image Alt Text (SEO)</label>
+            <input
+              id="imageAltText"
+              class="field"
+              placeholder="مثلاً: Michelin Pilot Sport 4 275/45R21 tyre Dubai"
+            />
+            <p class="mt-2 text-xs font-semibold leading-6 text-slate-500">
+              توضیح کوتاه تصویر برای گوگل؛ اگر خالی بماند، عنوان محصول استفاده می‌شود.
+            </p>
           </div>
         </div>
       </div>
@@ -383,6 +393,18 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
               class="field min-h-24"
               placeholder="Hi, I need price and availability for..."
             ></textarea>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-black text-slate-300">Product FAQ (هر خط یک سوال)</label>
+            <textarea
+              id="faq"
+              class="field min-h-32"
+              placeholder="هر خط: سوال | جواب&#10;مثلاً: آیا فیتینگ رایگان است؟ | بله، نصب و بالانس در هر دو شعبه انجام می‌شود.&#10;گارانتی چند سال است؟ | بر اساس برند، معمولاً ۱ تا ۵ سال."
+            ></textarea>
+            <p class="mt-2 text-xs font-semibold leading-6 text-slate-500">
+              هر خط یک پرسش‌وپاسخ: «سوال | جواب». این‌ها در صفحه محصول و به‌صورت FAQ schema به گوگل نمایش داده می‌شوند.
+            </p>
           </div>
         </div>
       </div>
@@ -480,6 +502,19 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
       return Number.isFinite(number) ? number : null;
     }
 
+    function parseFaq(text) {
+      return String(text || "")
+        .split("\n")
+        .map((line) => {
+          const i = line.indexOf("|");
+          if (i === -1) return null;
+          const question = line.slice(0, i).trim();
+          const answer = line.slice(i + 1).trim();
+          return question && answer ? { question, answer } : null;
+        })
+        .filter(Boolean);
+    }
+
     function booleanValue(id) {
       return inputValue(id) === "true";
     }
@@ -573,7 +608,7 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
         .insert({
           product_id: productId,
           image_url: publicUrl,
-          alt_text: productTitle,
+          alt_text: inputValue("imageAltText") || productTitle,
           is_primary: true,
           sort_order: 0,
         });
@@ -686,6 +721,11 @@ import AdminShell from "../../../components/admin/AdminShell.astro";
             inputValue("whatsappMessage") || generateWhatsAppMessage(title),
           sort_order: numberOrNull(inputValue("sortOrder")) || 0,
         };
+
+        const faqItems = parseFaq(inputValue("faq"));
+        if (faqItems.length) {
+          productPayload.faq = faqItems;
+        }
 
         const { data: product, error: productError } = await supabase
           .from("products")
