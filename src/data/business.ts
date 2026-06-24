@@ -54,19 +54,6 @@ export const business = {
     "Roadside Support",
   ],
 
-  brands: [
-    "Michelin",
-    "Bridgestone",
-    "Dunlop",
-    "Yokohama",
-    "Pirelli",
-    "Continental",
-    "Nexen",
-    "Zeetex",
-    "BFGoodrich",
-    "Goodyear",
-  ],
-
   popularSizes: [
     "275/60R20",
     "265/65R17",
