@@ -14,6 +14,7 @@ interface Props {
   dir?: "ltr" | "rtl";
   metaTitleKey?: string;
   metaDescriptionKey?: string;
+  image?: string;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   dir = "ltr",
   metaTitleKey,
   metaDescriptionKey,
+  image,
 } = Astro.props;
 
 const siteUrl = "https://khalidamintyres.com";
@@ -46,7 +48,9 @@ const isAr = lang === "ar";
 const ogLocale = isAr ? "ar_AE" : "en_AE";
 const alternateLocale = isAr ? "en_AE" : "ar_AE";
 
-const ogImage = `${siteUrl}/og-image.jpg`;
+const ogImage = image
+  ? (image.startsWith("http") ? image : absoluteUrl(image))
+  : `${siteUrl}/og-image.jpg`;
 
 const metaKeyMap: Record<string, { titleKey: string; descriptionKey: string }> = {
   "/": {

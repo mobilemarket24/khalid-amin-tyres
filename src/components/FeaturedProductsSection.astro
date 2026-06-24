@@ -309,14 +309,14 @@ function renderCard(product: any) {
       </div>
 
       <div class="relative mt-1 px-5">
-        <div class="h-44 w-full overflow-hidden">
+        <a href="/products/${escapeHtml(product.slug)}/" class="block h-44 w-full overflow-hidden">
           <img
             src="${escapeHtml(imageUrl)}"
             alt="${escapeHtml(product.title)}"
             loading="lazy"
             class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
           />
-        </div>
+        </a>
 
         ${
           product.warranty_text
@@ -329,9 +329,9 @@ function renderCard(product: any) {
       </div>
 
       <div class="flex flex-1 flex-col px-5 pb-4 pt-3">
-        <p class="line-clamp-1 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+        <a href="/products/${escapeHtml(product.slug)}/" class="line-clamp-1 block text-xs font-black uppercase tracking-[0.14em] text-slate-500 transition hover:text-amber-600">
           ${escapeHtml(product.title)}
-        </p>
+        </a>
 
         <div class="mt-1 flex items-end justify-between gap-2">
           ${
