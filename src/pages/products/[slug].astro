@@ -41,6 +41,11 @@ const { product } = Astro.props;
 const brand = product.brands || null;
 const brandName = brand?.name || "";
 
+// اگر عنوان محصول خودش با نام برند شروع شده، برند را دوباره جلویش نگذار.
+const titleHasBrand =
+  brandName && product.title.toLowerCase().startsWith(brandName.toLowerCase());
+const fullName = !brandName || titleHasBrand ? product.title : `${brandName} ${product.title}`;
+
 const images = (product.product_images || [])
   .slice()
   .sort((a, b) => {
@@ -168,7 +173,7 @@ const brandHref = brand?.slug ? `/${isRim ? "rims" : "tyres"}/${brand.slug}/` : 
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
-  name: [brandName, product.title].filter(Boolean).join(" "),
+  name: fullName,
   description: pageDescription,
   image: images.length ? images.map((i) => i.image_url) : [`${SITE_URL}/og-image.jpg`],
   sku: product.sku || undefined,
@@ -291,7 +296,7 @@ const breadcrumbSchema = {
         </div>
 
         <h1 class="mt-4 text-3xl font-black leading-tight sm:text-4xl">
-          {brandName ? `${brandName} ` : ""}{product.title}
+          {fullName}
         </h1>
 
         {product.size_display && (
