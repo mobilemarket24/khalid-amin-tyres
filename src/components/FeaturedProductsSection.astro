@@ -1,4 +1,6 @@
-﻿---
+---
+import { createClient } from "@supabase/supabase-js";
+
 interface Props {
   productType?: "all" | "tyre" | "rim" | "battery" | "service" | "accessory";
   branch?: "all" | "dubai" | "sharjah";
@@ -32,7 +34,6 @@ const text = isArabic
       subtitle:
         subtitle ||
         "اختر المنتج والفرع وتواصل معنا مباشرة عبر واتساب للحصول على السعر والتوفر.",
-      loading: "جاري تحميل المنتجات...",
       empty: emptyText || "لا توجد منتجات متوفرة حالياً.",
       askSharjah: "واتساب الشارقة",
       askDubai: "واتساب دبي",
@@ -61,7 +62,6 @@ const text = isArabic
       subtitle:
         subtitle ||
         "Choose a product and branch, then contact us directly on WhatsApp for price and availability.",
-      loading: "Loading products...",
       empty: emptyText || "No products available right now.",
       askSharjah: "WhatsApp Sharjah",
       askDubai: "WhatsApp Dubai",
@@ -85,29 +85,384 @@ const text = isArabic
       setOfFour: "Set of 4",
     };
 
-const labelsJson = JSON.stringify(text);
-const configJson = JSON.stringify({
-  productType,
-  branch,
-  brand,
-  featuredOnly,
-  limit,
-});
+const labels = text;
+
+const whatsappNumbers: Record<string, string> = {
+  sharjah: "971503512023",
+  dubai: "971561615010",
+};
+
+function escapeHtml(value: unknown) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getPrimaryImage(product: any) {
+  const images = product.product_images || [];
+  const primary = images.find((image: any) => image.is_primary) || images[0];
+  return primary?.image_url || "/images/hero-banner.png";
+}
+
+function getBrandName(product: any) {
+  return product.brands?.name || "";
+}
+
+function getBrandLogo(product: any) {
+  return product.brands?.logo_url || "";
+}
+
+function formatAed(value: unknown) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return "";
+  return "AED " + number.toLocaleString("en-AE");
+}
+
+function renderPrice(product: any) {
+  const price = formatAed(product.price);
+  if (!price) return "";
+
+  const setOfFour = formatAed(Number(product.price) * 4);
+
+  return `
+    <div class="mt-3 border-t border-slate-100 pt-3">
+      <div class="flex items-baseline gap-2">
+        <span class="text-2xl font-black text-slate-900">${escapeHtml(price)}</span>
+        <span class="text-[11px] font-bold text-slate-400">/ ${escapeHtml(labels.perTyre || "per tyre")}</span>
+      </div>
+      ${
+        setOfFour
+          ? `<p class="mt-0.5 text-xs font-bold text-slate-500">${escapeHtml(labels.setOfFour || "Set of 4")}: ${escapeHtml(setOfFour)}</p>`
+          : ""
+      }
+    </div>
+  `;
+}
+
+function getAvailability(product: any, branchId: string) {
+  const rows = product.product_branch_availability || [];
+  return rows.find((row: any) => row.branch_id === branchId);
+}
+
+function isAvailableStatus(status: string) {
+  return status === "in_stock" || status === "limited" || status === "order_only";
+}
+
+function availabilityText(status: string) {
+  if (status === "in_stock") return labels.inStock || "In Stock";
+  if (status === "limited") return labels.limited || "Limited";
+  if (status === "order_only") return labels.orderOnly || "Order Only";
+  if (status === "out_of_stock") return labels.outOfStock || "Out of Stock";
+  return labels.unknown || "Ask Us";
+}
+
+function availabilityClass(status: string) {
+  if (status === "in_stock") return "bg-green-100 text-green-700";
+  if (status === "limited") return "bg-amber-100 text-amber-700";
+  if (status === "order_only") return "bg-blue-100 text-blue-700";
+  if (status === "out_of_stock") return "bg-red-100 text-red-600";
+  return "bg-slate-100 text-slate-500";
+}
+
+function productSpecItems(product: any) {
+  return [
+    { label: labels.origin || "Origin", value: product.origin, tone: "slate" },
+    { label: labels.vehicle || "Vehicle", value: product.vehicle_type, tone: "orange" },
+    { label: labels.season || "Usage", value: product.season, tone: "purple" },
+    { label: labels.load || "Load", value: product.load_index, tone: "slate" },
+    { label: labels.speed || "Speed", value: product.speed_rating, tone: "slate" },
+    {
+      label: product.run_flat ? labels.runFlat || "Run Flat" : "",
+      value: product.run_flat ? "Yes" : "",
+      tone: "red",
+      compact: true,
+    },
+  ].filter((item) => item.value);
+}
+
+function specToneClass(tone: string) {
+  if (tone === "cyan") return "bg-amber-50 text-amber-700";
+  if (tone === "green") return "bg-green-50 text-green-700";
+  if (tone === "orange") return "bg-blue-50 text-blue-700";
+  if (tone === "purple") return "bg-purple-50 text-purple-700";
+  if (tone === "red") return "bg-red-50 text-red-600";
+  return "bg-slate-100 text-slate-600";
+}
+
+function renderSpecBadges(product: any) {
+  const specs = productSpecItems(product);
+  if (!specs.length) return "";
+
+  return `
+    <div class="mt-3">
+      <div class="flex flex-wrap gap-1.5">
+        ${specs
+          .map((spec) => {
+            if ((spec as any).compact) {
+              return `
+                <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${specToneClass(spec.tone)}">
+                  ${escapeHtml(spec.label)}
+                </span>
+              `;
+            }
+
+            return `
+              <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${specToneClass(spec.tone)}">
+                ${escapeHtml(spec.label)}: ${escapeHtml(spec.value)}
+              </span>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function buildWhatsAppLink(product: any, branchId: string) {
+  const brandName = getBrandName(product);
+  const branchName = branchId === "dubai" ? "Dubai" : "Sharjah";
+
+  const parts = [
+    labels.messagePrefix || "Hi, I need price and availability for",
+    product.title,
+    product.size_display ? `Size: ${product.size_display}` : "",
+    product.manufacture_year ? `Year: ${product.manufacture_year}` : "",
+    brandName ? `Brand: ${brandName}` : "",
+    product.model ? `Model: ${product.model}` : "",
+    product.origin ? `Origin: ${product.origin}` : "",
+    product.vehicle_type ? `Vehicle Type: ${product.vehicle_type}` : "",
+    product.season ? `Usage: ${product.season}` : "",
+    product.load_index ? `Load Index: ${product.load_index}` : "",
+    product.speed_rating ? `Speed Rating: ${product.speed_rating}` : "",
+    product.run_flat ? `Run Flat: Yes` : "",
+    product.warranty_text ? `Warranty: ${product.warranty_text}` : "",
+    `Branch: ${branchName}`,
+  ].filter(Boolean);
+
+  const message = parts.join("\n");
+  const number = whatsappNumbers[branchId];
+
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
+function renderBranchBlock(product: any, branchId: string) {
+  const branchRow = getAvailability(product, branchId);
+  const status = branchRow?.availability_status || "unknown";
+  const link = buildWhatsAppLink(product, branchId);
+  const isDubai = branchId === "dubai";
+
+  return `
+    <a
+      href="${link}"
+      target="_blank"
+      rel="noopener"
+      class="flex items-center justify-between gap-3 rounded-xl ${
+        isDubai
+          ? "bg-slate-900 text-white hover:bg-slate-800"
+          : "bg-amber-400 text-slate-950 hover:bg-amber-300"
+      } px-4 py-3 transition"
+    >
+      <span class="flex items-center gap-2 text-sm font-black">
+        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
+        </svg>
+        ${escapeHtml(isDubai ? labels.askDubai || "WhatsApp Dubai" : labels.askSharjah || "WhatsApp Sharjah")}
+      </span>
+
+      <span class="rounded-full px-2.5 py-1 text-[11px] font-black ${availabilityClass(status)}">
+        ${availabilityText(status)}
+      </span>
+    </a>
+  `;
+}
+
+function shouldShowProductForBranch(product: any) {
+  if (branch === "all") return true;
+  const branchRow = getAvailability(product, branch);
+  return isAvailableStatus(branchRow?.availability_status);
+}
+
+function renderCard(product: any) {
+  const imageUrl = getPrimaryImage(product);
+  const brandName = getBrandName(product);
+  const brandLogo = getBrandLogo(product);
+
+  const brandVisual = brandLogo
+    ? `<img src="${escapeHtml(brandLogo)}" alt="${escapeHtml(brandName)}"
+          class="h-6 w-auto max-w-[105px] object-contain object-left"
+          loading="lazy"
+          onerror="this.outerHTML='<span class=\\'text-sm font-black uppercase tracking-[0.12em] text-slate-800\\'>${escapeHtml(brandName || "Khalid Amin Tyres")}</span>'" />`
+    : `<span class="text-sm font-black uppercase tracking-[0.12em] text-slate-800">${escapeHtml(brandName || "Khalid Amin Tyres")}</span>`;
+
+  return `
+    <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_25px_60px_-20px_rgba(15,23,42,0.45)]">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4">
+        ${brandVisual}
+
+        <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">
+          ${escapeHtml(product.product_type || "product")}
+        </span>
+      </div>
+
+      <div class="relative mt-1 px-5">
+        <div class="h-44 w-full overflow-hidden">
+          <img
+            src="${escapeHtml(imageUrl)}"
+            alt="${escapeHtml(product.title)}"
+            loading="lazy"
+            class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+          />
+        </div>
+
+        ${
+          product.warranty_text
+            ? `<span class="absolute bottom-1 left-5 inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                ${escapeHtml(product.warranty_text)}
+              </span>`
+            : ""
+        }
+      </div>
+
+      <div class="flex flex-1 flex-col px-5 pb-4 pt-3">
+        <p class="line-clamp-1 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+          ${escapeHtml(product.title)}
+        </p>
+
+        <div class="mt-1 flex items-end justify-between gap-2">
+          ${
+            product.size_display
+              ? `<p class="text-2xl font-black leading-none tracking-tight text-slate-900">
+                  ${escapeHtml(product.size_display)}
+                </p>`
+              : `<p class="text-lg font-black leading-tight text-slate-900">${escapeHtml(product.title)}</p>`
+          }
+
+          ${
+            product.manufacture_year
+              ? `<span class="shrink-0 text-sm font-black text-slate-400">${escapeHtml(product.manufacture_year)}</span>`
+              : ""
+          }
+        </div>
+
+        ${renderSpecBadges(product)}
+
+        ${renderPrice(product)}
+
+        <div class="mt-auto grid gap-2 pt-4">
+          ${
+            branch === "dubai"
+              ? renderBranchBlock(product, "dubai")
+              : branch === "sharjah"
+                ? renderBranchBlock(product, "sharjah")
+                : renderBranchBlock(product, "sharjah") + renderBranchBlock(product, "dubai")
+          }
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+// --- Fetch products at build time (server-side, SEO-friendly) ---
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+let products: any[] = [];
+let fetchError = "";
+
+if (supabaseUrl && supabaseAnonKey) {
+  const publicSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+
+  let query = publicSupabase
+    .from("products")
+    .select(`
+      id,
+      title,
+      slug,
+      product_type,
+      status,
+      featured,
+      model,
+      short_description,
+      size_display,
+      price,
+      manufacture_year,
+      origin,
+      vehicle_type,
+      season,
+      load_index,
+      speed_rating,
+      run_flat,
+      warranty_text,
+      sort_order,
+      brands${brand && brand !== "all" ? "!inner" : ""} (
+        name,
+        slug,
+        logo_url
+      ),
+      product_images (
+        image_url,
+        is_primary,
+        sort_order
+      ),
+      product_branch_availability (
+        branch_id,
+        availability_status,
+        quantity
+      )
+    `)
+    .eq("status", "active")
+    .order("sort_order", { ascending: true });
+
+  if (featuredOnly) {
+    query = query.eq("featured", true);
+  }
+
+  if (productType && productType !== "all") {
+    query = query.eq("product_type", productType);
+  }
+
+  if (brand && brand !== "all") {
+    query = query.eq("brands.slug", brand);
+  }
+
+  const queryLimit =
+    branch && branch !== "all"
+      ? Math.max(Number(limit || 8) * 4, 32)
+      : Number(limit || 8);
+
+  const { data, error } = await query.limit(queryLimit);
+
+  if (error) {
+    fetchError = error.message;
+  } else {
+    products = data || [];
+  }
+}
+
+const visibleProducts = products
+  .filter(shouldShowProductForBranch)
+  .slice(0, Number(limit || 8));
+
+const gridHtml = visibleProducts.map(renderCard).join("");
+const hasProducts = visibleProducts.length > 0;
+
+const bodyHtml = hasProducts
+  ? `<div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">${gridHtml}</div>`
+  : `<div class="mt-10 rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-bold text-slate-300">${escapeHtml(fetchError || text.empty)}</div>`;
 ---
 
 <section class="relative overflow-hidden bg-slate-950 px-5 py-16 text-white sm:px-8 lg:px-12">
-  <script
-    id="featuredProductsLabels"
-    type="application/json"
-    set:html={labelsJson}
-  />
-
-  <script
-    id="featuredProductsConfig"
-    type="application/json"
-    set:html={configJson}
-  />
-
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.14),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.12),transparent_35%)]"></div>
 
   <div class="relative mx-auto max-w-7xl">
@@ -127,442 +482,6 @@ const configJson = JSON.stringify({
       </div>
     </div>
 
-    <div
-      id="featuredProductsLoading"
-      class="mt-10 rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-black"
-    >
-      {text.loading}
-    </div>
-
-    <div
-      id="featuredProductsEmpty"
-      class="mt-10 hidden rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center font-bold text-slate-300"
-    >
-      {text.empty}
-    </div>
-
-    <div
-      id="featuredProductsGrid"
-      class="mt-10 hidden grid gap-6 md:grid-cols-2 xl:grid-cols-4"
-    ></div>
+    <Fragment set:html={bodyHtml} />
   </div>
-
-  <script>
-    import { createClient } from "@supabase/supabase-js";
-
-    const labelsElement = document.getElementById("featuredProductsLabels");
-    const configElement = document.getElementById("featuredProductsConfig");
-
-    const labels = JSON.parse(labelsElement?.textContent || "{}");
-    const config = JSON.parse(configElement?.textContent || "{}");
-
-    const publicSupabase = createClient(
-      import.meta.env.PUBLIC_SUPABASE_URL,
-      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-        },
-      }
-    );
-
-    const loading = document.getElementById("featuredProductsLoading");
-    const empty = document.getElementById("featuredProductsEmpty");
-    const grid = document.getElementById("featuredProductsGrid");
-
-    const whatsappNumbers = {
-      sharjah: "971503512023",
-      dubai: "971561615010",
-    };
-
-    function escapeHtml(value) {
-      return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function getPrimaryImage(product) {
-      const images = product.product_images || [];
-      const primary = images.find((image) => image.is_primary) || images[0];
-
-      return primary?.image_url || "/images/hero-banner.png";
-    }
-
-    function getBrandName(product) {
-      return product.brands?.name || "";
-    }
-
-    function getBrandLogo(product) {
-      return product.brands?.logo_url || "";
-    }
-
-    function formatAed(value) {
-      const number = Number(value);
-      if (!Number.isFinite(number) || number <= 0) return "";
-      return "AED " + number.toLocaleString("en-AE");
-    }
-
-    function renderPrice(product) {
-      const price = formatAed(product.price);
-      if (!price) return "";
-
-      const setOfFour = formatAed(Number(product.price) * 4);
-
-      return `
-        <div class="mt-3 border-t border-slate-100 pt-3">
-          <div class="flex items-baseline gap-2">
-            <span class="text-2xl font-black text-slate-900">${escapeHtml(price)}</span>
-            <span class="text-[11px] font-bold text-slate-400">/ ${escapeHtml(labels.perTyre || "per tyre")}</span>
-          </div>
-          ${
-            setOfFour
-              ? `<p class="mt-0.5 text-xs font-bold text-slate-500">${escapeHtml(labels.setOfFour || "Set of 4")}: ${escapeHtml(setOfFour)}</p>`
-              : ""
-          }
-        </div>
-      `;
-    }
-
-    function getAvailability(product, branchId) {
-      const rows = product.product_branch_availability || [];
-      return rows.find((row) => row.branch_id === branchId);
-    }
-
-    function isAvailableStatus(status) {
-      return status === "in_stock" || status === "limited" || status === "order_only";
-    }
-
-    function availabilityText(status) {
-      if (status === "in_stock") return labels.inStock || "In Stock";
-      if (status === "limited") return labels.limited || "Limited";
-      if (status === "order_only") return labels.orderOnly || "Order Only";
-      if (status === "out_of_stock") return labels.outOfStock || "Out of Stock";
-      return labels.unknown || "Ask Us";
-    }
-
-    function availabilityClass(status) {
-      if (status === "in_stock") return "bg-green-100 text-green-700";
-      if (status === "limited") return "bg-amber-100 text-amber-700";
-      if (status === "order_only") return "bg-blue-100 text-blue-700";
-      if (status === "out_of_stock") return "bg-red-100 text-red-600";
-      return "bg-slate-100 text-slate-500";
-    }
-
-    function productSpecItems(product) {
-      return [
-        {
-          label: labels.origin || "Origin",
-          value: product.origin,
-          tone: "slate",
-        },
-        {
-          label: labels.vehicle || "Vehicle",
-          value: product.vehicle_type,
-          tone: "orange",
-        },
-        {
-          label: labels.season || "Usage",
-          value: product.season,
-          tone: "purple",
-        },
-        {
-          label: labels.load || "Load",
-          value: product.load_index,
-          tone: "slate",
-        },
-        {
-          label: labels.speed || "Speed",
-          value: product.speed_rating,
-          tone: "slate",
-        },
-        {
-          label: product.run_flat ? labels.runFlat || "Run Flat" : "",
-          value: product.run_flat ? "Yes" : "",
-          tone: "red",
-          compact: true,
-        },
-      ].filter((item) => item.value);
-    }
-
-    function specToneClass(tone) {
-      if (tone === "cyan") return "bg-amber-50 text-amber-700";
-      if (tone === "green") return "bg-green-50 text-green-700";
-      if (tone === "orange") return "bg-blue-50 text-blue-700";
-      if (tone === "purple") return "bg-purple-50 text-purple-700";
-      if (tone === "red") return "bg-red-50 text-red-600";
-      return "bg-slate-100 text-slate-600";
-    }
-
-    function renderSpecBadges(product) {
-      const specs = productSpecItems(product);
-
-      if (!specs.length) return "";
-
-      return `
-        <div class="mt-3">
-          <div class="flex flex-wrap gap-1.5">
-            ${specs
-              .map((spec) => {
-                if (spec.compact) {
-                  return `
-                    <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${specToneClass(spec.tone)}">
-                      ${escapeHtml(spec.label)}
-                    </span>
-                  `;
-                }
-
-                return `
-                  <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${specToneClass(spec.tone)}">
-                    ${escapeHtml(spec.label)}: ${escapeHtml(spec.value)}
-                  </span>
-                `;
-              })
-              .join("")}
-          </div>
-        </div>
-      `;
-    }
-
-    function buildWhatsAppLink(product, branchId) {
-      const brandName = getBrandName(product);
-      const branchName = branchId === "dubai" ? "Dubai" : "Sharjah";
-
-      const parts = [
-        labels.messagePrefix || "Hi, I need price and availability for",
-        product.title,
-        product.size_display ? `Size: ${product.size_display}` : "",
-        product.manufacture_year ? `Year: ${product.manufacture_year}` : "",
-        brandName ? `Brand: ${brandName}` : "",
-        product.model ? `Model: ${product.model}` : "",
-        product.origin ? `Origin: ${product.origin}` : "",
-        product.vehicle_type ? `Vehicle Type: ${product.vehicle_type}` : "",
-        product.season ? `Usage: ${product.season}` : "",
-        product.load_index ? `Load Index: ${product.load_index}` : "",
-        product.speed_rating ? `Speed Rating: ${product.speed_rating}` : "",
-        product.run_flat ? `Run Flat: Yes` : "",
-        product.warranty_text ? `Warranty: ${product.warranty_text}` : "",
-        `Branch: ${branchName}`,
-      ].filter(Boolean);
-
-      const message = parts.join("\n");
-      const number = whatsappNumbers[branchId];
-
-      return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-    }
-
-    function renderBranchBlock(product, branchId) {
-      const branch = getAvailability(product, branchId);
-      const status = branch?.availability_status || "unknown";
-      const link = buildWhatsAppLink(product, branchId);
-
-      const isDubai = branchId === "dubai";
-
-      return `
-        <a
-          href="${link}"
-          target="_blank"
-          class="flex items-center justify-between gap-3 rounded-xl ${
-            isDubai
-              ? "bg-slate-900 text-white hover:bg-slate-800"
-              : "bg-amber-400 text-slate-950 hover:bg-amber-300"
-          } px-4 py-3 transition"
-        >
-          <span class="flex items-center gap-2 text-sm font-black">
-            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L.054 23.454a.5.5 0 0 0 .492.546.499.499 0 0 0 .139-.02l5.789-1.534A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
-            </svg>
-            ${escapeHtml(isDubai ? labels.askDubai || "WhatsApp Dubai" : labels.askSharjah || "WhatsApp Sharjah")}
-          </span>
-
-          <span class="rounded-full px-2.5 py-1 text-[11px] font-black ${availabilityClass(status)}">
-            ${availabilityText(status)}
-          </span>
-        </a>
-      `;
-    }
-
-    function shouldShowProductForBranch(product) {
-      if (config.branch === "all") return true;
-
-      const branch = getAvailability(product, config.branch);
-      return isAvailableStatus(branch?.availability_status);
-    }
-
-    function renderProducts(products) {
-      const branchFilteredProducts = products
-        .filter(shouldShowProductForBranch)
-        .slice(0, Number(config.limit || 8));
-
-      if (!branchFilteredProducts.length) {
-        empty.classList.remove("hidden");
-        grid.classList.add("hidden");
-        return;
-      }
-
-      empty.classList.add("hidden");
-      grid.classList.remove("hidden");
-
-      grid.innerHTML = branchFilteredProducts
-        .map((product) => {
-          const imageUrl = getPrimaryImage(product);
-          const brandName = getBrandName(product);
-          const brandLogo = getBrandLogo(product);
-
-          const brandVisual = brandLogo
-            ? `<img src="${escapeHtml(brandLogo)}" alt="${escapeHtml(brandName)}"
-                  class="h-6 w-auto max-w-[105px] object-contain object-left"
-                  loading="lazy"
-                  onerror="this.outerHTML='<span class=\\'text-sm font-black uppercase tracking-[0.12em] text-slate-800\\'>${escapeHtml(brandName || "Khalid Amin Tyres")}</span>'" />`
-            : `<span class="text-sm font-black uppercase tracking-[0.12em] text-slate-800">${escapeHtml(brandName || "Khalid Amin Tyres")}</span>`;
-
-          return `
-            <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_25px_60px_-20px_rgba(15,23,42,0.45)]">
-              <div class="flex items-center justify-between gap-2 px-5 pt-4">
-                ${brandVisual}
-
-                <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-amber-700">
-                  ${escapeHtml(product.product_type || "product")}
-                </span>
-              </div>
-
-              <div class="relative mt-1 px-5">
-                <div class="h-44 w-full overflow-hidden">
-                  <img
-                    src="${escapeHtml(imageUrl)}"
-                    alt="${escapeHtml(product.title)}"
-                    class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
-                  />
-                </div>
-
-                ${
-                  product.warranty_text
-                    ? `<span class="absolute bottom-1 left-5 inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
-                        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-                        ${escapeHtml(product.warranty_text)}
-                      </span>`
-                    : ""
-                }
-              </div>
-
-              <div class="flex flex-1 flex-col px-5 pb-4 pt-3">
-                <p class="line-clamp-1 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
-                  ${escapeHtml(product.title)}
-                </p>
-
-                <div class="mt-1 flex items-end justify-between gap-2">
-                  ${
-                    product.size_display
-                      ? `<p class="text-2xl font-black leading-none tracking-tight text-slate-900">
-                          ${escapeHtml(product.size_display)}
-                        </p>`
-                      : `<p class="text-lg font-black leading-tight text-slate-900">${escapeHtml(product.title)}</p>`
-                  }
-
-                  ${
-                    product.manufacture_year
-                      ? `<span class="shrink-0 text-sm font-black text-slate-400">${escapeHtml(product.manufacture_year)}</span>`
-                      : ""
-                  }
-                </div>
-
-                ${renderSpecBadges(product)}
-
-                ${renderPrice(product)}
-
-                <div class="mt-auto grid gap-2 pt-4">
-                  ${
-                    config.branch === "dubai"
-                      ? renderBranchBlock(product, "dubai")
-                      : config.branch === "sharjah"
-                        ? renderBranchBlock(product, "sharjah")
-                        : renderBranchBlock(product, "sharjah") + renderBranchBlock(product, "dubai")
-                  }
-                </div>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
-    }
-
-    async function loadProducts() {
-      let query = publicSupabase
-        .from("products")
-        .select(`
-          id,
-          title,
-          slug,
-          product_type,
-          status,
-          featured,
-          model,
-          short_description,
-          size_display,
-          price,
-          manufacture_year,
-          origin,
-          vehicle_type,
-          season,
-          load_index,
-          speed_rating,
-          run_flat,
-          warranty_text,
-          sort_order,
-          brands${config.brand && config.brand !== "all" ? "!inner" : ""} (
-            name,
-            slug,
-            logo_url
-          ),
-          product_images (
-            image_url,
-            is_primary,
-            sort_order
-          ),
-          product_branch_availability (
-            branch_id,
-            availability_status,
-            quantity
-          )
-        `)
-        .eq("status", "active")
-        .order("sort_order", { ascending: true });
-
-      if (config.featuredOnly) {
-        query = query.eq("featured", true);
-      }
-
-      if (config.productType && config.productType !== "all") {
-        query = query.eq("product_type", config.productType);
-      }
-
-      if (config.brand && config.brand !== "all") {
-        query = query.eq("brands.slug", config.brand);
-      }
-
-      const queryLimit =
-        config.branch && config.branch !== "all"
-          ? Math.max(Number(config.limit || 8) * 4, 32)
-          : Number(config.limit || 8);
-
-      const { data, error } = await query.limit(queryLimit);
-
-      loading.classList.add("hidden");
-
-      if (error) {
-        empty.textContent = error.message;
-        empty.classList.remove("hidden");
-        return;
-      }
-
-      renderProducts(data || []);
-    }
-
-    loadProducts();
-  </script>
 </section>
