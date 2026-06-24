@@ -6,6 +6,9 @@ import FinalCtaSection from "../../components/FinalCtaSection.astro";
 
 const SITE_URL = "https://khalidamintyres.com";
 
+// Product detail pages are generated at build time from Supabase. A deploy
+// (build) is required to publish product data changes (price, FAQ, stock).
+
 export async function getStaticPaths() {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
