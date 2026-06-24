@@ -364,73 +364,35 @@ const initialType = content.types[0];
         .join("\n");
     }
 
-    async function insertLeadWithFallback(data) {
-      const adminMessage = buildAdminMessage(data);
+    async function insertLead(data) {
+      // ستون‌ها دقیقاً مطابق schema جدول leads هستند.
+      const payload = {
+        customer_name: data.name || null,
+        phone: data.whatsapp,
+        whatsapp: data.whatsapp,
+        branch_id: data.branch,            // "sharjah" | "dubai" (= branches.id)
+        lead_type: data.requestType,       // tyre | rim | battery | service
+        status: "new",                     // لازم برای RLS انسرت anon
+        priority: "normal",
+        language: pageIsArabic ? "ar" : "en",
+        source_page: window.location.pathname,
+        message: buildAdminMessage(data),  // متن کامل (شامل note) برای ادمین
+      };
 
-      const payloads = [
-        {
-          customer_name: data.name || null,
-          phone: data.whatsapp,
-          branch: data.branch,
-          request_type: data.requestType,
-          request_details: data.details,
-          message: adminMessage,
-          source: "website",
-          source_page: window.location.pathname,
-          status: "new",
-          priority: "normal",
-        },
-        {
-          customer_name: data.name || null,
-          whatsapp: data.whatsapp,
-          branch: data.branch,
-          lead_type: data.requestType,
-          details: data.details,
-          note: data.note || null,
-          status: "new",
-          priority: "normal",
-        },
-        {
-          phone: data.whatsapp,
-          branch: data.branch,
-          request_type: data.requestType,
-          message: adminMessage,
-          status: "new",
-          priority: "normal",
-        },
-        {
-          whatsapp: data.whatsapp,
-          branch: data.branch,
-          type: data.requestType,
-          request_details: data.details,
-          note: data.note || null,
-          status: "new",
-        },
-        {
-          phone: data.whatsapp,
-          message: adminMessage,
-          status: "new",
-        },
-        {
-          whatsapp: data.whatsapp,
-          message: adminMessage,
-          status: "new",
-        },
-      ];
-
-      let lastError = null;
-
-      for (const payload of payloads) {
-        const { error } = await leadSupabase.from("leads").insert(payload);
-
-        if (!error) {
-          return true;
-        }
-
-        lastError = error;
+      // متن آزادِ «جزئیات» را به ستون ساختاریافته‌ی مناسب نگاشت می‌کنیم.
+      if (data.requestType === "tyre") {
+        payload.tyre_size = data.details;
+      } else if (data.requestType === "rim") {
+        payload.rim_size = data.details;
       }
 
-      throw lastError;
+      const { error } = await leadSupabase.from("leads").insert(payload);
+
+      if (error) {
+        throw error;
+      }
+
+      return true;
     }
 
     form.addEventListener("submit", async (event) => {
@@ -460,7 +422,7 @@ const initialType = content.types[0];
       submitBtn.disabled = true;
 
       try {
-        await insertLeadWithFallback(data);
+        await insertLead(data);
         showLeadStatus(uiText.success, "success");
 
         setTimeout(() => {
