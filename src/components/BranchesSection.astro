@@ -1,6 +1,7 @@
 ﻿---
 import DynamicSiteText from "./DynamicSiteText.astro";
 import DynamicSiteImage from "./DynamicSiteImage.astro";
+import { business } from "../data/business";
 
 const isArabic = Astro.url.pathname.startsWith("/ar");
 
@@ -47,8 +48,7 @@ const branches = isArabic
         fallbackDirectionsLabel: "الاتجاهات",
         whatsappUrl:
           "https://wa.me/971561615010?text=Hello%20Khalid%20Amin%20Tyres%20Dubai%2C%20I%20need%20tyre%20or%20rim%20service.",
-        directionsUrl:
-          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Al%20Manara%20St%20Al%20Quoz%201%20Dubai",
+        directionsUrl: business.branches.dubai.mapUrl,
         accent: "orange",
       },
       {
@@ -70,8 +70,7 @@ const branches = isArabic
         fallbackDirectionsLabel: "الاتجاهات",
         whatsappUrl:
           "https://wa.me/971503512023?text=Hello%20Khalid%20Amin%20Tyres%20Sharjah%2C%20I%20need%20tyre%20or%20rim%20service.",
-        directionsUrl:
-          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Industrial%20Area%204%20Sharjah",
+        directionsUrl: business.branches.sharjah.mapUrl,
         accent: "cyan",
       },
     ]
@@ -95,8 +94,7 @@ const branches = isArabic
         fallbackDirectionsLabel: "Get Directions",
         whatsappUrl:
           "https://wa.me/971561615010?text=Hello%20Khalid%20Amin%20Tyres%20Dubai%2C%20I%20need%20tyre%20or%20rim%20service.",
-        directionsUrl:
-          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Al%20Manara%20St%20Al%20Quoz%201%20Dubai",
+        directionsUrl: business.branches.dubai.mapUrl,
         accent: "orange",
       },
       {
@@ -118,8 +116,7 @@ const branches = isArabic
         fallbackDirectionsLabel: "Get Directions",
         whatsappUrl:
           "https://wa.me/971503512023?text=Hello%20Khalid%20Amin%20Tyres%20Sharjah%2C%20I%20need%20tyre%20or%20rim%20service.",
-        directionsUrl:
-          "https://www.google.com/maps/search/?api=1&query=Khalid%20Amin%20Tyres%20Industrial%20Area%204%20Sharjah",
+        directionsUrl: business.branches.sharjah.mapUrl,
         accent: "cyan",
       },
     ];

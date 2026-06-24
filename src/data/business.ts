@@ -16,7 +16,7 @@ export const business = {
       whatsappNumber: "971503512023",
       address: "Industrial Area 4 - Industrial Area - Sharjah",
       hours: "9:00 AM - 11:00 PM",
-      mapUrl: "#",
+      mapUrl: "https://maps.app.goo.gl/LERVNcG3KYdUgw736",
     },
     dubai: {
       label: "Dubai Branch",
@@ -26,7 +26,7 @@ export const business = {
       whatsappNumber: "971561615010",
       address: "Al Manara St - Al Qouz Ind.first - Al Quoz 1 - Dubai",
       hours: "9:00 AM - 2:00 AM",
-      mapUrl: "#",
+      mapUrl: "https://maps.app.goo.gl/XTaoALWe5LUrfQPVA",
     },
   },
 
