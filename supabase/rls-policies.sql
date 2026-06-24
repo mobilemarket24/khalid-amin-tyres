@@ -55,9 +55,11 @@ drop policy if exists "admin read leads"        on public.leads;
 drop policy if exists "admin update leads"      on public.leads;
 drop policy if exists "admin delete leads"      on public.leads;
 
+-- نکته: جدول leads ستون «source» ندارد (فقط source_page). پس فقط status را
+-- مقید می‌کنیم تا فرم عمومی نتواند لید با وضعیت دلخواه (مثلاً won) بسازد.
 create policy "anon can insert leads"
   on public.leads for insert to anon
-  with check (status = 'new' and source = 'website');
+  with check (status = 'new');
 
 create policy "admin read leads"
   on public.leads for select to authenticated
@@ -164,41 +166,33 @@ create policy "admin write brands"
 
 
 -- =============================================================================
--- 6) site_texts
---    anon: SELECT فقط is_active = true   |   admin: کامل
+-- 6) site_texts  و  7) site_images
 -- =============================================================================
-
-alter table public.site_texts enable row level security;
-
-drop policy if exists "public read active site_texts" on public.site_texts;
-drop policy if exists "admin write site_texts"         on public.site_texts;
-
-create policy "public read active site_texts"
-  on public.site_texts for select to anon
-  using (is_active = true);
-
-create policy "admin write site_texts"
-  on public.site_texts for all to authenticated
-  using (public.is_admin()) with check (public.is_admin());
-
-
--- =============================================================================
--- 7) site_images
---    anon: SELECT فقط is_active = true   |   admin: کامل
--- =============================================================================
-
-alter table public.site_images enable row level security;
-
-drop policy if exists "public read active site_images" on public.site_images;
-drop policy if exists "admin write site_images"         on public.site_images;
-
-create policy "public read active site_images"
-  on public.site_images for select to anon
-  using (is_active = true);
-
-create policy "admin write site_images"
-  on public.site_images for all to authenticated
-  using (public.is_admin()) with check (public.is_admin());
+-- این دو جدول در حال حاضر در دیتابیس وجود ندارند (در خروجی schema نبودند).
+-- کامپوننت‌های DynamicSiteText/DynamicSiteImage آن‌ها را صدا می‌زنند ولی چون
+-- موجود نیستند، خطا را نادیده می‌گیرند و از مقدار fallback استفاده می‌کنند.
+--
+-- بنابراین بخش RLS این دو فعلاً غیرفعال است (اجرا روی جدول ناموجود خطا می‌دهد).
+-- اگر بعداً این جدول‌ها را با ستون is_active ساختی، بلوک زیر را از کامنت
+-- خارج و اجرا کن:
+--
+-- alter table public.site_texts enable row level security;
+-- drop policy if exists "public read active site_texts" on public.site_texts;
+-- drop policy if exists "admin write site_texts"         on public.site_texts;
+-- create policy "public read active site_texts"
+--   on public.site_texts for select to anon using (is_active = true);
+-- create policy "admin write site_texts"
+--   on public.site_texts for all to authenticated
+--   using (public.is_admin()) with check (public.is_admin());
+--
+-- alter table public.site_images enable row level security;
+-- drop policy if exists "public read active site_images" on public.site_images;
+-- drop policy if exists "admin write site_images"         on public.site_images;
+-- create policy "public read active site_images"
+--   on public.site_images for select to anon using (is_active = true);
+-- create policy "admin write site_images"
+--   on public.site_images for all to authenticated
+--   using (public.is_admin()) with check (public.is_admin());
 
 
 -- =============================================================================
