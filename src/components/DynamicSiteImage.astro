@@ -1,4 +1,6 @@
 ---
+import { getSiteImage } from "../lib/siteContent";
+
 interface Props {
   imageKey: string;
   fallbackSrc: string;
@@ -14,71 +16,11 @@ const {
   class: className = "",
   loading = "lazy",
 } = Astro.props;
+
+// در زمان build از Supabase گرفته می‌شود (سمت سرور)، نه در مرورگر.
+const image = await getSiteImage(imageKey);
+const src = image?.image_url || fallbackSrc;
+const finalAlt = image?.alt_text || alt;
 ---
 
-<img
-  data-site-image-key={imageKey}
-  src={fallbackSrc}
-  alt={alt}
-  class={className}
-  loading={loading}
-/>
-
-<script>
-  import { createClient } from "@supabase/supabase-js";
-
-  const siteImageSupabase = createClient(
-    import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-      },
-    }
-  );
-
-  async function loadDynamicSiteImages() {
-    const imageElements = Array.from(
-      document.querySelectorAll("[data-site-image-key]")
-    );
-
-    const imageKeys = [
-      ...new Set(
-        imageElements
-          .map((element) => element.getAttribute("data-site-image-key"))
-          .filter(Boolean)
-      ),
-    ];
-
-    if (imageKeys.length === 0) return;
-
-    const { data, error } = await siteImageSupabase
-      .from("site_images")
-      .select("image_key, image_url, alt_text")
-      .in("image_key", imageKeys)
-      .eq("is_active", true);
-
-    if (error || !data) return;
-
-    const imageMap = new Map(
-      data.map((image) => [image.image_key, image])
-    );
-
-    imageElements.forEach((element) => {
-      const imageKey = element.getAttribute("data-site-image-key");
-      const imageData = imageMap.get(imageKey);
-
-      if (!imageData?.image_url) return;
-
-      element.setAttribute("src", imageData.image_url);
-
-      if (imageData.alt_text) {
-        element.setAttribute("alt", imageData.alt_text);
-      }
-    });
-  }
-
-  loadDynamicSiteImages();
-</script>
+<img src={src} alt={finalAlt} class={className} loading={loading} />
