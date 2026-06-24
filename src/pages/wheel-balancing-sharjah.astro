@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SeoPageHero from "../components/SeoPageHero.astro";
+import LeadCaptureSection from "../components/LeadCaptureSection.astro";
+import BranchesSection from "../components/BranchesSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import FinalCtaSection from "../components/FinalCtaSection.astro";
+---
+
+<BaseLayout
+  title="Wheel Balancing Sharjah | Tyre Balancing Service UAE | Khalid Amin Tyres"
+  description="Wheel balancing service in Sharjah. Khalid Amin Tyres offers tyre balancing, fitting and tyre support in Sharjah and Dubai."
+>
+  <main>
+    <SeoPageHero
+      imageKey="wheel_balancing_sharjah_hero"
+      badge="Wheel Balancing Sharjah"
+      titleKey="wheel_balancing_sharjah_hero_title"
+      subtitleKey="wheel_balancing_sharjah_hero_subtitle"
+      title="Wheel Balancing in Sharjah"
+      subtitle="Reduce vibration and improve driving comfort with wheel balancing support from Khalid Amin Tyres."
+      branch="sharjah"
+      bullets={[
+        "Wheel balancing support",
+        "Vibration check",
+        "Tyre fitting support",
+        "Fast WhatsApp booking",
+      ]}
+    />
+
+    <LeadCaptureSection />
+    <BranchesSection />
+    <FAQSection />
+    <FinalCtaSection />
+  </main>
+</BaseLayout>

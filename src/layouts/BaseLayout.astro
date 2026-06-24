@@ -81,6 +81,14 @@ const metaKeyMap: Record<string, { titleKey: string; descriptionKey: string }> =
     titleKey: "meta_wheel_balancing_dubai_title",
     descriptionKey: "meta_wheel_balancing_dubai_description",
   },
+  "/wheel-alignment-sharjah/": {
+    titleKey: "meta_wheel_alignment_sharjah_title",
+    descriptionKey: "meta_wheel_alignment_sharjah_description",
+  },
+  "/wheel-balancing-sharjah/": {
+    titleKey: "meta_wheel_balancing_sharjah_title",
+    descriptionKey: "meta_wheel_balancing_sharjah_description",
+  },
 };
 
 const hreflangMap: Record<
@@ -124,6 +132,14 @@ const hreflangMap: Record<
   "/wheel-balancing-dubai/": {
     en: "/wheel-balancing-dubai/",
     xDefault: "/wheel-balancing-dubai/",
+  },
+  "/wheel-alignment-sharjah/": {
+    en: "/wheel-alignment-sharjah/",
+    xDefault: "/wheel-alignment-sharjah/",
+  },
+  "/wheel-balancing-sharjah/": {
+    en: "/wheel-balancing-sharjah/",
+    xDefault: "/wheel-balancing-sharjah/",
   },
 };
 
@@ -191,6 +207,24 @@ const servicePageMap: Record<
     branch: "dubai",
     fallbackDescription:
       "Wheel balancing support in Dubai from Khalid Amin Tyres to reduce vibration and improve driving comfort.",
+  },
+  "/wheel-alignment-sharjah/": {
+    pageName: "Wheel Alignment Sharjah",
+    serviceName: "Wheel Alignment Service in Sharjah",
+    serviceType: "Wheel Alignment",
+    city: "Sharjah",
+    branch: "sharjah",
+    fallbackDescription:
+      "Wheel alignment support in Sharjah from Khalid Amin Tyres to improve tyre life, steering feel and vehicle stability.",
+  },
+  "/wheel-balancing-sharjah/": {
+    pageName: "Wheel Balancing Sharjah",
+    serviceName: "Wheel Balancing Service in Sharjah",
+    serviceType: "Wheel Balancing",
+    city: "Sharjah",
+    branch: "sharjah",
+    fallbackDescription:
+      "Wheel balancing support in Sharjah from Khalid Amin Tyres to reduce vibration and improve driving comfort.",
   },
 };
 
@@ -540,6 +574,13 @@ const organizationSchema = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    />
 
     <title>{finalTitle}</title>
     <meta name="description" content={finalDescription} />

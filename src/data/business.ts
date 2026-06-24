@@ -5,7 +5,7 @@ export const business = {
   legalName: "KHALID AMIN TYRES TR CO LLC",
   tagline: "Tyres & Rims in Dubai & Sharjah",
 
-  email: "info@khalidamintyres.com",
+  email: "khalidamin.1978@yahoo.com",
 
   branches: {
     sharjah: {
@@ -40,7 +40,6 @@ export const business = {
     ferrariBay: "/images/ferrari-service-bay.jpg.webp",
     porscheBay: "/images/porsche-service-bay.jpg.webp",
     dubaiNight: "/images/branch-dubai-night.jpg.webp",
-    legacyLogo: "/images/legacy-logo.jpg.jpg",
   },
 
   services: [

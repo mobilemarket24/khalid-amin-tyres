@@ -17,7 +17,7 @@ html {
 
 body {
   margin: 0;
-  background: #f8fafc;
+  background: var(--ka-dark);
   color: #0f172a;
   font-family:
     Inter,

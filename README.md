@@ -1,43 +1,74 @@
-# Astro Starter Kit: Minimal
+# KHALID AMIN TYRES — Website
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Marketing and catalogue site for **KHALID AMIN TYRES TR CO LLC**, a tyre and
+rim business with branches in **Dubai** and **Sharjah** (UAE). Customers browse
+tyres, rims and wheel services, then request today's price over WhatsApp. An
+admin panel manages products, brands, branches, leads and editable site
+content.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Tech stack
 
-## 🚀 Project Structure
+- **Astro 6** — static site generation
+- **Tailwind CSS 4** — styling (via `@tailwindcss/vite`)
+- **Supabase** — database, auth (admin), storage (product images)
+- **@astrojs/sitemap** — auto-generated sitemap
 
-Inside of your Astro project, you'll see the following folders and files:
+## How content works
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+The site builds as **static HTML**, but dynamic data is loaded **client-side**
+from Supabase so it stays fresh without rebuilding:
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- Products, prices and stock — loaded live on each page (`FeaturedProductsSection`)
+- Brands, site texts and site images — loaded live from Supabase
+- Page `<title>`/meta — read from Supabase **at build time** (`BaseLayout`)
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+> Changing products/prices in the admin shows immediately. Changing page code,
+> design or meta text requires a rebuild.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Local setup
 
-## 🧞 Commands
+1. Requires Node `>=22.12.0`.
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Copy `.env.example` to `.env` and fill in your Supabase keys
+   (Supabase Dashboard → Project Settings → API):
+   ```
+   PUBLIC_SUPABASE_URL=...
+   PUBLIC_SUPABASE_ANON_KEY=...
+   ```
+4. Start the dev server:
+   ```sh
+   npm run dev
+   ```
 
-All commands are run from the root of the project, from a terminal:
+## Commands
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| Command           | Action                                      |
+| :---------------- | :------------------------------------------ |
+| `npm install`     | Install dependencies                        |
+| `npm run dev`     | Start dev server at `localhost:4321`        |
+| `npm run build`   | Build the production site to `./dist/`      |
+| `npm run preview` | Preview the production build locally        |
 
-## 👀 Want to learn more?
+## Admin panel
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Lives under `/admin/*` (e.g. `/admin/login`, `/admin/products`).
+- Auth is handled by Supabase; each admin page checks the session client-side
+  and redirects to `/admin/login` when signed out.
+- Data is protected by **Supabase Row Level Security (RLS)** — keep RLS enabled
+  on every table. `leads` must not be readable by the `anon` role.
+
+## Branches
+
+- **Sharjah** — Industrial Area 4, Sharjah · WhatsApp 050 351 2023
+- **Dubai** — Al Manara St, Al Quoz 1, Dubai · WhatsApp 056 161 5010
+
+Business details live in [`src/data/business.ts`](src/data/business.ts).
+
+## Deployment
+
+The site is fully static — the contents of `./dist/` can be served from any
+static host (or a static-capable platform). Set the two `PUBLIC_SUPABASE_*`
+environment variables in the host before building.
