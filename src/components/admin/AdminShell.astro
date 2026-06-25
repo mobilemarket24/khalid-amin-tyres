@@ -48,6 +48,15 @@ const navItems = [
     </nav>
 
     <button
+      id="adminPublishBtn"
+      type="button"
+      class="mt-5 w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 transition hover:bg-amber-300"
+    >
+      🚀 Publish changes
+    </button>
+    <p id="adminPublishStatus" class="mt-2 hidden text-center text-xs font-bold"></p>
+
+    <button
       id="adminLogoutBtn"
       type="button"
       class="absolute bottom-5 left-5 right-5 rounded-2xl bg-red-500/15 px-4 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/25"
@@ -62,18 +71,28 @@ const navItems = [
         Khalid Amin Admin
       </a>
 
-      <select
-        id="mobileAdminNav"
-        class="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm font-bold text-white"
-      >
-        {
-          navItems.map((item) => (
-            <option value={item.href} selected={current === item.key}>
-              {item.label}
-            </option>
-          ))
-        }
-      </select>
+      <div class="flex items-center gap-2">
+        <button
+          id="adminPublishBtnMobile"
+          type="button"
+          class="rounded-xl bg-amber-400 px-3 py-2 text-sm font-black text-slate-950 transition hover:bg-amber-300"
+        >
+          🚀 Publish
+        </button>
+
+        <select
+          id="mobileAdminNav"
+          class="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm font-bold text-white"
+        >
+          {
+            navItems.map((item) => (
+              <option value={item.href} selected={current === item.key}>
+                {item.label}
+              </option>
+            ))
+          }
+        </select>
+      </div>
     </div>
   </header>
 
@@ -102,5 +121,50 @@ const navItems = [
         }
       });
     }
+
+    const publishButtons = [
+      document.getElementById("adminPublishBtn"),
+      document.getElementById("adminPublishBtnMobile"),
+    ].filter(Boolean);
+    const publishStatus = document.getElementById("adminPublishStatus");
+
+    function setPublishStatus(text, tone) {
+      if (!publishStatus) return;
+      publishStatus.classList.remove("hidden", "text-amber-300", "text-green-300", "text-red-300");
+      publishStatus.classList.add(
+        tone === "error" ? "text-red-300" : tone === "success" ? "text-green-300" : "text-amber-300"
+      );
+      publishStatus.textContent = text;
+    }
+
+    async function triggerPublish() {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+
+      if (!token) {
+        window.location.href = "/admin/login/";
+        return;
+      }
+
+      publishButtons.forEach((b) => (b.disabled = true));
+      setPublishStatus("در حال انتشار…", "pending");
+
+      try {
+        const res = await fetch("/.netlify/functions/trigger-deploy", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        setPublishStatus("انتشار شروع شد ✅ تا ~۱ دقیقه دیگر زنده می‌شود.", "success");
+      } catch (error) {
+        setPublishStatus("خطا در انتشار. کمی بعد دوباره تلاش کن.", "error");
+      } finally {
+        publishButtons.forEach((b) => (b.disabled = false));
+      }
+    }
+
+    publishButtons.forEach((b) => b.addEventListener("click", triggerPublish));
   </script>
 </div>
