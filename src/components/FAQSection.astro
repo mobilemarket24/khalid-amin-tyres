@@ -1,5 +1,6 @@
 ﻿---
 import DynamicSiteText from "./DynamicSiteText.astro";
+import { getSiteText } from "../lib/siteContent";
 
 const isArabic = Astro.url.pathname.startsWith("/ar");
 
@@ -112,6 +113,25 @@ const faqs = isArabic
           "For Sharjah contact 050 351 2023. For Dubai contact 056 161 5010. You can also send your request from the website form.",
       },
     ];
+
+// Resolve the real (DB-overridden) question/answer text at build time and emit
+// FAQPage structured data so the answers can show as rich results in Google.
+const resolvedFaqs = await Promise.all(
+  faqs.map(async (faq) => ({
+    question: await getSiteText(faq.questionKey, faq.fallbackQuestion),
+    answer: await getSiteText(faq.answerKey, faq.fallbackAnswer),
+  }))
+);
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: resolvedFaqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
 ---
 
 <section
@@ -183,4 +203,6 @@ const faqs = isArabic
       }
     </div>
   </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </section>
