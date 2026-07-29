@@ -1,6 +1,10 @@
 ﻿---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { business } from "../data/business";
+import {
+  getOptimizedImageSrcSet,
+  getOptimizedImageUrl,
+} from "../utils/images";
 import { getWhatsAppUrl } from "../utils/whatsapp";
 
 interface FAQ {
@@ -47,6 +51,12 @@ const {
 
 const branchData = business.branches[branch];
 const whatsappUrl = getWhatsAppUrl(branch, primaryMessage);
+const optimizedHeroImage = getOptimizedImageUrl(heroImage, 1600, 76);
+const optimizedHeroImageSrcSet = getOptimizedImageSrcSet(
+  heroImage,
+  [640, 960, 1280, 1600],
+  76,
+);
 
 const serviceItems = [
   "Tyre fitting",
@@ -63,8 +73,13 @@ const serviceItems = [
     <section class="relative overflow-hidden bg-[#0a0a0e] text-white">
       <div class="absolute inset-0">
         <img
-          src={heroImage}
+          src={optimizedHeroImage}
+          srcset={optimizedHeroImageSrcSet}
+          sizes={optimizedHeroImageSrcSet ? "100vw" : undefined}
           alt={h1}
+          loading="eager"
+          decoding="sync"
+          fetchpriority="high"
           class="h-full w-full object-cover object-center opacity-45"
         />
       </div>

@@ -28,7 +28,7 @@ const services = isArabic
   ? [
       {
         imageKey: "services_tyres_image",
-        fallbackImage: "/images/service-tyres.png",
+        fallbackImage: "/images/service-tyres.webp",
         titleKey: "services_ar_tyres_title",
         descKey: "services_ar_tyres_desc",
         fallbackTitle: "إطارات",
@@ -39,7 +39,7 @@ const services = isArabic
       },
       {
         imageKey: "services_rims_image",
-        fallbackImage: "/images/service-rims.png",
+        fallbackImage: "/images/service-rims.webp",
         titleKey: "services_ar_rims_title",
         descKey: "services_ar_rims_desc",
         fallbackTitle: "رنقات وألوي ويلز",
@@ -50,7 +50,7 @@ const services = isArabic
       },
       {
         imageKey: "services_batteries_image",
-        fallbackImage: "/images/service-batteries.png",
+        fallbackImage: "/images/service-batteries.webp",
         titleKey: "services_ar_batteries_title",
         descKey: "services_ar_batteries_desc",
         fallbackTitle: "بطاريات",
@@ -60,7 +60,7 @@ const services = isArabic
       },
       {
         imageKey: "services_alignment_image",
-        fallbackImage: "/images/service-alignment.png",
+        fallbackImage: "/images/service-alignment.webp",
         titleKey: "services_ar_alignment_title",
         descKey: "services_ar_alignment_desc",
         fallbackTitle: "ميزان أرضي",
@@ -71,7 +71,7 @@ const services = isArabic
       },
       {
         imageKey: "services_balancing_image",
-        fallbackImage: "/images/service-balancing.png",
+        fallbackImage: "/images/service-balancing.webp",
         titleKey: "services_ar_balancing_title",
         descKey: "services_ar_balancing_desc",
         fallbackTitle: "ترصيص وميزان",
@@ -81,7 +81,7 @@ const services = isArabic
       },
       {
         imageKey: "services_onsite_image",
-        fallbackImage: "/images/service-support.png",
+        fallbackImage: "/images/service-support.webp",
         titleKey: "services_ar_onsite_title",
         descKey: "services_ar_onsite_desc",
         fallbackTitle: "دعم عبر واتساب",
@@ -94,7 +94,7 @@ const services = isArabic
   : [
       {
         imageKey: "services_tyres_image",
-        fallbackImage: "/images/service-tyres.png",
+        fallbackImage: "/images/service-tyres.webp",
         titleKey: "services_tyres_title",
         descKey: "services_tyres_desc",
         fallbackTitle: "Tyres",
@@ -105,7 +105,7 @@ const services = isArabic
       },
       {
         imageKey: "services_rims_image",
-        fallbackImage: "/images/service-rims.png",
+        fallbackImage: "/images/service-rims.webp",
         titleKey: "services_rims_title",
         descKey: "services_rims_desc",
         fallbackTitle: "Rims & Alloy Wheels",
@@ -116,7 +116,7 @@ const services = isArabic
       },
       {
         imageKey: "services_batteries_image",
-        fallbackImage: "/images/service-batteries.png",
+        fallbackImage: "/images/service-batteries.webp",
         titleKey: "services_batteries_title",
         descKey: "services_batteries_desc",
         fallbackTitle: "Batteries",
@@ -127,7 +127,7 @@ const services = isArabic
       },
       {
         imageKey: "services_alignment_image",
-        fallbackImage: "/images/service-alignment.png",
+        fallbackImage: "/images/service-alignment.webp",
         titleKey: "services_alignment_title",
         descKey: "services_alignment_desc",
         fallbackTitle: "Wheel Alignment",
@@ -138,7 +138,7 @@ const services = isArabic
       },
       {
         imageKey: "services_balancing_image",
-        fallbackImage: "/images/service-balancing.png",
+        fallbackImage: "/images/service-balancing.webp",
         titleKey: "services_balancing_title",
         descKey: "services_balancing_desc",
         fallbackTitle: "Wheel Balancing",
@@ -149,7 +149,7 @@ const services = isArabic
       },
       {
         imageKey: "services_onsite_image",
-        fallbackImage: "/images/service-support.png",
+        fallbackImage: "/images/service-support.webp",
         titleKey: "services_onsite_title",
         descKey: "services_onsite_desc",
         fallbackTitle: "On-site Support",
@@ -204,6 +204,12 @@ const services = isArabic
                 fallbackSrc={service.fallbackImage}
                 alt={service.fallbackTitle}
                 loading="lazy"
+                maxWidth={960}
+                widths={[320, 640, 960]}
+                sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
+                quality={76}
+                fallbackWidth={960}
+                fallbackHeight={640}
                 class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"
               />
 

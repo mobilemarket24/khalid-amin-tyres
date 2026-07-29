@@ -1,5 +1,9 @@
 ---
 import { createClient } from "@supabase/supabase-js";
+import {
+  getOptimizedImageSrcSet,
+  getOptimizedImageUrl,
+} from "../utils/images";
 
 interface Props {
   productType?: "all" | "tyre" | "rim" | "battery" | "service" | "accessory";
@@ -104,7 +108,7 @@ function escapeHtml(value: unknown) {
 function getPrimaryImage(product: any) {
   const images = product.product_images || [];
   const primary = images.find((image: any) => image.is_primary) || images[0];
-  return primary?.image_url || "/images/hero-banner.png";
+  return primary?.image_url || "/images/hero-banner.webp";
 }
 
 function getBrandName(product: any) {
@@ -288,13 +292,23 @@ function shouldShowProductForBranch(product: any) {
 
 function renderCard(product: any) {
   const imageUrl = getPrimaryImage(product);
+  const optimizedImageUrl = getOptimizedImageUrl(imageUrl, 480, 76);
+  const optimizedImageSrcSet = getOptimizedImageSrcSet(
+    imageUrl,
+    [240, 360, 480],
+    76,
+  );
   const brandName = getBrandName(product);
   const brandLogo = getBrandLogo(product);
+  const optimizedBrandLogo = brandLogo
+    ? getOptimizedImageUrl(brandLogo, 180, 80)
+    : "";
 
   const brandVisual = brandLogo
-    ? `<img src="${escapeHtml(brandLogo)}" alt="${escapeHtml(brandName)}"
+    ? `<img src="${escapeHtml(optimizedBrandLogo)}" alt="${escapeHtml(brandName)}"
           class="h-6 w-auto max-w-[105px] object-contain object-left"
           loading="lazy"
+          decoding="async"
           onerror="this.outerHTML='<span class=\\'text-sm font-black uppercase tracking-[0.12em] text-slate-800\\'>${escapeHtml(brandName || "Khalid Amin Tyres")}</span>'" />`
     : `<span class="text-sm font-black uppercase tracking-[0.12em] text-slate-800">${escapeHtml(brandName || "Khalid Amin Tyres")}</span>`;
 
@@ -311,9 +325,11 @@ function renderCard(product: any) {
       <div class="relative mt-1 px-5">
         <a href="/products/${escapeHtml(product.slug)}/" class="block h-44 w-full overflow-hidden">
           <img
-            src="${escapeHtml(imageUrl)}"
+            src="${escapeHtml(optimizedImageUrl)}"
+            ${optimizedImageSrcSet ? `srcset="${escapeHtml(optimizedImageSrcSet)}" sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 25vw"` : ""}
             alt="${escapeHtml(product.title)}"
             loading="lazy"
+            decoding="async"
             class="h-full w-full object-contain transition duration-500 group-hover:scale-105"
           />
         </a>

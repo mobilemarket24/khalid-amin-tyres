@@ -5,5 +5,8 @@
 [build.environment]
   NODE_VERSION = "22"
 
+[images]
+  remote_images = ["https://hzkcofnklmwbhcbybstu\\.supabase\\.co/.*"]
+
 [functions]
   directory = "netlify/functions"

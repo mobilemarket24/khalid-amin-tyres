@@ -117,6 +117,19 @@ const initialBrands = Object.entries(brandStyles).map(([slug, style]) => ({
       .replaceAll("'", "&#039;");
   }
 
+  function optimizedLogoUrl(src, width = 180) {
+    if (!src || import.meta.env.DEV) return src;
+
+    const params = new URLSearchParams({
+      url: src,
+      w: String(width),
+      q: "80",
+      fm: "webp",
+    });
+
+    return `/.netlify/images?${params.toString()}`;
+  }
+
   function styleFor(name) {
     const key = String(name || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
     if (brandStyles[key]) return brandStyles[key];
@@ -132,9 +145,10 @@ const initialBrands = Object.entries(brandStyles).map(([slug, style]) => ({
     const name = escapeHtml(brand.name);
 
     const visual = brand.logo_url
-      ? `<img src="${escapeHtml(brand.logo_url)}" alt="${name}"
+      ? `<img src="${escapeHtml(optimizedLogoUrl(brand.logo_url))}" alt="${name}"
             class="h-9 w-auto max-w-[120px] shrink-0 object-contain"
             loading="lazy"
+            decoding="async"
             onerror="this.outerHTML='<div class=\\'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black\\' style=\\'background:${style.bg}; color:${style.color};\\'>${escapeHtml(style.short)}</div>'" />`
       : `<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black"
             style="background:${style.bg}; color:${style.color};">${escapeHtml(style.short)}</div>`;

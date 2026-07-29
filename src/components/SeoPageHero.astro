@@ -40,9 +40,15 @@ const branchPhone = branch === "sharjah" ? "050 351 2023" : "056 161 5010";
 <section class="relative min-h-[620px] overflow-hidden bg-[#0a0a0e] px-5 py-16 text-white sm:px-8 lg:px-12 lg:py-20">
   <DynamicSiteImage
     imageKey={imageKey}
-    fallbackSrc="/images/hero-banner.png"
+    fallbackSrc="/images/hero-banner.webp"
     alt={title}
     loading="eager"
+    maxWidth={1600}
+    widths={[640, 960, 1280, 1600]}
+    sizes="100vw"
+    quality={76}
+    fallbackWidth={1672}
+    fallbackHeight={941}
     class="absolute inset-0 h-full w-full object-cover object-center"
   />
 

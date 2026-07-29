@@ -1,5 +1,9 @@
 ---
 import { getSiteImage } from "../lib/siteContent";
+import {
+  getOptimizedImageSrcSet,
+  getOptimizedImageUrl,
+} from "../utils/images";
 
 interface Props {
   imageKey: string;
@@ -7,6 +11,13 @@ interface Props {
   alt: string;
   class?: string;
   loading?: "eager" | "lazy";
+  maxWidth?: number;
+  widths?: number[];
+  sizes?: string;
+  quality?: number;
+  priority?: boolean;
+  fallbackWidth?: number;
+  fallbackHeight?: number;
 }
 
 const {
@@ -15,12 +26,38 @@ const {
   alt,
   class: className = "",
   loading = "lazy",
+  maxWidth = 1600,
+  widths = [480, 768, 1200, 1600],
+  sizes = "100vw",
+  quality = 76,
+  priority,
+  fallbackWidth,
+  fallbackHeight,
 } = Astro.props;
 
 // در زمان build از Supabase گرفته می‌شود (سمت سرور)، نه در مرورگر.
 const image = await getSiteImage(imageKey);
 const src = image?.image_url || fallbackSrc;
 const finalAlt = image?.alt_text || alt;
+const isPriority = priority ?? loading === "eager";
+const responsiveWidths = widths.filter((width) => width <= maxWidth);
+const optimizedSrc = getOptimizedImageUrl(src, maxWidth, quality);
+const optimizedSrcSet = getOptimizedImageSrcSet(
+  src,
+  responsiveWidths,
+  quality,
+);
 ---
 
-<img src={src} alt={finalAlt} class={className} loading={loading} />
+<img
+  src={optimizedSrc}
+  srcset={optimizedSrcSet}
+  sizes={optimizedSrcSet ? sizes : undefined}
+  alt={finalAlt}
+  class={className}
+  loading={loading}
+  decoding={isPriority ? "sync" : "async"}
+  fetchpriority={isPriority ? "high" : undefined}
+  width={fallbackWidth}
+  height={fallbackHeight}
+/>
