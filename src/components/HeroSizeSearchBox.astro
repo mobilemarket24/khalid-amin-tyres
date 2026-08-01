@@ -1,10 +1,12 @@
 ﻿---
+import { getTyreSizeIndex } from "../lib/tyreSizes";
+
 const isAr = Astro.url.pathname.startsWith("/ar");
 
 const t = isAr
   ? {
       title: "ابحث حسب المقاس",
-      subtitle: "اختر مقاس الإطار أو الجنط وأرسل الطلب على واتساب.",
+      subtitle: "اختر مقاس الإطار أو الجنط وتحقق من التوفر.",
       tyreTab: "إطارات",
       rimTab: "جنوط",
       width: "العرض",
@@ -24,10 +26,18 @@ const t = isAr
       rimButton: "إرسال طلب الجنط",
       selectCar: "اختر السيارة",
       modelPlaceholder: "مثال: X5 2022",
+      noSizes: "لا توجد مقاسات متوفرة حالياً. تواصل معنا عبر واتساب.",
+      notListed: "هذا المقاس غير متوفر أونلاين. تواصل عبر واتساب للسعر والتوفر.",
+      inStock: "متوفر",
+      limited: "كمية محدودة",
+      orderOnly: "بالطلب",
+      outOfStock: "غير متوفر",
+      unknown: "اسألنا",
+      viewProduct: "عرض المنتج",
     }
   : {
       title: "Search by Size",
-      subtitle: "Choose tyre or rim size and send request on WhatsApp.",
+      subtitle: "Choose your tyre size and check availability.",
       tyreTab: "Tyres",
       rimTab: "Rims",
       width: "Width",
@@ -47,7 +57,46 @@ const t = isAr
       rimButton: "Send Rim Request",
       selectCar: "Select Car",
       modelPlaceholder: "e.g. X5 2022",
+      noSizes: "No sizes available online yet. Contact us on WhatsApp.",
+      notListed: "This size is not listed online. Message us on WhatsApp for price and availability.",
+      inStock: "In Stock",
+      limited: "Limited",
+      orderOnly: "Order Only",
+      outOfStock: "Out of Stock",
+      unknown: "Ask Us",
+      viewProduct: "View product",
     };
+
+// سایزهای واقعی تایرها از دیتابیس (برای جستجوی آبشاری + موجودی)
+const tyreIndex = await getTyreSizeIndex();
+const tyreDataJson = JSON.stringify(tyreIndex);
+const labelsJson = JSON.stringify({
+  notListed: t.notListed,
+  inStock: t.inStock,
+  limited: t.limited,
+  orderOnly: t.orderOnly,
+  outOfStock: t.outOfStock,
+  unknown: t.unknown,
+  viewProduct: t.viewProduct,
+  sharjah: t.sharjah,
+  dubai: t.dubai,
+});
+
+const availWidths = tyreIndex.widths;
+const hasSizes = availWidths.length > 0;
+const defWidth = availWidths[0];
+const defHeights =
+  defWidth != null
+    ? Object.keys(tyreIndex.tree[String(defWidth)] || {})
+        .map(Number)
+        .sort((a, b) => a - b)
+    : [];
+const defHeight = defHeights[0];
+const defRims =
+  defWidth != null && defHeight != null
+    ? tyreIndex.tree[String(defWidth)]?.[String(defHeight)] || []
+    : [];
+const defRim = defRims[0];
 
 const tyreWidths = [
   145, 155, 165, 175, 185, 195, 205, 215, 225, 235, 245, 255, 265, 275, 285,
@@ -180,98 +229,98 @@ const carMakes = [
     </div>
 
     <div data-hero-panel="tyre" class="space-y-4">
-      <div class="grid grid-cols-3 gap-2">
-        <div>
-          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-            {t.width}
-          </label>
+      <script type="application/json" data-hero-tyre-data set:html={tyreDataJson}></script>
+      <script type="application/json" data-hero-tyre-labels set:html={labelsJson}></script>
 
-          <select
-            data-hero-tyre-width
-            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
-          >
-            {
-              tyreWidths.map((item) => (
-                <option value={item} selected={item === 275}>
-                  {item}
-                </option>
-              ))
-            }
-          </select>
-        </div>
+      {
+        hasSizes ? (
+          <>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                  {t.width}
+                </label>
 
-        <div>
-          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-            {t.height}
-          </label>
+                <select
+                  data-hero-tyre-width
+                  class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+                >
+                  {availWidths.map((item) => (
+                    <option value={item} selected={item === defWidth}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <select
-            data-hero-tyre-height
-            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
-          >
-            {
-              tyreHeights.map((item) => (
-                <option value={item} selected={item === 60}>
-                  {item}
-                </option>
-              ))
-            }
-          </select>
-        </div>
+              <div>
+                <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                  {t.height}
+                </label>
 
-        <div>
-          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-            {t.tyreRim}
-          </label>
+                <select
+                  data-hero-tyre-height
+                  class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+                >
+                  {defHeights.map((item) => (
+                    <option value={item} selected={item === defHeight}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <select
-            data-hero-tyre-rim
-            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
-          >
-            {
-              tyreRimSizes.map((item) => (
-                <option value={item} selected={item === 20}>
-                  R{item}
-                </option>
-              ))
-            }
-          </select>
-        </div>
-      </div>
+              <div>
+                <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                  {t.tyreRim}
+                </label>
 
-      <div class="grid gap-2 sm:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-            {t.branch}
-          </label>
+                <select
+                  data-hero-tyre-rim
+                  class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+                >
+                  {defRims.map((item) => (
+                    <option value={item} selected={item === defRim}>
+                      R{item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-          <select
-            data-hero-tyre-branch
-            class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
-          >
-            <option value="sharjah">{t.sharjah}</option>
-            <option value="dubai">{t.dubai}</option>
-          </select>
-        </div>
+            <div>
+              <label class="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                {t.branch}
+              </label>
 
-        <div class="rounded-xl border border-amber-300/20 bg-amber-400/10 p-3">
-          <p class="text-[10px] font-black uppercase tracking-[0.16em] text-amber-300">
-            {t.preview}
+              <select
+                data-hero-tyre-branch
+                class="w-full rounded-xl border border-white/10 bg-white px-3 py-3 text-sm font-black text-slate-950 outline-none"
+              >
+                <option value="sharjah">{t.sharjah}</option>
+                <option value="dubai">{t.dubai}</option>
+              </select>
+            </div>
+
+            <div
+              data-hero-tyre-result
+              class="rounded-xl border border-white/10 bg-white/5 p-4 text-sm font-bold text-white"
+            />
+
+            <button
+              type="button"
+              data-hero-send-tyre
+              class="w-full rounded-2xl bg-amber-400 px-5 py-4 font-black text-slate-950 transition hover:bg-amber-300"
+            >
+              {t.tyreButton}
+            </button>
+          </>
+        ) : (
+          <p class="rounded-xl border border-white/10 bg-white/5 p-4 text-sm font-bold text-slate-300">
+            {t.noSizes}
           </p>
-
-          <p data-hero-tyre-preview class="mt-1 text-xl font-black text-white">
-            275/60R20
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        data-hero-send-tyre
-        class="w-full rounded-2xl bg-amber-400 px-5 py-4 font-black text-slate-950 transition hover:bg-amber-300"
-      >
-        {t.tyreButton}
-      </button>
+        )
+      }
     </div>
 
     <div data-hero-panel="rim" class="hidden space-y-4">
@@ -436,8 +485,15 @@ const carMakes = [
       const tyreHeight = root.querySelector("[data-hero-tyre-height]");
       const tyreRim = root.querySelector("[data-hero-tyre-rim]");
       const tyreBranch = root.querySelector("[data-hero-tyre-branch]");
-      const tyrePreview = root.querySelector("[data-hero-tyre-preview]");
+      const tyreResult = root.querySelector("[data-hero-tyre-result]");
       const sendTyre = root.querySelector("[data-hero-send-tyre]");
+
+      const tyreDataEl = root.querySelector("[data-hero-tyre-data]");
+      const tyreLabelsEl = root.querySelector("[data-hero-tyre-labels]");
+      const TYRE = tyreDataEl
+        ? JSON.parse(tyreDataEl.textContent || "{}")
+        : { tree: {}, matches: {} };
+      const L = tyreLabelsEl ? JSON.parse(tyreLabelsEl.textContent || "{}") : {};
 
       const rimCarMake = root.querySelector("[data-hero-rim-car-make]");
       const rimCarModel = root.querySelector("[data-hero-rim-car-model]");
@@ -473,15 +529,114 @@ const carMakes = [
       }
 
       function tyreSize() {
-        const size =
+        return (
           valueOf(tyreWidth) +
           "/" +
           valueOf(tyreHeight) +
           "R" +
-          valueOf(tyreRim).replace("R", "");
+          valueOf(tyreRim).replace("R", "")
+        );
+      }
 
-        if (tyrePreview) tyrePreview.textContent = size;
-        return size;
+      function fillSelect(select, values, rimLabel) {
+        if (!select) return;
+        select.innerHTML = values
+          .map((v) => `<option value="${v}">${rimLabel ? "R" + v : v}</option>`)
+          .join("");
+      }
+
+      function refreshHeights() {
+        const w = valueOf(tyreWidth);
+        const heights = Object.keys((TYRE.tree || {})[w] || {})
+          .map(Number)
+          .sort((a, b) => a - b);
+        fillSelect(tyreHeight, heights, false);
+        refreshRims();
+      }
+
+      function refreshRims() {
+        const w = valueOf(tyreWidth);
+        const h = valueOf(tyreHeight);
+        const rims = (((TYRE.tree || {})[w] || {})[h] || [])
+          .slice()
+          .sort((a, b) => a - b);
+        fillSelect(tyreRim, rims, true);
+        renderTyreResult();
+      }
+
+      function tyreStatusText(status) {
+        if (status === "in_stock") return L.inStock || "In Stock";
+        if (status === "limited") return L.limited || "Limited";
+        if (status === "order_only") return L.orderOnly || "Order Only";
+        if (status === "out_of_stock") return L.outOfStock || "Out of Stock";
+        return L.unknown || "Ask Us";
+      }
+
+      function tyreStatusClass(status) {
+        if (status === "in_stock") return "bg-green-100 text-green-700";
+        if (status === "limited") return "bg-amber-100 text-amber-700";
+        if (status === "order_only") return "bg-blue-100 text-blue-700";
+        if (status === "out_of_stock") return "bg-red-100 text-red-600";
+        return "bg-slate-200 text-slate-600";
+      }
+
+      function renderTyreResult() {
+        if (!tyreResult) return;
+        const key = tyreSize();
+        const list = (TYRE.matches || {})[key] || [];
+
+        if (!list.length) {
+          tyreResult.innerHTML =
+            '<p class="text-slate-300">' + (L.notListed || "") + "</p>";
+          return;
+        }
+
+        tyreResult.innerHTML = list
+          .map((m) => {
+            const price =
+              m.priceVisible && m.price
+                ? "AED " + Number(m.price).toLocaleString("en-AE")
+                : "";
+            const badges = ["sharjah", "dubai"]
+              .map((b) => {
+                const st = (m.availability || {})[b] || "unknown";
+                const bl = b === "dubai" ? L.dubai || "Dubai" : L.sharjah || "Sharjah";
+                return (
+                  '<span class="rounded-full px-2.5 py-1 text-[11px] font-black ' +
+                  tyreStatusClass(st) +
+                  '">' +
+                  bl +
+                  ": " +
+                  tyreStatusText(st) +
+                  "</span>"
+                );
+              })
+              .join("");
+            return (
+              '<div class="flex flex-col gap-2">' +
+              '<div class="flex items-center justify-between gap-3">' +
+              '<span class="text-lg font-black text-white">' +
+              key +
+              "</span>" +
+              (price
+                ? '<span class="font-black text-amber-300">' + price + "</span>"
+                : "") +
+              "</div>" +
+              '<div class="text-xs font-semibold text-slate-300">' +
+              m.title +
+              "</div>" +
+              '<div class="flex flex-wrap gap-2">' +
+              badges +
+              "</div>" +
+              '<a href="/products/' +
+              m.slug +
+              '/" class="mt-1 inline-flex w-max rounded-lg bg-white/10 px-3 py-1.5 text-xs font-black text-white hover:bg-white/20">' +
+              (L.viewProduct || "View product") +
+              " →</a>" +
+              "</div>"
+            );
+          })
+          .join('<div class="my-3 h-px bg-white/10"></div>');
       }
 
       function rimSize() {
@@ -511,9 +666,9 @@ const carMakes = [
         });
       });
 
-      [tyreWidth, tyreHeight, tyreRim].forEach((el) => {
-        el?.addEventListener("change", tyreSize);
-      });
+      tyreWidth?.addEventListener("change", refreshHeights);
+      tyreHeight?.addEventListener("change", refreshRims);
+      tyreRim?.addEventListener("change", renderTyreResult);
 
       [rimCarMake, rimCarModel, rimDiameter, rimWidth, rimPcd, rimOffset].forEach((el) => {
         el?.addEventListener("change", rimSize);
@@ -552,7 +707,7 @@ const carMakes = [
         window.open("https://wa.me/" + number + "?text=" + encodeURIComponent(message), "_blank");
       });
 
-      tyreSize();
+      renderTyreResult();
       rimSize();
     });
   </script>
