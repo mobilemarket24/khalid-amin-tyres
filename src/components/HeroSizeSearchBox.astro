@@ -1,5 +1,6 @@
 ﻿---
 import { getTyreSizeIndex } from "../lib/tyreSizes";
+import { TYRE_SIZE_REFERENCE } from "../data/tyreSizeReference";
 
 const isAr = Astro.url.pathname.startsWith("/ar");
 
@@ -67,9 +68,11 @@ const t = isAr
       viewProduct: "View product",
     };
 
-// سایزهای واقعی تایرها از دیتابیس (برای جستجوی آبشاری + موجودی)
-const tyreIndex = await getTyreSizeIndex();
-const tyreDataJson = JSON.stringify(tyreIndex);
+// درخت سایز از جدول مرجع استاندارد (همه‌ی سایزهای واقعی)،
+// موجودی از انبار (getTyreSizeIndex → matches).
+const inventory = await getTyreSizeIndex();
+const tyreTree = TYRE_SIZE_REFERENCE;
+const tyreDataJson = JSON.stringify({ tree: tyreTree, matches: inventory.matches });
 const labelsJson = JSON.stringify({
   notListed: t.notListed,
   inStock: t.inStock,
@@ -82,21 +85,23 @@ const labelsJson = JSON.stringify({
   dubai: t.dubai,
 });
 
-const availWidths = tyreIndex.widths;
+const availWidths = Object.keys(tyreTree)
+  .map(Number)
+  .sort((a, b) => a - b);
 const hasSizes = availWidths.length > 0;
-const defWidth = availWidths[0];
+const defWidth = availWidths.includes(215) ? 215 : availWidths[0];
 const defHeights =
   defWidth != null
-    ? Object.keys(tyreIndex.tree[String(defWidth)] || {})
+    ? Object.keys(tyreTree[defWidth] || {})
         .map(Number)
         .sort((a, b) => a - b)
     : [];
-const defHeight = defHeights[0];
+const defHeight = defHeights.includes(55) ? 55 : defHeights[0];
 const defRims =
   defWidth != null && defHeight != null
-    ? tyreIndex.tree[String(defWidth)]?.[String(defHeight)] || []
+    ? tyreTree[defWidth]?.[defHeight] || []
     : [];
-const defRim = defRims[0];
+const defRim = defRims.includes(17) ? 17 : defRims[0];
 
 const tyreWidths = [
   145, 155, 165, 175, 185, 195, 205, 215, 225, 235, 245, 255, 265, 275, 285,
