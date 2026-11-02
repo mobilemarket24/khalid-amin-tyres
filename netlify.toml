@@ -11,6 +11,14 @@
 [functions]
   directory = "netlify/functions"
 
+# Product slug changes: keep old indexed URLs working (301).
+# A real page always wins over these rules, so a redirect listed here only
+# takes effect once that page's slug changes.
+[[redirects]]
+  from = "/products/bridgestone-dueler-h-t-d684-275-60r20-115h/"
+  to = "/products/bridgestone-dueler-h-t-d684-275-60r20-115h-2025/"
+  status = 301
+
 # Security headers applied to every response.
 [[headers]]
   for = "/*"
