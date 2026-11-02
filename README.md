@@ -62,7 +62,7 @@ from Supabase so it stays fresh without rebuilding:
 
 ## Branches
 
-- **Sharjah** — Industrial Area 4, Sharjah · WhatsApp 050 351 2023
+- **Sharjah** — Industrial Area 4, Sharjah · WhatsApp 050 737 4697
 - **Dubai** — Al Manara St, Al Quoz 1, Dubai · WhatsApp 056 161 5010
 
 Business details live in [`src/data/business.ts`](src/data/business.ts).
