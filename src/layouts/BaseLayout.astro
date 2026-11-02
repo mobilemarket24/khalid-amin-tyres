@@ -476,16 +476,22 @@ const structuredDataGraph = [
     "@type": "AutomotiveBusiness",
     "@id": `${siteUrl}/#sharjah-branch`,
     name: "KHALID AMIN TYRES - Sharjah Branch",
-    url: siteUrl,
+    url: absoluteUrl(business.branches.sharjah.pageUrl),
     image: `${siteUrl}${business.images.exteriorDay}`,
     telephone: "+971507374697",
     priceRange: "$$",
+    hasMap: business.branches.sharjah.mapUrl,
     address: {
       "@type": "PostalAddress",
       streetAddress: business.branches.sharjah.address,
       addressLocality: "Sharjah",
       addressRegion: "Sharjah",
       addressCountry: "AE",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: business.branches.sharjah.geo.lat,
+      longitude: business.branches.sharjah.geo.lng,
     },
     areaServed: {
       "@type": "City",

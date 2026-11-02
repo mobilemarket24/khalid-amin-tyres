@@ -17,6 +17,9 @@ export const business = {
       address: "Industrial Area 4 - Industrial Area - Sharjah",
       hours: "9:00 AM - 11:00 PM",
       mapUrl: "https://maps.app.goo.gl/LERVNcG3KYdUgw736",
+      // Coordinates of the branch's Google Maps listing — used for local SEO geo markup.
+      geo: { lat: 25.3365455, lng: 55.4136217 },
+      pageUrl: "/tyres-sharjah/",
     },
     dubai: {
       label: "Dubai Branch",
