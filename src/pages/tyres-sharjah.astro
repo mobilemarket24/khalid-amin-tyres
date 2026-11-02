@@ -6,6 +6,10 @@ import LeadCaptureSection from "../components/LeadCaptureSection.astro";
 import BranchesSection from "../components/BranchesSection.astro";
 import FAQSection from "../components/FAQSection.astro";
 import FinalCtaSection from "../components/FinalCtaSection.astro";
+import LocalContentSection from "../components/LocalContentSection.astro";
+import { getSharjahContent } from "../data/sharjahContent";
+
+const localContent = getSharjahContent("tyres");
 ---
 
 <BaseLayout
@@ -41,6 +45,8 @@ import FinalCtaSection from "../components/FinalCtaSection.astro";
       subtitle="Browse active tyre options available for Sharjah customers, including tyre size, year, origin, vehicle type and direct WhatsApp pricing."
       emptyText="No active Sharjah tyres are available right now. Please contact us on WhatsApp for current stock."
     />
+
+    {localContent && <LocalContentSection content={localContent} />}
 
     <LeadCaptureSection />
     <BranchesSection />

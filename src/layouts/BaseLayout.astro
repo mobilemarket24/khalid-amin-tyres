@@ -493,11 +493,11 @@ const structuredDataGraph = [
       latitude: business.branches.sharjah.geo.lat,
       longitude: business.branches.sharjah.geo.lng,
     },
-    areaServed: {
-      "@type": "City",
-      name: "Sharjah",
-      addressCountry: "AE",
-    },
+    areaServed: [
+      { "@type": "City", name: "Sharjah", addressCountry: "AE" },
+      { "@type": "City", name: "Ajman", addressCountry: "AE" },
+      { "@type": "City", name: "Dubai", addressCountry: "AE" },
+    ],
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
