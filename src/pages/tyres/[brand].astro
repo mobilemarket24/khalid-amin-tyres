@@ -7,7 +7,9 @@ import BranchesSection from "../../components/BranchesSection.astro";
 import FAQSection from "../../components/FAQSection.astro";
 import FinalCtaSection from "../../components/FinalCtaSection.astro";
 import TyreRimSearchSection from "../../components/TyreRimSearchSection.astro";
+import BrandContentSection from "../../components/BrandContentSection.astro";
 import { getActiveBrands } from "../../lib/brands";
+import { getBrandContent } from "../../data/brandContent";
 
 export async function getStaticPaths() {
   const brands = await getActiveBrands();
@@ -19,8 +21,19 @@ export async function getStaticPaths() {
 
 const { brandName, brandSlug } = Astro.props;
 
-const title = `${brandName} Tyres in Dubai & Sharjah | Khalid Amin Tyres`;
-const description = `Buy ${brandName} tyres in Dubai and Sharjah. Khalid Amin Tyres offers ${brandName} tyres with fitting, balancing and fast WhatsApp pricing across both branches.`;
+// Brands with dedicated copy get unique meta and an editorial section;
+// the rest keep the generic template.
+const brandContent = getBrandContent(brandSlug);
+
+const title =
+  brandContent?.metaTitle ??
+  `${brandName} Tyres in Dubai & Sharjah | Khalid Amin Tyres`;
+const description =
+  brandContent?.metaDescription ??
+  `Buy ${brandName} tyres in Dubai and Sharjah. Khalid Amin Tyres offers ${brandName} tyres with fitting, balancing and fast WhatsApp pricing across both branches.`;
+const heroSubtitle =
+  brandContent?.heroSubtitle ??
+  `Looking for ${brandName} tyres? Get pricing, sizes and availability from Khalid Amin Tyres with fitting and balancing support in Dubai and Sharjah.`;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -29,7 +42,7 @@ const description = `Buy ${brandName} tyres in Dubai and Sharjah. Khalid Amin Ty
       imageKey="tyres_dubai_hero"
       badge={`${brandName} Tyres`}
       title={`${brandName} Tyres in Dubai & Sharjah`}
-      subtitle={`Looking for ${brandName} tyres? Get pricing, sizes and availability from Khalid Amin Tyres with fitting and balancing support in Dubai and Sharjah.`}
+      subtitle={heroSubtitle}
       branch="dubai"
       bullets={[
         `Genuine ${brandName} tyres`,
@@ -49,6 +62,8 @@ const description = `Buy ${brandName} tyres in Dubai and Sharjah. Khalid Amin Ty
       subtitle={`Browse ${brandName} tyre options with size, year, origin and vehicle type, then get today's price on WhatsApp from your nearest branch.`}
       emptyText={`No ${brandName} tyres are listed online right now. Message us on WhatsApp for current ${brandName} stock and pricing.`}
     />
+
+    {brandContent && <BrandContentSection brandName={brandName} content={brandContent} />}
 
     <LeadCaptureSection />
     <BranchesSection />
